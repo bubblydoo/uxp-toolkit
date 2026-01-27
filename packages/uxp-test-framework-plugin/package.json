@@ -1,0 +1,45 @@
+{
+  "name": "@bubblydoo/uxp-test-framework-plugin",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    "./create-vite-config": {
+      "types": "./dist/create-vite-config.d.ts",
+      "import": "./dist/create-vite-config.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsup"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.20",
+    "error-stack-parser": "^2.1.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "source-map-js": "^1.2.1",
+    "vite-plugin-static-copy": "^3.1.6"
+  },
+  "devDependencies": {
+    "@adobe/cc-ext-uxp-types": "https://github.com/justintaylor-dev/cc-ext-uxp-types.git",
+    "@bubblydoo/uxp-test-framework-base": "workspace:*",
+    "@types/node": "^20.8.7",
+    "@types/photoshop": "^25.0.2",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "@types/ws": "^8.5.8",
+    "@vitejs/plugin-react": "^5.1.2",
+    "tailwindcss": "^3",
+    "postcss": "^8",
+    "autoprefixer": "^10",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "npm-run-all": "^4.1.5",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-uxp-plugin": "^1.2.5",
+    "ws": "^8.14.2"
+  }
+}

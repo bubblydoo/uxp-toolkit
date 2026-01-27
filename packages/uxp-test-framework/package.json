@@ -1,0 +1,21 @@
+{
+  "name": "@bubblydoo/uxp-test-framework",
+  "version": "0.0.1",
+  "type": "module",
+  "bin": {
+    "create-uxp-test-plugin": "./src/create-uxp-test-plugin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "arg": "^5.0.2",
+    "vite": "^7.3.1",
+    "@bubblydoo/uxp-test-framework-base": "workspace:*",
+    "@bubblydoo/uxp-test-framework-plugin": "workspace:*"
+  }
+}

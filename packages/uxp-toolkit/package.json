@@ -1,0 +1,32 @@
+{
+  "name": "@bubblydoo/uxp-toolkit",
+  "version": "0.0.1",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test:uxp": "create-uxp-test-plugin --id co.bubblydoo.uxp-toolkit-test-plugin --name 'UXP Toolkit' --tests test/index.ts --fixtures test/fixtures --at-alias src"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@adobe-uxp-types/uxp": "^0.0.9",
+    "@bubblydoo/uxp-test-framework": "workspace:*",
+    "@types/chai": "^5.2.3",
+    "@types/node": "^20.8.7",
+    "@types/photoshop": "^25.0.2",
+    "typescript": "^5.8.3",
+    "zod": "^4.3.6"
+  },
+  "dependencies": {
+    "arg": "^5.0.2",
+    "chai": "^6.2.2"
+  }
+}

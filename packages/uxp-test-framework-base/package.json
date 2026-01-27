@@ -1,0 +1,15 @@
+{
+  "name": "@bubblydoo/uxp-test-framework-base",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "typescript": "^5.9.3"
+  }
+}
