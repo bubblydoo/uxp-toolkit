@@ -1,7 +1,7 @@
 {
   "name": "@bubblydoo/uxp-test-framework-plugin",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "license": "MIT",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
@@ -17,7 +17,9 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["*"],
+  "files": [
+    "*"
+  ],
   "scripts": {
     "build": "tsup"
   },
