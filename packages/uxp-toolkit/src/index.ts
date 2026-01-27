@@ -61,6 +61,7 @@ export {
 export {
   photoshopLayerDescriptorsToTree,
   type UTLayer,
+  type PsTreeNode,
 } from "./ut-tree/photoshopLayerDescriptorsToTree";
 export { type PsLayerData } from "./ut-tree/psLayerData";
 export { type PsLayerRef } from "./ut-tree/psLayerRef";

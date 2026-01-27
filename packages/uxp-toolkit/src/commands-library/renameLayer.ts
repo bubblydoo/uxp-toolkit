@@ -1,5 +1,5 @@
-import { createCommand } from "@/core/command";
-import type { PsLayerRef } from "@/ut-tree/psLayerRef";
+import { createCommand } from "../core/command";
+import type { PsLayerRef } from "../ut-tree/psLayerRef";
 import { z } from "zod";
 
 export function createRenameLayerCommand(layerRef: PsLayerRef, newName: string) {

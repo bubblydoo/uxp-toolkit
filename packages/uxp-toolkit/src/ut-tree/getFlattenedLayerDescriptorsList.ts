@@ -1,7 +1,6 @@
 import { getLayerProperties } from "./getLayerProperties";
-import type { Document } from "photoshop/dom/Document";
 import { z } from "zod";
-import { batchPlayCommands, createCommand } from "@/core/command";
+import { batchPlayCommands, createCommand } from "../core/command";
 
 // export interface LayerDescriptor {
 //   name: string;
@@ -39,9 +38,9 @@ export type LayerDescriptor = z.infer<typeof layerDescriptorSchema> & {
 
 // get all layers (including nested in groups)
 export const getFlattenedLayerDescriptorsList = async (
-  document: Document
+  documentId: number
 ) => {
-  const layerProperties = await getLayerProperties(document);
+  const layerProperties = await getLayerProperties(documentId);
 
   const commands = layerProperties.map((layerProp) =>
     createCommand({
@@ -67,7 +66,7 @@ export const getFlattenedLayerDescriptorsList = async (
   return layerDescriptors.map((desc) => {
     return {
       ...desc,
-      docId: document.id,
+      docId: documentId,
     };
   });
 };

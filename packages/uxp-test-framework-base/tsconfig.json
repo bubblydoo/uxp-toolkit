@@ -1,0 +1,7 @@
+{
+  "extends": "@bubblydoo/tsconfig/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "."
+  },
+  "include": ["src"]
+}

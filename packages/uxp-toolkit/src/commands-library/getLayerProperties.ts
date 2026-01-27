@@ -1,6 +1,6 @@
 import type { Document } from "photoshop/dom/Document";
 import { z } from "zod";
-import { batchPlayCommand, createCommand } from "@/core/command";
+import { batchPlayCommand, createCommand } from "../core/command";
 
 // get layer properties like name and layerID for all layers in the document (by index)
 export const getLayerProperties = async (document: Document) => {

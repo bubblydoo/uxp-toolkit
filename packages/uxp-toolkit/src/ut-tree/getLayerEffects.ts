@@ -1,6 +1,6 @@
 import { type PsLayerData } from "./psLayerData";
 import { type PsLayerRef } from "./psLayerRef";
-import { batchPlayCommand, createCommand } from "@/core/command";
+import { batchPlayCommand, createCommand } from "../core/command";
 import { z } from "zod";
 
 export function createGetLayerEffectsCommand(layerRef: PsLayerRef) {

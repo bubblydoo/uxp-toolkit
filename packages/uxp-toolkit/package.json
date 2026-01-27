@@ -30,17 +30,19 @@
   },
   "dependencies": {
     "error-stack-parser": "^2.1.4",
-    "source-map-js": "^1.2.1"
+    "source-map-js": "^1.2.1",
+    "xmlbuilder2": "^4.0.3"
   },
   "devDependencies": {
     "@adobe-uxp-types/uxp": "^0.0.9",
+    "@bubblydoo/tsconfig": "workspace:*",
     "@bubblydoo/uxp-test-framework": "workspace:*",
     "@types/chai": "^5.2.3",
     "@types/node": "^20.8.7",
     "@types/photoshop": "^25.0.2",
-    "typescript": "^5.8.3",
-    "zod": "^4.3.6",
+    "chai": "^6.2.2",
     "tsup": "^8.5.1",
-    "chai": "^6.2.2"
+    "typescript": "^5.8.3",
+    "zod": "^4.3.6"
   }
 }

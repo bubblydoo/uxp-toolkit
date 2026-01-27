@@ -1,6 +1,6 @@
 import { app } from "photoshop";
 import { storage } from "uxp";
-import { executeAsModal } from "@/core/executeAsModal";
+import { executeAsModal } from "../core/executeAsModal";
 
 export async function openFileByPath(path: string) {
   const fs = (storage as any).localFileSystem;

@@ -1,6 +1,6 @@
-import { executeAsModal } from "@/core/executeAsModal";
-import { openFileByPath } from "@/filesystem/openFileByPath";
-import { getLayerProperties } from "@/ut-tree/getLayerProperties";
+import { executeAsModal } from "../core/executeAsModal";
+import { openFileByPath } from "../filesystem/openFileByPath";
+import { getLayerProperties } from "../ut-tree/getLayerProperties";
 import type { Test } from "@bubblydoo/uxp-test-framework";
 import { expect } from "chai";
 import { app } from "photoshop";

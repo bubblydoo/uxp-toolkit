@@ -1,8 +1,8 @@
 import { type PsLayerData } from "./psLayerData";
-import { type Tree } from "@/general-tree/treeTypes";
-import { batchPlay } from "@/core/batchPlay";
+import { type Tree } from "../general-tree/treeTypes";
+import { batchPlay } from "../core/batchPlay";
 import { type LayerDescriptor } from "./getFlattenedLayerDescriptorsList";
-import { executeAsModal } from "@/core/executeAsModal";
+import { executeAsModal } from "../core/executeAsModal";
 
 type UTLayerKind = "pixel" | "adjustment-layer" | "text" | "curves" | "smartObject" | "video" | "group" | "threeD" | "gradientFill" | "pattern" | "solidColor" | "background";
 
@@ -115,7 +115,7 @@ type PsTreeNodeBuilder = {
   layer: UTLayerBuilder;
 };
 
-type PsTreeNode = {
+export type PsTreeNode = {
   data: PsLayerData;
   layer: UTLayer;
 };

@@ -1,5 +1,5 @@
 import type { Layer as DomLayer } from "photoshop/dom/Layer";
-import type { Tree } from "@/general-tree/treeTypes";
+import type { Tree } from "../general-tree/treeTypes";
 
 // get layers recursively
 export const photoshopDomLayersToTree = (layers: DomLayer[]): Tree<DomLayer> => {

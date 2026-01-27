@@ -1,7 +1,7 @@
 import type { Layer as DomLayer } from "photoshop/dom/Layer";
-import type { UTLayer } from "@/ut-tree/photoshopLayerDescriptorsToTree";
+import type { UTLayer } from "../ut-tree/photoshopLayerDescriptorsToTree";
 import { app } from "photoshop";
-import { getFlattenedDomLayersList } from "@/dom/getFlattenedDomLayersList";
+import { getFlattenedDomLayersList } from "../dom/getFlattenedDomLayersList";
 
 export function utLayerToDomLayer(layer: UTLayer): DomLayer {
   const doc = app.documents.find((d) => d.id === layer.docId);

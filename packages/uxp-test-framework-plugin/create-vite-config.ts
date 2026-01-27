@@ -5,6 +5,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { createRequire } from "module";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import tsconfigPaths from "vite-tsconfig-paths";
 import z from "zod";
 
 const require = createRequire(import.meta.url);
@@ -21,8 +22,9 @@ const resolvedConfigSchema = z.object({
   testsFile: z.string().refine((val) => path.isAbsolute(val), "Path must be absolute"),
   testFixturesDir: z.string().refine((val) => path.isAbsolute(val), "Path must be absolute").optional(),
   vite: z.object({
+    enableTsconfigPathsPlugin: z.boolean().optional().default(false),
     alias: z.record(z.string(), z.string().refine((val) => path.isAbsolute(val), "Path must be absolute")).optional().default({}),
-  }).optional().default({ alias: {} }),
+  }).optional().default({ enableTsconfigPathsPlugin: false, alias: {} }),
 });
 
 type ResolvedConfig = z.infer<typeof resolvedConfigSchema>;
@@ -32,16 +34,18 @@ const nativeModules = ["photoshop", "uxp", "fs", "os", "path", "process", "shell
 export function createViteConfig(opts: ResolvedConfig, mode: "dev" | "build") {
   resolvedConfigSchema.parse(opts);
 
-  const adjustedConfig = createUxpConfig({
+  const uxpConfig = createUxpConfig({
     id: opts.plugin.id,
     name: opts.plugin.name + " - UXP Test Framework Plugin",
     version: "0.0.1",
   });
+
   return defineConfig({
     root,
     plugins: [
-      uxp(adjustedConfig, mode, { disablePolyfills: true }) as any,
+      uxp(uxpConfig, mode, { disablePolyfills: true }) as any,
       react(),
+      ...(opts.vite.enableTsconfigPathsPlugin ? [tsconfigPaths()] : []),
       // copy the test fixtures to the dist directory
       ...(opts.testFixturesDir
         ? [

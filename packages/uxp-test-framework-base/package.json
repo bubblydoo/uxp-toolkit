@@ -33,6 +33,7 @@
     }
   },
   "devDependencies": {
+    "@bubblydoo/tsconfig": "workspace:*",
     "typescript": "^5.9.3",
     "tsup": "^8.5.1"
   }

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { batchPlayCommand, createCommand } from "@/core/command";
+import { batchPlayCommand, createCommand } from "../core/command";
 
 export async function photoshopGetApplicationInfo() {
   return await batchPlayCommand(photoshopApplicationInfoCommand);

@@ -1,6 +1,5 @@
-import type { Document } from "photoshop/dom/Document";
 import { z } from "zod";
-import { batchPlayCommand, createCommand } from "@/core/command";
+import { batchPlayCommand, createCommand } from "../core/command";
 
 export function createGetLayerPropertiesCommand(docId: number) {
   return createCommand({
@@ -26,8 +25,8 @@ export function createGetLayerPropertiesCommand(docId: number) {
 }
 
 // get layer properties like name and layerID for all layers in the document (by index)
-export const getLayerProperties = async (document: Document) => {
-  const command = createGetLayerPropertiesCommand(document.id);
+export const getLayerProperties = async (documentId: number) => {
+  const command = createGetLayerPropertiesCommand(documentId);
 
   const result = await batchPlayCommand(command);
 

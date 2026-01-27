@@ -42,6 +42,11 @@
       "type": "object",
       "description": "Vite build configuration for the test plugin.",
       "properties": {
+        "enableTsconfigPathsPlugin": {
+          "type": "boolean",
+          "description": "Whether to enable the Vite tsconfig paths plugin. Defaults to false.",
+          "default": false
+        },
         "alias": {
           "type": "object",
           "description": "Path aliases for source imports (e.g. {\"@\": \"src\"}). Keys are import aliases, values are paths resolved relative to the project root.",

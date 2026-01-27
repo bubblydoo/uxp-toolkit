@@ -1,0 +1,15 @@
+{
+  "extends": "@bubblydoo/tsconfig/tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "verbatimModuleSyntax": true,
+    "noUncheckedIndexedAccess": true,
+    "rootDir": ".",
+    "jsx": "react-jsx",
+    "typeRoots": ["./node_modules/@adobe-uxp-types", "./node_modules/@types"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}

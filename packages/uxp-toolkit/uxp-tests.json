@@ -8,8 +8,6 @@
     "name": "UXP Toolkit Tests"
   },
   "vite": {
-    "alias": {
-      "@": "src"
-    }
+    "enableTsconfigPathsPlugin": true
   }
 }
