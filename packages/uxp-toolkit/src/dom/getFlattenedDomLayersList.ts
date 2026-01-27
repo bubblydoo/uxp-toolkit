@@ -1,5 +1,5 @@
 import { constants } from "photoshop";
-import { Layer as DomLayer } from "photoshop/dom/Layer";
+import type { Layer as DomLayer } from "photoshop/dom/Layer";
 
 // get all layers (including nested in groups)
 // TODO: I would rename this to getAllDOMLayers to avoid confusion with UXPToolkitLayer

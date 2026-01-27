@@ -135,3 +135,79 @@ const tree = await photoshopLayerDescriptorsToTree(await getFlattenedLayerDescri
 We have a library of commands for common actions in Photoshop.
 
 - `getRenameLayerCommand` to rename layers
+
+### Error sourcemaps
+
+We have a function to parse error sourcemaps, which is very useful for debugging errors in your code.
+
+```ts
+function throwError() {
+  throw new Error("Test error");
+}
+
+try {
+  throwError();
+} catch (error) {
+  //    [{ fileName: "test.ts", lineNumber: 2, columnNumber: 8 }]
+  //    ^
+  const parsedError = await parseUxpErrorSourcemaps(error);
+
+  //    "/Users/you/project/src/test.ts:2:8"
+  //    ^
+  const absolutePath = await getBasicStackFrameAbsoluteFilePath(parsedError[0]);
+
+  await copyToClipboard(absolutePath);
+}
+```
+
+### Testing plugin
+
+We have developed a plugin specifically for testing UXP plugins. It allows you to run tests inside of Photoshop, and see the results in a panel.
+
+<img src="res/screenshot-test-plugin.png" alt="Screenshot of the test plugin" width="400" />
+
+You can run tests using the `create-uxp-test-plugin` command.
+
+`uxp-tests.json`:
+```json
+{
+  "testsFile": "test/index.ts",
+  "testFixturesDir": "test/fixtures",
+  "plugin": {
+    "id": "co.bubblydoo.uxp-toolkit-test-plugin",
+    "name": "UXP Toolkit Tests"
+  }
+}
+```
+
+`test/index.ts`:
+```ts
+import type { Test } from "@bubblydoo/uxp-test-framework";
+import { expect } from "chai";
+import { app } from "photoshop";
+
+const clipboardTest: Test = {
+  name: "should copy and read from clipboard",
+  async run() {
+    await openFileByPath("plugin:/fixtures/one-layer.psd");
+    expect(app.activeDocument.layers[0].name).to.equal("Layer 1");
+    await executeAsModal("Rename Layer", async (ctx) => {
+      await ctx.batchPlayCommand(createRenameLayerCommand(layer.ref, "New Name"));
+    });
+    expect(app.activeDocument.layers[0].name)).to.equal("New Name");
+  },
+};
+
+export const tests: Test[] = [
+  clipboardTest,
+];
+```
+
+Then you can run:
+```bash
+pnpx create-uxp-test-plugin build
+```
+
+And you will get a plugin in the `uxp-tests-plugin` directory, which you can load using UXP Developer Tools, and then you can run the tests inside of Photoshop.
+
+In the future, we'd like to get Vitest to work natively with a UXP runner or pool, but for now, this is a good compromise.

@@ -28,6 +28,10 @@
   "peerDependencies": {
     "zod": "^4.0.0"
   },
+  "dependencies": {
+    "error-stack-parser": "^2.1.4",
+    "source-map-js": "^1.2.1"
+  },
   "devDependencies": {
     "@adobe-uxp-types/uxp": "^0.0.9",
     "@bubblydoo/uxp-test-framework": "workspace:*",

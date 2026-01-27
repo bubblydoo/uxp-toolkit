@@ -4,6 +4,12 @@
   "version": "0.0.1",
   "type": "module",
   "license": "MIT",
+  "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bubblydoo/uxp-toolkit.git"
+  },
+  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-test-framework-plugin",
   "exports": {
     "./create-vite-config": {
       "types": "./dist/create-vite-config.d.ts",
@@ -14,6 +20,9 @@
   "files": ["*"],
   "scripts": {
     "build": "tsup"
+  },
+  "peerDependencies": {
+    "@bubblydoo/uxp-toolkit": "workspace:*"
   },
   "dependencies": {
     "@bubblydoo/uxp-polyfills": "workspace:*",
@@ -26,6 +35,7 @@
   },
   "devDependencies": {
     "@adobe/cc-ext-uxp-types": "https://github.com/justintaylor-dev/cc-ext-uxp-types.git",
+    "@bubblydoo/uxp-toolkit": "workspace:*",
     "@bubblydoo/uxp-test-framework-base": "workspace:*",
     "@types/node": "^20.8.7",
     "@types/photoshop": "^25.0.2",

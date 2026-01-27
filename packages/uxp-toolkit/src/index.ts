@@ -67,3 +67,6 @@ export { type PsLayerRef } from "./ut-tree/psLayerRef";
 
 // Util
 export { utLayerToDomLayer, utLayersToDomLayers } from "./util/utLayerToLayer";
+
+// Error sourcemaps
+export { parseUxpErrorSourcemaps, getBasicStackFrameAbsoluteFilePath, type BasicStackFrame } from "./error-sourcemaps/sourcemaps";

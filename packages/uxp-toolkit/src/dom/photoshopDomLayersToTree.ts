@@ -1,4 +1,4 @@
-import { Layer as DomLayer } from "photoshop/dom/Layer";
+import type { Layer as DomLayer } from "photoshop/dom/Layer";
 import type { Tree } from "@/general-tree/treeTypes";
 
 // get layers recursively

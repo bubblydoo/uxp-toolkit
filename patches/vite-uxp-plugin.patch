@@ -1,0 +1,70 @@
+diff --git a/lib/index.d.ts b/lib/index.d.ts
+index 96b91c7de3fa519e891c350da725683a66334171..35d3c91b3f26f41f093c36637783ce5143c54138 100644
+--- a/lib/index.d.ts
++++ b/lib/index.d.ts
+@@ -2,5 +2,5 @@ import type { Plugin } from "vite";
+ import type { UXP_Config, UXP_Manifest } from "./types";
+ export type { UXP_Config, UXP_Manifest };
+ export declare const uxpSetup: (config: UXP_Config, mode?: string) => void;
+-export declare const uxp: (config: UXP_Config, mode?: string) => Plugin;
++export declare const uxp: (config: UXP_Config, mode?: string, opts?: { disablePolyfills?: boolean }) => Plugin;
+ export declare const runAction: (config: UXP_Config, action: string) => never;
+diff --git a/lib/index.js b/lib/index.js
+index c661b5e64762b1fff2d13e62f44e879e45873740..6d19b0cedfcbaaf833e0b7fb4c507b7e5fe4c51c 100644
+--- a/lib/index.js
++++ b/lib/index.js
+@@ -120,7 +120,7 @@ const generateManifest = (config) => {
+         fileName: "manifest.json",
+     };
+ };
+-const uxp = (config, mode) => {
++const uxp = (config, mode, { disablePolyfills = false }) => {
+     return {
+         name: "vite-uxp-plugin",
+         //* We can't delete exisitng binaries yet because they're actively being read by UXP dev tool
+@@ -170,17 +170,19 @@ const uxp = (config, mode) => {
+             return html.replace('<script type="module" crossorigin', "<script");
+         },
+         generateBundle(output, bundle) {
+-            Object.keys(bundle)
+-                .filter((file) => file.indexOf(".js") > 0)
+-                .map((file) => {
+-                const current = bundle[file];
+-                current.code = polyfill_1.polyfills + "\n" + current.code;
+-                console.log("file", file);
+-                if (mode === "dev" && file.indexOf("index") > 0) {
+-                    // Add WS Snippet
+-                    current.code = (0, polyfill_1.wsListener)(config) + "\n" + current.code;
+-                }
+-            });
++            if (!disablePolyfills) {
++                Object.keys(bundle)
++                    .filter((file) => file.indexOf(".js") > 0)
++                    .map((file) => {
++                    const current = bundle[file];
++                    current.code = polyfill_1.polyfills + "\n" + current.code;
++                    console.log("file", file);
++                    if (mode === "dev" && file.indexOf("index") > 0) {
++                        // Add WS Snippet
++                        current.code = (0, polyfill_1.wsListener)(config) + "\n" + current.code;
++                    }
++                });
++            }
+             //@ts-ignore
+             this.emitFile(generateManifest(config));
+             (0, hot_reload_1.wsUpdate)(config.manifest.id);
+diff --git a/lib/types.d.ts b/lib/types.d.ts
+index 39ae00bba9cba993a38228422a6a331ba2d5dbed..00f69ea88538b2a59260b4cf73afaf77633a6a50 100644
+--- a/lib/types.d.ts
++++ b/lib/types.d.ts
+@@ -90,8 +90,8 @@ export type UXP_Manifest = {
+ export type UXP_Config = {
+     manifest: UXP_Manifest;
+     hotReloadPort: number;
+-    webviewUi: boolean;
+-    webviewReloadPort: number;
++    webviewUi?: boolean;
++    webviewReloadPort?: number;
+     copyZipAssets: string[];
+     uniqueIds?: boolean;
+ };

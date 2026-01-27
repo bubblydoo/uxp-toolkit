@@ -1,4 +1,4 @@
-import { Tree } from "./treeTypes";
+import type { Tree } from "./treeTypes";
 
 export function mapTreeRef<TRef, TMappedRef>(tree: Tree<TRef>, mapFn: (node: TRef) => TMappedRef): Tree<TMappedRef> {
   return tree.map((node) => {

@@ -2,6 +2,13 @@
   "name": "@bubblydoo/uxp-test-framework-base",
   "version": "0.0.1",
   "type": "module",
+  "license": "MIT",
+  "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bubblydoo/uxp-toolkit.git"
+  },
+  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-test-framework-base",
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --outDir dist"
   },

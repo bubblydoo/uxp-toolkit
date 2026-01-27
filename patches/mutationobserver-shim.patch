@@ -1,0 +1,16 @@
+diff --git a/MutationObserver.js b/MutationObserver.js
+index 6ac986b2728dea2a736d37cd3d132ba69e404a72..5c798f16f7c34a34542259cf02974a8245d2d90f 100644
+--- a/MutationObserver.js
++++ b/MutationObserver.js
+@@ -215,7 +215,7 @@ if (!window.MutationObserver) {
+         // element.attributes.style to always be null.
+         var hasAttributeBug = document.createElement("i");
+         hasAttributeBug.style.top = 0;
+-        hasAttributeBug = hasAttributeBug.attributes.style.value != "null";
++        hasAttributeBug = hasAttributeBug.attributes.style?.value != "null";
+ 
+         /**
+          * Gets an attribute value in an environment without attribute bug
+diff --git a/dist/README.md b/dist/README.md
+deleted file mode 100644
+index a3e83b26767be384c66bd8fc1a00593390bc4082..0000000000000000000000000000000000000000

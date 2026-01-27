@@ -54,15 +54,9 @@ const resolvedConfig = {
   },
 }
 
-if (action === 'build') {
-  const viteConfig = createViteConfig(resolvedConfig, 'build');
-  await build(viteConfig);
-} else if (action === 'dev') {
-  const viteConfig = createViteConfig(resolvedConfig, 'dev');
-  const server = await createServer(viteConfig);
-  await server.listen();
-  server.bindCLIShortcuts({ print: true });
-}
+const viteConfig = createViteConfig(resolvedConfig, action);
+
+await build(viteConfig);
 
 async function fileExists(path) {
   try {

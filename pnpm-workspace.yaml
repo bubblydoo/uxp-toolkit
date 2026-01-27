@@ -1,2 +1,6 @@
 packages:
-  - 'packages/*'
+  - packages/*
+
+patchedDependencies:
+  mutationobserver-shim: patches/mutationobserver-shim.patch
+  vite-uxp-plugin: patches/vite-uxp-plugin.patch

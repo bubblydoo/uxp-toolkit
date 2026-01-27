@@ -2,6 +2,8 @@
   "name": "@bubblydoo/uxp-test-framework",
   "version": "0.0.1",
   "type": "module",
+  "license": "MIT",
+  "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
   "bin": {
     "create-uxp-test-plugin": "./bin/create-uxp-test-plugin.js"
   },

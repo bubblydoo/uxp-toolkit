@@ -1,4 +1,4 @@
-import { Tree } from "./treeTypes";
+import type { Tree } from "./treeTypes";
 
 export function flattenTree<T>(tree: Tree<T>): Tree<T>[0][] {
   const result: Tree<T>[0][] = [];

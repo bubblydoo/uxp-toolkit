@@ -1,9 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import ErrorStackParser from "error-stack-parser";
-import React, { useMemo } from "react";
-import { SourceMapConsumer } from "source-map-js";
-import { storage } from "uxp";
-import { pathResolve } from "../lib/resolvePath";
+import { BasicStackFrame, copyToClipboard, getBasicStackFrameAbsoluteFilePath, parseUxpErrorSourcemaps } from "@bubblydoo/uxp-toolkit";
 
 declare const __UNSOURCEMAPPED_HEADER_LINES__: number;
 
@@ -12,98 +8,19 @@ const UNSOURCEMAPPED_HEADER_LINES =
     ? __UNSOURCEMAPPED_HEADER_LINES__
     : 0;
 
-type BasicStackFrame = Pick<
-  ErrorStackParser.StackFrame,
-  "functionName" | "fileName" | "lineNumber" | "columnNumber"
->;
-
 export function ErrorView({ error }: { error: Error }) {
-  const parsedError: BasicStackFrame[] | "CANNOT_PARSE_ERROR" = useMemo(() => {
-    try {
-      const frames = ErrorStackParser.parse(error);
-      return frames.map((frame) => {
-        return {
-          functionName: frame.functionName,
-          fileName: frame.fileName,
-          lineNumber: frame.lineNumber,
-          columnNumber: frame.columnNumber,
-        };
-      });
-    } catch (e) {
-      return "CANNOT_PARSE_ERROR";
-    }
-  }, [error]);
-
   const sourcemappedError = useQuery({
-    queryKey: ["sourcemappedError", parsedError],
+    queryKey: ["sourcemappedError", error],
     queryFn: async () => {
-      if (parsedError === "CANNOT_PARSE_ERROR") {
-        throw new Error("Cannot parse error");
-      }
-
-      const loadedFilesCache: Record<string, storage.File> = {};
-
-      const fs = (storage as any).localFileSystem;
-      const parsedMappedError: BasicStackFrame[] = [];
-      for (const frame of parsedError) {
-        if (!frame.fileName || !frame.lineNumber || !frame.columnNumber) {
-          parsedMappedError.push(frame);
-          continue;
-        }
-        const entryPath = "plugin:" + frame.fileName;
-        const file =
-          loadedFilesCache[entryPath] ??
-          ((await fs.getEntryWithUrl(entryPath)) as storage.File);
-        loadedFilesCache[entryPath] = file;
-        if (!file.isFile) {
-          parsedMappedError.push(frame);
-          continue;
-        }
-        const sourcemapFileEntryPath = entryPath + ".map";
-        const sourcemapFile =
-          loadedFilesCache[sourcemapFileEntryPath] ??
-          ((await fs.getEntryWithUrl(sourcemapFileEntryPath)) as storage.File);
-        loadedFilesCache[sourcemapFileEntryPath] = sourcemapFile;
-        if (!sourcemapFile.isFile) {
-          parsedMappedError.push(frame);
-          continue;
-        }
-        const sourcemapContents = (await sourcemapFile.read({})) as string;
-        const sourcemap = JSON.parse(sourcemapContents);
-        const smc = new SourceMapConsumer(sourcemap);
-        const mappedFrame = smc.originalPositionFor({
-          line: frame.lineNumber - UNSOURCEMAPPED_HEADER_LINES,
-          column: frame.columnNumber,
-        });
-        if (mappedFrame.source && mappedFrame.line && mappedFrame.column) {
-          parsedMappedError.push({
-            ...frame,
-            fileName: mappedFrame.source,
-            lineNumber: mappedFrame.line,
-            columnNumber: mappedFrame.column,
-          } as ErrorStackParser.StackFrame);
-        } else {
-          parsedMappedError.push(frame);
-        }
-      }
-      return parsedMappedError;
+      return await parseUxpErrorSourcemaps(error, {
+        unsourcemappedHeaderLines: UNSOURCEMAPPED_HEADER_LINES,
+      });
     },
-    enabled: !!parsedError.length,
   });
 
   const copyMutation = useMutation({
     mutationFn: async (frame: BasicStackFrame) => {
-      const pluginFolder = await (
-        storage as any
-      ).localFileSystem.getPluginFolder();
-      const absoluteFileName = pathResolve(
-        pluginFolder.nativePath,
-        "index.js",
-        frame.fileName!,
-      ).replace(/^plugin:/, "");
-      await navigator.clipboard.writeText(
-        `${absoluteFileName}:${frame.lineNumber}:${frame.columnNumber}`
-      );
+      await copyToClipboard(await getBasicStackFrameAbsoluteFilePath(frame));
     },
   });
 

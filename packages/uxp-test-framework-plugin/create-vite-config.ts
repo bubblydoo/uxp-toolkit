@@ -40,7 +40,7 @@ export function createViteConfig(opts: ResolvedConfig, mode: "dev" | "build") {
   return defineConfig({
     root,
     plugins: [
-      uxp(adjustedConfig, mode === "dev" ? "dev" : "build") as any,
+      uxp(adjustedConfig, mode, { disablePolyfills: true }) as any,
       react(),
       // copy the test fixtures to the dist directory
       ...(opts.testFixturesDir
@@ -65,6 +65,7 @@ export function createViteConfig(opts: ResolvedConfig, mode: "dev" | "build") {
     build: {
       sourcemap: true,
       outDir: opts.outDir,
+      watch: mode === 'dev' ? {} : undefined,
       minify: false,
       emptyOutDir: true,
       rollupOptions: {

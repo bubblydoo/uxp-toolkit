@@ -1,5 +1,4 @@
-import { batchPlay } from "@/core/batchPlay";
-import { Document } from "photoshop/dom/Document";
+import type { Document } from "photoshop/dom/Document";
 import { z } from "zod";
 import { batchPlayCommand, createCommand } from "@/core/command";
 

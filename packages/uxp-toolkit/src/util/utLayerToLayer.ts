@@ -1,5 +1,5 @@
-import { Layer as DomLayer } from "photoshop/dom/Layer";
-import { type UTLayer } from "@/ut-tree/photoshopLayerDescriptorsToTree";
+import type { Layer as DomLayer } from "photoshop/dom/Layer";
+import type { UTLayer } from "@/ut-tree/photoshopLayerDescriptorsToTree";
 import { app } from "photoshop";
 import { getFlattenedDomLayersList } from "@/dom/getFlattenedDomLayersList";
 
