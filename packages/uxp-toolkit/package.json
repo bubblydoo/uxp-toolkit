@@ -4,7 +4,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "test:uxp": "create-uxp-test-plugin --id co.bubblydoo.uxp-toolkit-test-plugin --name 'UXP Toolkit' --tests test/index.ts --fixtures test/fixtures --at-alias src"
+    "test:uxp": "create-uxp-test-plugin -c uxp-tests.json"
   },
   "exports": {
     ".": {

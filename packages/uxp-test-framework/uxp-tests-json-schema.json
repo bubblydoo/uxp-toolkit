@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bubblydoo.co/schemas/uxp-tests.json",
+  "title": "UXP Tests Configuration",
+  "description": "Configuration for the UXP test framework plugin. Used when building a UXP plugin that runs tests via create-uxp-test-plugin.",
+  "type": "object",
+  "required": ["testsFile", "plugin"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "The schema URL for the configuration file."
+    },
+    "outDir": {
+      "type": "string",
+      "description": "Path to the output directory for the UXP test plugin. Resolved relative to the project root. Defaults to 'uxp-tests-plugin'."
+    },
+    "testsFile": {
+      "type": "string",
+      "description": "Path to the main test entry file (e.g. test/index.ts). Resolved relative to the project root. Exposed as the TESTS alias in the build."
+    },
+    "testFixturesDir": {
+      "type": "string",
+      "description": "Optional path to a directory of test fixtures (e.g. test/fixtures). Contents are copied into the plugin output. Omit if no fixtures are used."
+    },
+    "plugin": {
+      "type": "object",
+      "description": "Plugin manifest details for the UXP test plugin.",
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Plugin identifier (e.g. co.bubblydoo.uxp-toolkit-test-plugin). Used as the plugin ID in the UXP manifest."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable plugin name. Shown in the UXP manifest and appended with ' - UXP Test Framework Plugin' when building."
+        }
+      },
+      "additionalProperties": false
+    },
+    "vite": {
+      "type": "object",
+      "description": "Vite build configuration for the test plugin.",
+      "properties": {
+        "alias": {
+          "type": "object",
+          "description": "Path aliases for source imports (e.g. {\"@\": \"src\"}). Keys are import aliases, values are paths resolved relative to the project root.",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

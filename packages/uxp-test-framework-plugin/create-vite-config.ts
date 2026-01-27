@@ -1,10 +1,11 @@
 import { uxp } from "vite-uxp-plugin";
-import { config } from "./uxp.config";
+import { createUxpConfig } from "./uxp.config";
 import path from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { createRequire } from "module";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import z from "zod";
 
 const require = createRequire(import.meta.url);
 const pkg =
@@ -13,23 +14,29 @@ const root = path.dirname(pkg);
 
 const mode = "dev";
 
-export function createViteConfig(opts: {
-  id: string;
-  name: string;
-  outDir?: string;
-  testsFile: string;
-  testFixturesDir?: string;
-  atAlias?: string;
-}) {
-  const adjustedManifest = {
-    ...config.manifest,
-    id: opts.id,
-    name: opts.name + " - UXP Test Framework Plugin",
-  };
-  const adjustedConfig = {
-    ...config,
-    manifest: adjustedManifest,
-  };
+const resolvedConfigSchema = z.object({
+  plugin: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  outDir: z.string().refine((val) => path.isAbsolute(val), "Path must be absolute"),
+  testsFile: z.string().refine((val) => path.isAbsolute(val), "Path must be absolute"),
+  testFixturesDir: z.string().refine((val) => path.isAbsolute(val), "Path must be absolute").optional(),
+  vite: z.object({
+    alias: z.record(z.string(), z.string().refine((val) => path.isAbsolute(val), "Path must be absolute")).optional().default({}),
+  }).optional().default({ alias: {} }),
+});
+
+type ResolvedConfig = z.infer<typeof resolvedConfigSchema>;
+
+export function createViteConfig(opts: ResolvedConfig) {
+  resolvedConfigSchema.parse(opts);
+
+  const adjustedConfig = createUxpConfig({
+    id: opts.plugin.id,
+    name: opts.plugin.name + " - UXP Test Framework Plugin",
+    version: "0.0.1",
+  });
   return defineConfig({
     root,
     plugins: [
@@ -51,8 +58,8 @@ export function createViteConfig(opts: {
     ],
     resolve: {
       alias: {
+        ...opts.vite.alias,
         TESTS: opts.testsFile,
-        ...(opts.atAlias ? { "@": opts.atAlias } : {}),
       },
     },
     build: {
@@ -66,6 +73,7 @@ export function createViteConfig(opts: {
           format: "cjs",
         },
       },
+      watch: {},
     },
     publicDir: "public",
   });

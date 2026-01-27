@@ -7,6 +7,5 @@ export const applicationInfoTest: Test = {
   async run() {
     const info = await photoshopGetApplicationInfo();
     expect(info.hostName).to.include("Adobe Photoshop");
-    console.log(info);
   },
 }

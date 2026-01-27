@@ -186,9 +186,9 @@ function TestView({ tests }: { tests: Test[] }) {
       >
         Run All Tests
       </button>
-      {tests.map((test) => {
+      {tests.map((test, i) => {
         if (!test) return;
-        return <OneTest test={test} />;
+        return <OneTest test={test} key={i} />;
       })}
     </div>
   );

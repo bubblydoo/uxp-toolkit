@@ -1,0 +1,17 @@
+{
+  "name": "@bubblydoo/uxp-polyfills",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "mutationobserver-shim": "^0.3.7",
+    "matchmedia-polyfill": "^0.3.2",
+    "@perf-tools/performance": "^1.1.1"
+  }
+}

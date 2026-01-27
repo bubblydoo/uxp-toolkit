@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/@bubblydoo/uxp-test-framework/uxp-tests-json-schema.json",
+  "outDir": "uxp-tests-plugin",
+  "testsFile": "test/index.ts",
+  "testFixturesDir": "test/fixtures",
+  "plugin": {
+    "id": "co.bubblydoo.uxp-toolkit-test-plugin",
+    "name": "UXP Toolkit Tests"
+  },
+  "vite": {
+    "alias": {
+      "@": "src"
+    }
+  }
+}
