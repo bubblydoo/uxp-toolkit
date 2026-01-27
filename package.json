@@ -2,5 +2,14 @@
   "name": "@bubblydoo/uxp-toolkit-repo",
   "version": "0.0.0",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
-  "private": true
+  "private": true,
+  "packageManager": "pnpm@10.21.0",
+  "scripts": {
+    "build": "turbo run build",
+    "ci:publish": "pnpm publish -r"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.8",
+    "turbo": "^2.3.3"
+  }
 }

@@ -1,0 +1,12 @@
+{
+  "extends": "@bubblydoo/tsconfig/tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "rootDir": ".",
+  },
+  "include": ["src"]
+}

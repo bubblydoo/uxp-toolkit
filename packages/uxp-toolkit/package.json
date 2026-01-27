@@ -4,7 +4,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --outDir dist",
+    "build": "tsup",
     "uxp-tests:build": "create-uxp-test-plugin build",
     "uxp-tests:dev": "create-uxp-test-plugin dev"
   },

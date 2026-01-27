@@ -1,1 +1,4 @@
 .gitignore
+tsconfig.json
+turbo.json
+.DS_Store
