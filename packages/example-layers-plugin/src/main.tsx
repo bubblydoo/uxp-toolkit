@@ -30,6 +30,7 @@ import {
   Folder,
 } from "lucide-react";
 import { app } from "photoshop";
+import type { Document } from "photoshop/dom/Document";
 import { Fragment, useMemo, useState } from "react";
 import { z } from "zod";
 import { cn } from "./lib/cn";
@@ -37,9 +38,17 @@ import { cn } from "./lib/cn";
 export function App() {
   return (
     <QueryClientProvider>
-      <LayersPanel />
+      <Router />
     </QueryClientProvider>
   );
+}
+
+function Router() {
+  const activeDocument = useActiveDocument();
+
+  if (!activeDocument) return <div>No active document</div>;
+
+  return <LayersPanel document={activeDocument} />;
 }
 
 function QueryClientProvider({ children }: { children: React.ReactNode }) {
@@ -57,10 +66,9 @@ type NodeWithExtraData = {
   isClipped: boolean;
 };
 
-function LayersPanel() {
-  const activeDocument = useActiveDocument();
+function LayersPanel({ document }: { document: Document }) {
   const queryClient = useQueryClient();
-  const activeDocumentId = activeDocument.id;
+  const activeDocumentId = document.id;
 
   const layersQuery = useQuery({
     queryKey: ["layers", activeDocumentId],
@@ -99,8 +107,8 @@ function LayersPanel() {
 
   const activeLayerRefsQuery = useQuery({
     queryKey: ["activeLayers", activeDocumentId],
-    queryFn: async () => {
-      // return await getActiveLayers(activeDocumentId);
+    queryFn: async (): Promise<PsLayerRef[]> => {
+      // return [];
       const doc = app.documents.find((d) => d.id === activeDocumentId);
       if (!doc)
         throw new Error(`Document with id ${activeDocumentId} not found`);
@@ -111,7 +119,7 @@ function LayersPanel() {
     },
   });
 
-  useOnDocumentEdited(activeDocument, () => {
+  useOnDocumentEdited(document, () => {
     queryClient.invalidateQueries({ queryKey: ["layers", activeDocumentId] });
     queryClient.invalidateQueries({
       queryKey: ["activeLayers", activeDocumentId],

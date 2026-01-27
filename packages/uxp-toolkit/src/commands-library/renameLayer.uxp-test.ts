@@ -7,7 +7,7 @@ import { app } from "photoshop";
 import { createRenameLayerCommand } from "./renameLayer";
 
 async function getFirstLayer() {
-  const allLayers = await getLayerProperties(app.activeDocument);
+  const allLayers = await getLayerProperties(app.activeDocument.id);
   return {
     ref: {
       id: allLayers[0]!.layerID,

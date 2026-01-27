@@ -1,7 +1,7 @@
 import { action, app } from "photoshop";
 import { useEventListenerSkippable } from "./useEventListenerSkippable";
 import { useIsAnyPluginPanelVisible } from "./useIsPluginVisible";
-import { Document } from "photoshop/dom/Document";
+import type { Document } from "photoshop/dom/Document";
 
 export function useOnEvent(
   document: Document,

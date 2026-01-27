@@ -1,5 +1,5 @@
 import { action, app } from "photoshop";
-import { Document } from "photoshop/dom/Document";
+import type { Document } from "photoshop/dom/Document";
 import { useEventListenerSkippable } from "./useEventListenerSkippable";
 import { useIsAnyPluginPanelVisible } from "./useIsPluginVisible";
 

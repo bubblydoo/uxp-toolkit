@@ -6,6 +6,7 @@ import { suspendHistoryTest } from "../src/core/suspendHistory.uxp-test";
 import { sourcemapsTest } from "../src/error-sourcemaps/sourcemaps.uxp-test";
 import { clipboardTest } from "../src/other/clipboard.uxp-test";
 import { photoshopLayerDescriptorsToUTLayersTest } from "../src/ut-tree/photoshopLayerDescriptorsToUTLayers.uxp-test";
+import { metadataStorageTest } from "../src/metadata-storage/metadataStorage.uxp-test";
 
 export const tests = [
   applicationInfoTest,
@@ -16,4 +17,5 @@ export const tests = [
   sourcemapsTest,
   clipboardTest,
   photoshopLayerDescriptorsToUTLayersTest,
+  metadataStorageTest,
 ];

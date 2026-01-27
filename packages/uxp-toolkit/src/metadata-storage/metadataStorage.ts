@@ -1,5 +1,5 @@
 import { convert } from "xmlbuilder2";
-import { Document } from "photoshop/dom/Document";
+import type { Document } from "photoshop/dom/Document";
 import { batchPlayCommand, createCommand, executeAsModal } from "@bubblydoo/uxp-toolkit";
 import { z } from "zod";
 

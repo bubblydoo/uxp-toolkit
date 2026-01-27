@@ -1,6 +1,6 @@
 import { action, app } from "photoshop";
 import { useSyncExternalStore } from "react";
-import { Document } from "photoshop/dom/Document";
+import type { Document } from "photoshop/dom/Document";
 import { useIsAnyPluginPanelVisible } from "./useIsPluginVisible";
 import { useEventListenerSkippable } from "./useEventListenerSkippable";
 
@@ -51,7 +51,7 @@ const activeDocumentExternalStore = {
       action.removeNotificationListener(DOCUMENT_CHANGE_EVENTS, fn);
     };
   },
-  getSnapshot: () => app.activeDocument,
+  getSnapshot: (): Document | null => app.activeDocument,
 };
 
 export function useActiveDocument() {
