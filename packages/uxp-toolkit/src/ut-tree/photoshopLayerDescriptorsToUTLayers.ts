@@ -1,8 +1,6 @@
-import { type PsLayerData } from "./psLayerData";
-import { type Tree } from "../general-tree/treeTypes";
-import { batchPlay } from "../core/batchPlay";
 import { type LayerDescriptor } from "./getFlattenedLayerDescriptorsList";
 import { executeAsModal } from "../core/executeAsModal";
+import { createGetLayerCommand } from "./getLayerEffects";
 
 type UTLayerKind = "pixel" | "adjustment-layer" | "text" | "curves" | "smartObject" | "video" | "group" | "threeD" | "gradientFill" | "pattern" | "solidColor" | "background";
 
@@ -15,8 +13,9 @@ type UTLayerBuilder = {
   visible: boolean;
   kind: UTLayerKind;
   blendMode: UTBlendMode;
-  layers?: UTLayerBuilder[];
+  effects: Record<string, boolean>;
   isClippingMask: boolean;
+  layers?: UTLayerBuilder[];
 };
 
 export type UTLayer = Readonly<Omit<UTLayerBuilder, "layers">> & {
@@ -110,52 +109,30 @@ const determineLayerSection = (layer: LayerDescriptor): string => {
   return isGroupStart ? "start" : isGroupEnd ? "end" : "normal";
 };
 
-type PsTreeNodeBuilder = {
-  data: PsLayerData;
-  layer: UTLayerBuilder;
-};
-
-export type PsTreeNode = {
-  data: PsLayerData;
-  layer: UTLayer;
-};
-
 // Generate a tree from a flat list of layer descriptors
-export const photoshopLayerDescriptorsToTree = async (layers: LayerDescriptor[]): Promise<Tree<PsTreeNode>> => {
-  const root: Tree<PsTreeNodeBuilder> = [];
+export const photoshopLayerDescriptorsToUTLayers = async (layers: LayerDescriptor[]): Promise<UTLayer[]> => {
+  const root: UTLayerBuilder[] = [];
   const stack: {
-    nodes: Tree<PsTreeNodeBuilder>;
-  }[] = [{ nodes: root }];
+    layers: UTLayerBuilder[];
+  }[] = [{ layers: root }];
 
   // 1. Prepare a single batch request for all layers
-  const descriptors = layers.map((layer) => ({
-    _obj: "get",
-    _target: [
-      { _ref: "layer", _id: layer.layerID },
-      { _ref: "document", _id: layer.docId },
-    ],
-    _options: {
-      dialogOptions: "dontDisplay",
-    },
-  }));
+  const commands = layers.map((layer) => createGetLayerCommand({ docId: layer.docId, id: layer.layerID }));
 
   // 2. Execute one batch command instead of N commands
-  const batchResults = await executeAsModal("Get Layer Effects Data", async () => {
-    return await batchPlay(descriptors, {
-      synchronousExecution: true,
-      modalBehavior: "fail",
-    });
+  const batchResults = await executeAsModal("Get Layer Effects Data", async (ctx) => {
+    return await ctx.batchPlayCommands(commands);
   });
 
   // 3. Create a fast lookup map for the results
-  const effectsMap = new Map<number, PsLayerData["effects"]>();
+  const effectsMap = new Map<number, UTLayerBuilder["effects"]>();
   batchResults.forEach((result, index) => {
     const layerId = layers[index]!.layerID;
     const data = result.layerEffects;
-    const effects: PsLayerData["effects"] = {};
+    const effects: UTLayerBuilder["effects"] = {};
     if (data) {
       for (const effect in data) {
-        if (effect !== "scale") effects[effect] = data[effect].enabled;
+        effects[effect] = Array.isArray(data[effect]) ? data[effect].some((e) => e.enabled) : !!data[effect]?.enabled;
       }
     }
     effectsMap.set(layerId, effects);
@@ -165,7 +142,7 @@ export const photoshopLayerDescriptorsToTree = async (layers: LayerDescriptor[])
     // Determine if the layer is a group start or end
     const sectionType = determineLayerSection(layer);
 
-    const isClippingMask = batchResults.find((res, index) => {
+    const isClippingMask = !!batchResults.find((res, index) => {
       return layer.layerID === res.layerID;
     })?.group;
 
@@ -177,43 +154,29 @@ export const photoshopLayerDescriptorsToTree = async (layers: LayerDescriptor[])
       continue;
     }
     // Create the node
-    const node: Tree<PsTreeNodeBuilder>[number] = {
-      ref: {
-        layer: {
-          name: layer.name,
-          docId: layer.docId,
-          id: layer.layerID,
-          visible: layer.visible,
-          kind: getLayerKind(layer),
-          blendMode: getBlendMode(layer),
-          isClippingMask,
-        },
-        data: {
-          // add clipping (isClippingMask) for adjustment layers
-          type:
-            getLayerKind(layer) === "adjustment-layer" // This is messy
-              ? "adjustment-layer"
-              : (getLayerKind(layer) as any) || "pixel",
-          blendMode: getBlendMode(layer),
-          effects: effectsMap.get(layer.layerID) || {},
-        },
-      },
+    const node: UTLayerBuilder = {
       name: layer.name,
+      docId: layer.docId,
+      id: layer.layerID,
+      visible: layer.visible,
+      kind: getLayerKind(layer),
+      blendMode: getBlendMode(layer),
+      isClippingMask,
+      effects: effectsMap.get(layer.layerID) || {},
     };
 
     // Add the node to the current level
     const current = stack[stack.length - 1];
-    current!.nodes.push(node);
+    current!.layers.push(node);
 
     // Handle group start
     if (sectionType === "start") {
-      node.children = [];
-      node.ref.layer.layers = [];
+      node.layers = [];
       // Push children array to stack to process content
-      stack.push({ nodes: node.children });
+      stack.push({ layers: node.layers });
     }
   }
 
   // Cast to the readonly Tree type
-  return root as Tree<PsTreeNode>;
+  return root as UTLayer[];
 };

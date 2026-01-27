@@ -3,8 +3,9 @@ import {
   executeAsModal,
   flattenTree,
   getFlattenedLayerDescriptorsList,
-  photoshopLayerDescriptorsToTree,
+  photoshopLayerDescriptorsToUTLayers,
   type PsLayerRef,
+  type UTLayer,
   type PsTreeNode,
   type Tree,
 } from "@bubblydoo/uxp-toolkit";
@@ -19,7 +20,14 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ChevronDown, Eye, EyeOff, Folder } from "lucide-react";
+import {
+  ChevronDown,
+  CornerLeftDown,
+  Eye,
+  EyeOff,
+  FlowerIcon,
+  Folder,
+} from "lucide-react";
 import { app } from "photoshop";
 import { Fragment, useState } from "react";
 import { z } from "zod";
@@ -51,7 +59,7 @@ function LayersPanel() {
   const layersQuery = useQuery({
     queryKey: ["layers", activeDocumentId],
     queryFn: async () => {
-      const tree = await photoshopLayerDescriptorsToTree(
+      const tree = await photoshopLayerDescriptorsToUTLayers(
         await getFlattenedLayerDescriptorsList(activeDocumentId),
       );
 
@@ -85,13 +93,7 @@ function createSetLayerVisibilityCommand(
   });
 }
 
-function TreeNode({
-  tree,
-  depth = 0,
-}: {
-  tree: Tree<PsTreeNode>;
-  depth?: number;
-}) {
+function TreeNode({ tree, depth = 0 }: { tree: UTLayer[]; depth?: number }) {
   const queryClient = useQueryClient();
 
   const changeLayerVisibilityMutation = useMutation({
@@ -121,15 +123,15 @@ function TreeNode({
               onClick={() =>
                 changeLayerVisibilityMutation.mutate({
                   layerRef: {
-                    id: node.ref.layer.id,
-                    docId: node.ref.layer.docId,
+                    id: node.id,
+                    docId: node.docId,
                   },
-                  visible: !node.ref.layer.visible,
+                  visible: !node.visible,
                 })
               }
             >
               <ButtonDiv className="text-white">
-                {node.ref.layer.visible ? (
+                {node.visible ? (
                   <Eye
                     size={14}
                     style={{ fill: "transparent", stroke: "currentColor" }}
@@ -143,10 +145,18 @@ function TreeNode({
               </ButtonDiv>
             </div>
             <div
-              className="flex-1 flex items-center"
+              className="flex-1 flex items-center pr-2"
               style={{ marginLeft: `${depth * 8 + 6}px` }}
             >
-              {node.ref.layer.kind === "group" && (
+              {node.isClippingMask && (
+                <div className="mr-2 ml-1 flex items-center">
+                  <CornerLeftDown
+                    size={14}
+                    style={{ fill: "transparent", stroke: "currentColor" }}
+                  />
+                </div>
+              )}
+              {node.kind === "group" && (
                 <div className="mr-2 flex items-center">
                   <ChevronDown
                     size={14}
@@ -159,10 +169,18 @@ function TreeNode({
                   />
                 </div>
               )}
-              {node.name}
+              <div className="flex-1 flex items-center">{node.name}</div>
+              {Object.keys(node.effects).length > 0 && (
+                <div className="ml-2 flex items-center">
+                  <FlowerIcon
+                    size={14}
+                    style={{ fill: "transparent", stroke: "currentColor" }}
+                  />
+                </div>
+              )}
             </div>
           </div>
-          {node.children && <TreeNode tree={node.children} depth={depth + 1} />}
+          {node.layers && <TreeNode tree={node.layers} depth={depth + 1} />}
         </Fragment>
       ))}
     </>

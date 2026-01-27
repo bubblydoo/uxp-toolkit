@@ -44,6 +44,7 @@ export { type LayerRef } from "./general-tree/layerRef";
 // Other
 export { photoshopGetApplicationInfo } from "./other/applicationInfo";
 export { copyToClipboard, readFromClipboard } from "./other/clipboard";
+export { uxpEntrypointsSchema } from "./other/uxpEntrypoints";
 
 // UT tree – layer descriptors & Photoshop tree
 export {
@@ -55,15 +56,13 @@ export {
   getLayerProperties as getLayerPropertiesFromUtTree,
 } from "./ut-tree/getLayerProperties";
 export {
-  createGetLayerEffectsCommand,
+  createGetLayerCommand as createGetLayerEffectsCommand,
   getLayerEffects,
 } from "./ut-tree/getLayerEffects";
 export {
-  photoshopLayerDescriptorsToTree,
+  photoshopLayerDescriptorsToUTLayers,
   type UTLayer,
-  type PsTreeNode,
-} from "./ut-tree/photoshopLayerDescriptorsToTree";
-export { type PsLayerData } from "./ut-tree/psLayerData";
+} from "./ut-tree/photoshopLayerDescriptorsToUTLayers";
 export { type PsLayerRef } from "./ut-tree/psLayerRef";
 
 // Util

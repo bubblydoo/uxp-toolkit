@@ -1,17 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { entrypoints } from "uxp";
-import { z } from "zod";
-import { photoshopGetApplicationInfo } from "@bubblydoo/uxp-toolkit";
+import { photoshopGetApplicationInfo, uxpEntrypointsSchema } from "@bubblydoo/uxp-toolkit";
 
-const pluginInfoSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  version: z.string(),
-});
-
-const pluginInfo = pluginInfoSchema.parse(
-  (entrypoints as unknown as { _pluginInfo: unknown })._pluginInfo
-);
+const pluginInfo = uxpEntrypointsSchema.parse(entrypoints)._pluginInfo;
 
 export function useApplicationInfoQuery(refetchInterval: number = 1000) {
   return useQuery({

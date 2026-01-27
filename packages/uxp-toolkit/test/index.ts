@@ -5,6 +5,7 @@ import { executeAsModalErrorTest } from "./meta-tests/executeAsModal.uxp-test";
 import { suspendHistoryTest } from "../src/core/suspendHistory.uxp-test";
 import { sourcemapsTest } from "../src/error-sourcemaps/sourcemaps.uxp-test";
 import { clipboardTest } from "../src/other/clipboard.uxp-test";
+import { photoshopLayerDescriptorsToUTLayersTest } from "../src/ut-tree/photoshopLayerDescriptorsToUTLayers.uxp-test";
 
 export const tests = [
   applicationInfoTest,
@@ -14,4 +15,5 @@ export const tests = [
   suspendHistoryTest,
   sourcemapsTest,
   clipboardTest,
+  photoshopLayerDescriptorsToUTLayersTest,
 ];

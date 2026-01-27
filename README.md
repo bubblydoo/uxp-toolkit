@@ -1,6 +1,6 @@
 # UXP Toolkit
 
-This is a toolkit for building UXP extensions for Adobe Photoshop. It has been created because the experience building extensions for Adobe Photoshop is pretty terrible. Nothing works as expected and the documentation is lacking.
+This is a toolkit for building UXP extensions for Adobe Photoshop. It has been created because the experience building extensions for Adobe Photoshop is pretty terrible: nothing works as expected and the documentation is lacking.
 
 With the code in this repo, we fix a few things:
 - A large amount of functions, including automated tests, for common actions in Photoshop, like interacting with layers and files. 
@@ -120,12 +120,12 @@ await executeAsModalAndSuspendHistory("Combined action", document, async (ctx, s
 });
 ```
 
-### `UTLayer` and `Tree`
+### `UTLayer`
 
 As `document.layers` can get slow, we provide a parser for a layer tree, built on `batchPlay` commands.
 
 ```ts
-//    Tree<{ layer: UTLayer, data: PsLayerData }>
+//    UTLayer[]
 //    ^
 const tree = await photoshopLayerDescriptorsToTree(await getFlattenedLayerDescriptorsList(document));
 ```
@@ -160,7 +160,11 @@ try {
 }
 ```
 
-### Testing plugin
+### Testing framework and plugin
+
+```bash
+pnpm add @bubblydoo/uxp-test-framework
+```
 
 We have developed a plugin specifically for testing UXP plugins. It allows you to run tests inside of Photoshop, and see the results in a panel.
 
@@ -215,3 +219,32 @@ In the future, we'd like to get Vitest to work natively with a UXP runner or poo
 The plugin also sourcemaps the errors, so you can find the error much more easily:
 
 <img src="res/screenshot-test-plugin-error.png" alt="Screenshot of the test plugin with an error" width="800" />
+
+### React integration
+
+```bash
+pnpm add @bubblydoo/uxp-toolkit-react
+```
+
+We have a React integration for the toolkit. It allows you to use the toolkit in a React application. Many functions use React Query under the hood.
+
+```ts
+import { useActiveDocument } from "@bubblydoo/uxp-toolkit-react";
+
+function App() {
+  const activeDocument = useActiveDocument();
+  return <div>Active document: {activeDocument.name}</div>;
+}
+```
+
+This package provides the following hooks:
+
+- `useActiveDocument` – Sync external store for the current active document
+- `useOnDocumentEdited` – Run a callback when the given document is edited (select, delete, make, set, move, close, show, hide, etc.)
+- `useOnDocumentLayersEdited` – Run a callback when layers change (delete, make, set, move, close)
+- `useOnDocumentLayersSelection` – Run a callback when layer selection changes (select, deselect)
+- `useOnEvent` – Run a callback for arbitrary Photoshop action events on a given document
+- `useOpenDocuments` – Sync external store for the list of open documents
+- `useIsPluginPanelVisible` and `useIsAnyPluginPanelVisible` – Whether a plugin panel is visible
+- `useApplicationInfoQuery` – React Query for Photoshop application info (e.g. panel list)
+- `useEventListenerSkippable` - Generic hook to subscribe to events with optional skip/filter so triggers can be queued or ignored
