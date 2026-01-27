@@ -6,7 +6,15 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        "psBackground": "#4d4d4d",
+        "psNeutral": "#535353",
+        "psActive": "#6b6b6b",
+        "psDark": "#454545",
+        "psHover": "#516291"
+      }
+    },
   },
   plugins: [],
 }

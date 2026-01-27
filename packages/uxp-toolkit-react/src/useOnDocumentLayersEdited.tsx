@@ -14,6 +14,7 @@ const EVENTS = [
   // "hide",
   // "convertToProfile",
   // "selectNoLayers",
+  "historyStateChanged" // this might have changed the layers
 ];
 
 export function useOnDocumentLayersEdited(

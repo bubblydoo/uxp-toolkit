@@ -5,3 +5,4 @@ dist
 build
 .turbo
 tsconfig.tsbuildinfo
+.pnpm-store

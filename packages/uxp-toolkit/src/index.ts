@@ -64,6 +64,7 @@ export {
   type UTLayer,
 } from "./ut-tree/photoshopLayerDescriptorsToUTLayers";
 export { type PsLayerRef } from "./ut-tree/psLayerRef";
+export { utLayersToTree, type UTLayerWithoutChildren } from "./ut-tree/utLayersToTree";
 
 // Util
 export { utLayerToDomLayer, utLayersToDomLayers } from "./util/utLayerToLayer";

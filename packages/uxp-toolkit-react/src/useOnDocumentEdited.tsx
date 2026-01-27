@@ -15,6 +15,7 @@ const EVENTS = [
   "hide",
   "convertToProfile",
   "selectNoLayers",
+  "historyStateChanged" // this might have changed the document
 ];
 
 export function useOnDocumentEdited(document: Document, trigger: () => void) {

@@ -15,6 +15,7 @@ const EVENTS = [
   // "hide",
   // "convertToProfile",
   // "selectNoLayers",
+  "historyStateChanged" // this might have changed the layers selection, e.g. when deleting an undo
 ];
 
 export function useOnDocumentLayersSelection(

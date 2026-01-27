@@ -1,17 +1,18 @@
 import {
   createCommand,
   executeAsModal,
-  flattenTree,
   getFlattenedLayerDescriptorsList,
   photoshopLayerDescriptorsToUTLayers,
+  utLayersToTree,
   type PsLayerRef,
-  type UTLayer,
-  type PsTreeNode,
   type Tree,
+  type UTLayer,
+  type UTLayerWithoutChildren,
 } from "@bubblydoo/uxp-toolkit";
 import {
   useActiveDocument,
   useOnDocumentEdited,
+  useOnEvent,
 } from "@bubblydoo/uxp-toolkit-react";
 import {
   QueryClient,
@@ -29,7 +30,7 @@ import {
   Folder,
 } from "lucide-react";
 import { app } from "photoshop";
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { z } from "zod";
 import { cn } from "./lib/cn";
 
@@ -51,6 +52,11 @@ function QueryClientProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+type NodeWithExtraData = {
+  layer: UTLayerWithoutChildren;
+  isClipped: boolean;
+};
+
 function LayersPanel() {
   const activeDocument = useActiveDocument();
   const queryClient = useQueryClient();
@@ -59,21 +65,67 @@ function LayersPanel() {
   const layersQuery = useQuery({
     queryKey: ["layers", activeDocumentId],
     queryFn: async () => {
-      const tree = await photoshopLayerDescriptorsToUTLayers(
+      const utLayers = await photoshopLayerDescriptorsToUTLayers(
         await getFlattenedLayerDescriptorsList(activeDocumentId),
       );
 
-      return tree;
+      return utLayersToTree(utLayers);
+    },
+  });
+
+  const treeWithExtraData = useMemo(() => {
+    if (!layersQuery.data) return undefined;
+
+    function crawl(tree: Tree<UTLayerWithoutChildren>) {
+      const newTree: Tree<NodeWithExtraData> = [];
+      for (let i = 0; i < tree.length; i++) {
+        const prevNode = i > 0 ? tree[i - 1] : null;
+        const node = tree[i]!;
+        const isClipped = prevNode?.ref.isClippingMask ?? false;
+        newTree.push({
+          ref: {
+            layer: node.ref,
+            isClipped,
+          },
+          name: node.name,
+          children: node.children ? crawl(node.children) : undefined,
+        });
+      }
+      return newTree;
+    }
+
+    return crawl(layersQuery.data);
+  }, [layersQuery.data]);
+
+  const activeLayerRefsQuery = useQuery({
+    queryKey: ["activeLayers", activeDocumentId],
+    queryFn: async () => {
+      // return await getActiveLayers(activeDocumentId);
+      const doc = app.documents.find((d) => d.id === activeDocumentId);
+      if (!doc)
+        throw new Error(`Document with id ${activeDocumentId} not found`);
+      return doc.activeLayers.map((l) => ({
+        id: l.id,
+        docId: l._docId,
+      }));
     },
   });
 
   useOnDocumentEdited(activeDocument, () => {
     queryClient.invalidateQueries({ queryKey: ["layers", activeDocumentId] });
+    queryClient.invalidateQueries({
+      queryKey: ["activeLayers", activeDocumentId],
+    });
   });
 
-  if (!layersQuery.data) return <div>Loading...</div>;
+  if (!treeWithExtraData) return <div>Loading...</div>;
 
-  return <TreeNode tree={layersQuery.data} />;
+  return (
+    <TreeNode
+      tree={treeWithExtraData}
+      activeLayerRefs={activeLayerRefsQuery.data}
+    />
+  );
 }
 
 function createSetLayerVisibilityCommand(
@@ -93,7 +145,15 @@ function createSetLayerVisibilityCommand(
   });
 }
 
-function TreeNode({ tree, depth = 0 }: { tree: UTLayer[]; depth?: number }) {
+function TreeNode({
+  tree,
+  depth = 0,
+  activeLayerRefs,
+}: {
+  tree: Tree<NodeWithExtraData>;
+  depth?: number;
+  activeLayerRefs: PsLayerRef[] | undefined;
+}) {
   const queryClient = useQueryClient();
 
   const changeLayerVisibilityMutation = useMutation({
@@ -107,8 +167,39 @@ function TreeNode({ tree, depth = 0 }: { tree: UTLayer[]; depth?: number }) {
     onSuccess: (_data, variables) => {
       const docId = variables.layerRef.docId;
       queryClient.invalidateQueries({ queryKey: ["layers", docId] });
+      queryClient.invalidateQueries({ queryKey: ["activeLayers", docId] });
     },
   });
+
+  const selectLayerMutation = useMutation({
+    mutationFn: async (options: { layerRef: PsLayerRef }) => {
+      await executeAsModal("Select Layer", async (ctx) => {
+        await ctx.batchPlayCommand(
+          createCommand({
+            modifying: true,
+            descriptor: {
+              _obj: "select",
+              _target: [
+                { _ref: "layer", _id: options.layerRef.id },
+                { _ref: "document", _id: options.layerRef.docId },
+              ],
+            },
+            schema: z.unknown(),
+          }),
+        );
+      });
+    },
+    onSuccess: (_data, variables) => {
+      const docId = variables.layerRef.docId;
+      queryClient.invalidateQueries({ queryKey: ["activeLayers", docId] });
+    },
+  });
+
+  function isActiveLayer(ref: NodeWithExtraData) {
+    return activeLayerRefs?.some(
+      (l) => l.id === ref.layer.id && l.docId === ref.layer.docId,
+    );
+  }
 
   return (
     <>
@@ -116,22 +207,25 @@ function TreeNode({ tree, depth = 0 }: { tree: UTLayer[]; depth?: number }) {
         <Fragment key={idx}>
           <div
             key={idx}
-            className="border-b border-gray-900 bg-gray-700 flex flex-row items-stretch h-6"
+            className={cn(
+              "border-b border-psDark bg-psNeutral hover:bg-psHover flex flex-row items-stretch h-6",
+              isActiveLayer(node.ref) && "bg-psActive hover:bg-psActive",
+            )}
           >
             <div
-              className="w-6 border-r border-gray-900 flex items-center justify-center disabled:opacity-50"
+              className="w-6 border-r border-psDark flex items-center justify-center disabled:opacity-50"
               onClick={() =>
                 changeLayerVisibilityMutation.mutate({
                   layerRef: {
-                    id: node.id,
-                    docId: node.docId,
+                    id: node.ref.layer.id,
+                    docId: node.ref.layer.docId,
                   },
-                  visible: !node.visible,
+                  visible: !node.ref.layer.visible,
                 })
               }
             >
               <ButtonDiv className="text-white">
-                {node.visible ? (
+                {node.ref.layer.visible ? (
                   <Eye
                     size={14}
                     style={{ fill: "transparent", stroke: "currentColor" }}
@@ -144,11 +238,19 @@ function TreeNode({ tree, depth = 0 }: { tree: UTLayer[]; depth?: number }) {
                 )}
               </ButtonDiv>
             </div>
-            <div
+            <ButtonDiv
+              onClick={() => {
+                selectLayerMutation.mutate({
+                  layerRef: {
+                    id: node.ref.layer.id,
+                    docId: node.ref.layer.docId,
+                  },
+                });
+              }}
               className="flex-1 flex items-center pr-2"
               style={{ marginLeft: `${depth * 8 + 6}px` }}
             >
-              {node.isClippingMask && (
+              {node.ref.layer.isClippingMask && (
                 <div className="mr-2 ml-1 flex items-center">
                   <CornerLeftDown
                     size={14}
@@ -156,7 +258,7 @@ function TreeNode({ tree, depth = 0 }: { tree: UTLayer[]; depth?: number }) {
                   />
                 </div>
               )}
-              {node.kind === "group" && (
+              {node.ref.layer.kind === "group" && (
                 <div className="mr-2 flex items-center">
                   <ChevronDown
                     size={14}
@@ -169,8 +271,14 @@ function TreeNode({ tree, depth = 0 }: { tree: UTLayer[]; depth?: number }) {
                   />
                 </div>
               )}
-              <div className="flex-1 flex items-center">{node.name}</div>
-              {Object.keys(node.effects).length > 0 && (
+              <div className={cn("flex-1 flex items-center")}>
+                <span
+                  className={cn(node.ref.isClipped && "border-b border-white")}
+                >
+                  {node.name}
+                </span>
+              </div>
+              {Object.keys(node.ref.layer.effects).length > 0 && (
                 <div className="ml-2 flex items-center">
                   <FlowerIcon
                     size={14}
@@ -178,9 +286,15 @@ function TreeNode({ tree, depth = 0 }: { tree: UTLayer[]; depth?: number }) {
                   />
                 </div>
               )}
-            </div>
+            </ButtonDiv>
           </div>
-          {node.layers && <TreeNode tree={node.layers} depth={depth + 1} />}
+          {node.children && (
+            <TreeNode
+              tree={node.children}
+              depth={depth + 1}
+              activeLayerRefs={activeLayerRefs}
+            />
+          )}
         </Fragment>
       ))}
     </>
