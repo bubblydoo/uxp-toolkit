@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import { uxp } from "vite-uxp-plugin";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
-
 import { config } from "./uxp.config";
 
 const mode = process.env.MODE;

@@ -8,7 +8,10 @@ import {
   type PsTreeNode,
   type Tree,
 } from "@bubblydoo/uxp-toolkit";
-import { useActiveDocument, useOnDocumentEdited } from "@bubblydoo/uxp-toolkit-react";
+import {
+  useActiveDocument,
+  useOnDocumentEdited,
+} from "@bubblydoo/uxp-toolkit-react";
 import {
   QueryClient,
   QueryClientProvider as ReactQueryClientProvider,
@@ -16,9 +19,11 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import { ChevronDown, Eye, EyeOff, Folder } from "lucide-react";
 import { app } from "photoshop";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { z } from "zod";
+import { cn } from "./lib/cn";
 
 export function App() {
   return (
@@ -29,8 +34,10 @@ export function App() {
 }
 
 function QueryClientProvider({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
-    <ReactQueryClientProvider client={new QueryClient()}>
+    <ReactQueryClientProvider client={queryClient}>
       {children}
     </ReactQueryClientProvider>
   );
@@ -44,7 +51,7 @@ function LayersPanel() {
   const layersQuery = useQuery({
     queryKey: ["layers", activeDocumentId],
     queryFn: async () => {
-      const tree = photoshopLayerDescriptorsToTree(
+      const tree = await photoshopLayerDescriptorsToTree(
         await getFlattenedLayerDescriptorsList(activeDocumentId),
       );
 
@@ -69,7 +76,10 @@ function createSetLayerVisibilityCommand(
     modifying: true,
     descriptor: {
       _obj: visible ? "show" : "hide",
-      _target: [{ _ref: "layer", _id: layerRef.id }, { _ref: "document", _id: layerRef.docId }],
+      _target: [
+        { _ref: "layer", _id: layerRef.id },
+        { _ref: "document", _id: layerRef.docId },
+      ],
     },
     schema: z.unknown(),
   });
@@ -106,9 +116,8 @@ function TreeNode({
             key={idx}
             className="border-b border-gray-900 bg-gray-700 flex flex-row items-stretch h-6"
           >
-            <button
+            <div
               className="w-6 border-r border-gray-900 flex items-center justify-center disabled:opacity-50"
-              disabled={changeLayerVisibilityMutation.isPending}
               onClick={() =>
                 changeLayerVisibilityMutation.mutate({
                   layerRef: {
@@ -119,12 +128,37 @@ function TreeNode({
                 })
               }
             >
-              {node.ref.layer.visible ? "v" : "h"}
-            </button>
+              <ButtonDiv className="text-white">
+                {node.ref.layer.visible ? (
+                  <Eye
+                    size={14}
+                    style={{ fill: "transparent", stroke: "currentColor" }}
+                  />
+                ) : (
+                  <EyeOff
+                    size={14}
+                    style={{ fill: "transparent", stroke: "currentColor" }}
+                  />
+                )}
+              </ButtonDiv>
+            </div>
             <div
               className="flex-1 flex items-center"
               style={{ marginLeft: `${depth * 8 + 6}px` }}
             >
+              {node.ref.layer.kind === "group" && (
+                <div className="mr-2 flex items-center">
+                  <ChevronDown
+                    size={14}
+                    style={{ fill: "transparent", stroke: "currentColor" }}
+                    className="mr-[2px] ml-[-2px]"
+                  />
+                  <Folder
+                    size={14}
+                    style={{ fill: "transparent", stroke: "currentColor" }}
+                  />
+                </div>
+              )}
               {node.name}
             </div>
           </div>
@@ -133,4 +167,8 @@ function TreeNode({
       ))}
     </>
   );
+}
+
+function ButtonDiv(props: React.ButtonHTMLAttributes<HTMLDivElement>) {
+  return <div {...props} className={cn("cursor-pointer", props.className)} />;
 }
