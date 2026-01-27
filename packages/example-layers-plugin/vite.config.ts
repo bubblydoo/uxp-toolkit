@@ -21,6 +21,10 @@ const nativeModules = [
 
 export default defineConfig({
   plugins: [uxp(config, mode, { disablePolyfills: true }), react(), tsconfigPaths()],
+  define: {
+    BOLT_UXP_HOT_RELOAD_PORT: config.hotReloadPort,
+    BOLT_UXP_MANIFEST_ID: JSON.stringify(config.manifest.id),
+  },
   build: {
     sourcemap: mode && ["dev", "build"].includes(mode) ? true : false,
     minify: false,

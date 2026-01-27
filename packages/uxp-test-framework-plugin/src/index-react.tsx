@@ -1,4 +1,5 @@
 import "@bubblydoo/uxp-polyfills";
+import "./bolt-uxp-ws-listener";
 
 import "./index.css";
 import React from "react";

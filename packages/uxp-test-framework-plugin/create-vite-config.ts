@@ -42,6 +42,10 @@ export function createViteConfig(opts: ResolvedConfig, mode: "dev" | "build") {
 
   return defineConfig({
     root,
+    define: {
+      BOLT_UXP_HOT_RELOAD_PORT: uxpConfig.hotReloadPort,
+      BOLT_UXP_MANIFEST_ID: JSON.stringify(uxpConfig.manifest.id),
+    },
     plugins: [
       uxp(uxpConfig, mode, { disablePolyfills: true }) as any,
       react(),
