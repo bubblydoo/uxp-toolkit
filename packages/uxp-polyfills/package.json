@@ -9,9 +9,12 @@
     },
     "./package.json": "./package.json"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "mutationobserver-shim": "^0.3.7",
     "matchmedia-polyfill": "^0.3.2",
-    "@perf-tools/performance": "^1.1.1"
+    "core-js": "^3.48.0"
   }
 }

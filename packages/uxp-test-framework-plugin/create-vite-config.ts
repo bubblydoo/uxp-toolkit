@@ -12,8 +12,6 @@ const pkg =
   require.resolve("@bubblydoo/uxp-test-framework-plugin/package.json");
 const root = path.dirname(pkg);
 
-const mode = "dev";
-
 const resolvedConfigSchema = z.object({
   plugin: z.object({
     id: z.string(),
@@ -29,7 +27,9 @@ const resolvedConfigSchema = z.object({
 
 type ResolvedConfig = z.infer<typeof resolvedConfigSchema>;
 
-export function createViteConfig(opts: ResolvedConfig) {
+const nativeModules = ["photoshop", "uxp", "fs", "os", "path", "process", "shell"];
+
+export function createViteConfig(opts: ResolvedConfig, mode: "dev" | "build") {
   resolvedConfigSchema.parse(opts);
 
   const adjustedConfig = createUxpConfig({
@@ -40,7 +40,7 @@ export function createViteConfig(opts: ResolvedConfig) {
   return defineConfig({
     root,
     plugins: [
-      uxp(adjustedConfig, mode) as any,
+      uxp(adjustedConfig, mode === "dev" ? "dev" : "build") as any,
       react(),
       // copy the test fixtures to the dist directory
       ...(opts.testFixturesDir
@@ -68,13 +68,15 @@ export function createViteConfig(opts: ResolvedConfig) {
       minify: false,
       emptyOutDir: true,
       rollupOptions: {
-        external: [/^photoshop\b/, /^uxp\b/, /^fs\b/, /^os\b/, /^path\b/, /^process\b/, /^shell\b/],
+        external: nativeModules.map((module) => new RegExp(`^${module}\\b`)),
         output: {
           format: "cjs",
         },
       },
-      watch: {},
     },
     publicDir: "public",
+    optimizeDeps: {
+      exclude: nativeModules,
+    }
   });
 }

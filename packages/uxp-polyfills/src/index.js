@@ -6,3 +6,6 @@ import "mutationobserver-shim/MutationObserver";
 // breaking React performance measurements
 import { performanceMeasurePolyfill } from "./performance-measure";
 performance.measure = performanceMeasurePolyfill;
+
+// mostly for Error.cause
+import "core-js/actual/error";

@@ -5,6 +5,9 @@
   "bin": {
     "create-uxp-test-plugin": "./bin/create-uxp-test-plugin.js"
   },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --outDir dist"
+  },
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -12,6 +15,19 @@
     },
     "./package.json": "./package.json",
     "./uxp-tests-json-schema.json": "./uxp-tests-json-schema.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
   },
   "dependencies": {
     "arg": "^5.0.2",

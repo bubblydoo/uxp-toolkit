@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "license": "MIT",
   "exports": {
     "./create-vite-config": {
       "types": "./dist/create-vite-config.d.ts",
@@ -10,6 +11,7 @@
     },
     "./package.json": "./package.json"
   },
+  "files": ["*"],
   "scripts": {
     "build": "tsup"
   },

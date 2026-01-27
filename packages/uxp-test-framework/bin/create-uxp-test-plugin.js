@@ -5,7 +5,7 @@ import { createViteConfig } from '@bubblydoo/uxp-test-framework-plugin/create-vi
 import arg from 'arg';
 import path from 'path';
 import z from 'zod';
-import fs from 'fs';
+import fs from 'fs/promises';
 
 const configSchema = z.object({
   testsFile: z.string(),
@@ -20,21 +20,26 @@ const configSchema = z.object({
   }).optional().default({}),
 });
 
+const actionSchema = z.enum(['build', 'dev']);
+
 const args = arg({
   '--config': String,
   '-c': '--config',
 });
 
-if (!args['--config']) {
-  console.error('--config is required');
+const action = actionSchema.parse(args._[0]);
+
+const configFileName = args['--config'] || 'uxp-tests.json';
+const configFilePath = path.resolve(process.cwd(), configFileName);
+
+if (!await fileExists(configFilePath)) {
+  console.error(`Config file ${configFilePath} does not exist`);
   process.exit(1);
 }
 
-const configFile = path.resolve(process.cwd(), args['--config']);
-const configString = fs.readFileSync(configFile, 'utf8');
+const configString = await fs.readFile(configFilePath, 'utf8');
 const config = configSchema.parse(JSON.parse(configString));
-
-const configDirName = path.dirname(configFile);
+const configDirName = path.dirname(configFilePath);
 
 const resolvedConfig = {
   outDir: path.resolve(configDirName, config.outDir),
@@ -49,14 +54,21 @@ const resolvedConfig = {
   },
 }
 
-const viteConfig = createViteConfig(resolvedConfig);
+if (action === 'build') {
+  const viteConfig = createViteConfig(resolvedConfig, 'build');
+  await build(viteConfig);
+} else if (action === 'dev') {
+  const viteConfig = createViteConfig(resolvedConfig, 'dev');
+  const server = await createServer(viteConfig);
+  await server.listen();
+  server.bindCLIShortcuts({ print: true });
+}
 
-console.log(viteConfig);
-
-const server = await createServer(viteConfig);
-
-await build(viteConfig);
-
-await server.listen();
-
-server.bindCLIShortcuts({ print: true });
+async function fileExists(path) {
+  try {
+    await fs.stat(path);
+    return true;
+  } catch {
+    return false;
+  }
+}

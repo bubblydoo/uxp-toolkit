@@ -2,6 +2,9 @@
   "name": "@bubblydoo/uxp-test-framework-base",
   "version": "0.0.1",
   "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --outDir dist"
+  },
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -9,7 +12,21 @@
     },
     "./package.json": "./package.json"
   },
-  "dependencies": {
-    "typescript": "^5.9.3"
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "tsup": "^8.5.1"
   }
 }
