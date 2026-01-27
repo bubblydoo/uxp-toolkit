@@ -211,3 +211,7 @@ pnpx create-uxp-test-plugin build
 And you will get a plugin in the `uxp-tests-plugin` directory, which you can load using UXP Developer Tools, and then you can run the tests inside of Photoshop.
 
 In the future, we'd like to get Vitest to work natively with a UXP runner or pool, but for now, this is a good compromise.
+
+The plugin also sourcemaps the errors, so you can find the error much more easily:
+
+<img src="res/screenshot-test-plugin-error.png" alt="Screenshot of the test plugin with an error" width="800" />
