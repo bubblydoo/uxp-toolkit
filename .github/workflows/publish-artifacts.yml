@@ -1,0 +1,44 @@
+name: Publish Artifacts
+
+on: [push]
+
+env:
+  CI: true
+
+jobs:
+  publish-artifacts:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
+      
+      - name: Build @bubblydoo/uxp-toolkit test plugin
+        run: pnpm -C packages/uxp-toolkit uxp-test:build
+
+      - name: Publish @bubblydoo/uxp-toolkit test plugin as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: uxp-toolkit-test-plugin
+          path: packages/uxp-toolkit/uxp-tests-plugin
+
+      - name: Publish example layers plugin as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: example-layers-plugin
+          path: packages/example-layers-plugin/dist
