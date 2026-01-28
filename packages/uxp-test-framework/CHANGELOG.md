@@ -1,5 +1,14 @@
 # @bubblydoo/uxp-test-framework
 
+## 0.0.4
+
+### Patch Changes
+
+- d0d1067: Setup changeset releases
+- Updated dependencies [d0d1067]
+  - @bubblydoo/uxp-test-framework-base@0.0.4
+  - @bubblydoo/uxp-test-framework-plugin@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes

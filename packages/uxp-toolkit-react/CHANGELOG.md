@@ -1,5 +1,13 @@
 # @bubblydoo/uxp-toolkit-react
 
+## 0.0.4
+
+### Patch Changes
+
+- d0d1067: Setup changeset releases
+- Updated dependencies [d0d1067]
+  - @bubblydoo/uxp-toolkit@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes
