@@ -8,5 +8,5 @@
     "jsx": "react-jsx",
     "types": ["@adobe/cc-ext-uxp-types", "photoshop", "node", "react", "react-dom"]
   },
-  "include": ["src", "create-vite-config.ts", "uxp.config.ts"]
+  "include": ["src-plugin", "src-vite"]
 }

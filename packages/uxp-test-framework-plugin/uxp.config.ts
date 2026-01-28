@@ -1,7 +1,6 @@
 import { UXP_Manifest, UXP_Config } from "vite-uxp-plugin";
 
 const extraPrefs = {
-  hotReloadPort: 8080,
   copyZipAssets: ["public-zip/*"],
   uniqueIds: true,
 };
@@ -10,12 +9,14 @@ type CreateManifestOpts = {
   id: string;
   name: string;
   version: string;
+  hotReloadPort: number;
 };
 
 const createUxpManifest: (opts: CreateManifestOpts) => UXP_Manifest = ({
   id,
   name,
   version,
+  hotReloadPort,
 }) => {
   return {
     id,
@@ -69,7 +70,7 @@ const createUxpManifest: (opts: CreateManifestOpts) => UXP_Manifest = ({
       },
       network: {
         domains: [
-          `ws://localhost:${extraPrefs.hotReloadPort}`, // Required for hot reload
+          `ws://localhost:${hotReloadPort}`, // Required for hot reload
         ],
       },
       clipboard: "readAndWrite",
@@ -101,9 +102,11 @@ export const createUxpConfig: (opts: CreateManifestOpts) => UXP_Config = ({
   id,
   name,
   version,
+  hotReloadPort,
 }) => {
   return {
-    manifest: createUxpManifest({ id, name, version }),
+    manifest: createUxpManifest({ id, name, version, hotReloadPort }),
+    hotReloadPort,
     ...extraPrefs,
   } as UXP_Config;
 };

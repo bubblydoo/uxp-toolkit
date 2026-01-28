@@ -6,3 +6,4 @@ build
 .turbo
 tsconfig.tsbuildinfo
 .pnpm-store
+*.tgz

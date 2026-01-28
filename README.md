@@ -1,3 +1,5 @@
+![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-toolkit)
+
 # UXP Toolkit
 
 This is a toolkit for building UXP extensions for Adobe Photoshop. It has been created because the experience building extensions for Adobe Photoshop is pretty terrible: nothing works as expected and the documentation is lacking.
@@ -175,6 +177,7 @@ You can run tests using the `create-uxp-test-plugin` command.
 `uxp-tests.json`:
 ```json
 {
+  "$schema": "./node_modules/@bubblydoo/uxp-test-framework/uxp-tests-json-schema.json",
   "testsFile": "test/index.ts",
   "testFixturesDir": "test/fixtures",
   "plugin": {
@@ -190,8 +193,8 @@ import type { Test } from "@bubblydoo/uxp-test-framework";
 import { expect } from "chai";
 import { app } from "photoshop";
 
-const clipboardTest: Test = {
-  name: "should copy and read from clipboard",
+const renameLayerTest: Test = {
+  name: "Should rename layer",
   async run() {
     await openFileByPath("plugin:/fixtures/one-layer.psd");
     expect(app.activeDocument.layers[0].name).to.equal("Layer 1");
@@ -203,13 +206,23 @@ const clipboardTest: Test = {
 };
 
 export const tests: Test[] = [
-  clipboardTest,
+  renameLayerTest,
 ];
+```
+
+```json
+{
+  "name": "your-plugin",
+  "scripts": {
+    "uxp-test:build": "uxp-test build",
+    "uxp-test:dev": "uxp-test dev"
+  }
+}
 ```
 
 Then you can run:
 ```bash
-pnpx create-uxp-test-plugin build
+pnpm uxp-test:dev
 ```
 
 And you will get a plugin in the `uxp-tests-plugin` directory, which you can load using UXP Developer Tools, and then you can run the tests inside of Photoshop.

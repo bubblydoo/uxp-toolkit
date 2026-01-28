@@ -4,8 +4,13 @@
   "type": "module",
   "license": "MIT",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bubblydoo/uxp-toolkit.git"
+  },
+  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-test-framework",
   "bin": {
-    "create-uxp-test-plugin": "./bin/create-uxp-test-plugin.js"
+    "uxp-test": "bin/cli.js"
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --outDir dist"
@@ -33,11 +38,10 @@
   },
   "dependencies": {
     "@bubblydoo/uxp-test-framework-base": "workspace:*",
-    "@bubblydoo/uxp-test-framework-plugin": "workspace:*",
-    "zod": "^4.3.6"
+    "@bubblydoo/uxp-test-framework-plugin": "workspace:*"
   },
   "devDependencies": {
-    "vite": "^7.3.1",
+    "vite": "^6.4.1",
     "tsup": "^8.5.1",
     "@bubblydoo/tsconfig": "workspace:^",
     "@types/node": "^20.8.7",

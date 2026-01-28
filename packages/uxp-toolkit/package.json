@@ -3,10 +3,16 @@
   "version": "0.0.2",
   "license": "MIT",
   "type": "module",
+  "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bubblydoo/uxp-toolkit.git"
+  },
+  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-toolkit",
   "scripts": {
     "build": "tsup",
-    "uxp-tests:build": "create-uxp-test-plugin build",
-    "uxp-tests:dev": "create-uxp-test-plugin dev"
+    "uxp-test:build": "uxp-test build",
+    "uxp-test:dev": "uxp-test dev"
   },
   "exports": {
     ".": {
@@ -41,6 +47,7 @@
     "@types/node": "^20.8.7",
     "@types/photoshop": "^25.0.2",
     "chai": "^6.2.2",
+    "rollup": "^4.57.0",
     "tsup": "^8.5.1",
     "typescript": "^5.8.3",
     "zod": "^4.3.6"

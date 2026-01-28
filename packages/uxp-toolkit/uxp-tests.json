@@ -8,6 +8,7 @@
     "name": "UXP Toolkit Tests"
   },
   "vite": {
+    "hotReloadPort": 8081,
     "enableTsconfigPathsPlugin": true
   }
 }
