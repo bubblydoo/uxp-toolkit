@@ -2,6 +2,7 @@ import {
   createCommand,
   executeAsModal,
   getFlattenedLayerDescriptorsList,
+  mapTree,
   photoshopLayerDescriptorsToUTLayers,
   utLayersToTree,
   type PsLayerRef,
@@ -22,12 +23,16 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import {
+  ArrowDown,
+  ArrowUp,
+  BlendIcon,
   ChevronDown,
   CornerLeftDown,
   Eye,
   EyeOff,
   FlowerIcon,
   Folder,
+  Lightbulb,
 } from "lucide-react";
 import { app } from "photoshop";
 import type { Document } from "photoshop/dom/Document";
@@ -64,6 +69,10 @@ function QueryClientProvider({ children }: { children: React.ReactNode }) {
 type NodeWithExtraData = {
   layer: UTLayerWithoutChildren;
   isClipped: boolean;
+};
+
+type NodeWithExtraDataAndFiltered = NodeWithExtraData & {
+  filtered: boolean;
 };
 
 function LayersPanel({ document }: { document: Document }) {
@@ -126,14 +135,42 @@ function LayersPanel({ document }: { document: Document }) {
     });
   });
 
-  if (!treeWithExtraData) return <div>Loading...</div>;
+  const [filter, setFilter] = useState("");
+
+  const filteredTree = useMemo(() => {
+    if (!treeWithExtraData) return undefined;
+    return createFilteredTree(treeWithExtraData, filter);
+  }, [treeWithExtraData, filter]);
+
+  if (!filteredTree) return <div>Loading...</div>;
 
   return (
-    <TreeNode
-      tree={treeWithExtraData}
-      activeLayerRefs={activeLayerRefsQuery.data}
-    />
+    <>
+      <div className="flex flex-row items-center p-2">
+        <input type="text" className="w-full" value={filter} onChange={(e) => setFilter(e.target.value)} />
+        {`1/2`}
+        <ButtonDiv>
+          <ArrowUp size={14} style={{ fill: "transparent", stroke: "currentColor" }} />
+        </ButtonDiv>
+        <ButtonDiv>
+          <ArrowDown size={14} style={{ fill: "transparent", stroke: "currentColor" }} />
+        </ButtonDiv>
+      </div>
+      <TreeNode
+        tree={filteredTree}
+        activeLayerRefs={activeLayerRefsQuery.data}
+      />
+    </>
   );
+}
+
+function createFilteredTree(tree: Tree<NodeWithExtraData>, filter: string): Tree<NodeWithExtraDataAndFiltered> {
+  return mapTree(tree, (node) => {
+    return {
+      ...node,
+      filtered: node.layer.name.toLowerCase().includes(filter.toLowerCase()),
+    };
+  });
 }
 
 function createSetLayerVisibilityCommand(
@@ -158,7 +195,7 @@ function TreeNode({
   depth = 0,
   activeLayerRefs,
 }: {
-  tree: Tree<NodeWithExtraData>;
+  tree: Tree<NodeWithExtraDataAndFiltered>;
   depth?: number;
   activeLayerRefs: PsLayerRef[] | undefined;
 }) {
@@ -209,11 +246,18 @@ function TreeNode({
     );
   }
 
+  function isNonDefaultBlendMode(ref: NodeWithExtraData) {
+    if (ref.layer.kind === "group") {
+      return ref.layer.blendMode !== "passThrough";
+    }
+    return ref.layer.blendMode !== "normal";
+  }
+
   return (
     <>
       {tree.map((node, idx) => (
         <Fragment key={idx}>
-          <div
+          {node.ref.filtered && (<div
             key={idx}
             className={cn(
               "border-b border-psDark bg-psNeutral hover:bg-psHover flex flex-row items-stretch h-6",
@@ -246,6 +290,7 @@ function TreeNode({
                 )}
               </ButtonDiv>
             </div>
+            {/* {node.ref.filtered ? "f" : "n"} */}
             <ButtonDiv
               onClick={() => {
                 selectLayerMutation.mutate({
@@ -286,6 +331,24 @@ function TreeNode({
                   {node.name}
                 </span>
               </div>
+              {isNonDefaultBlendMode(node.ref) && (
+                <div className="ml-2 flex items-center">
+                  <BlendIcon
+                    size={14}
+                    style={{ fill: "transparent", stroke: "currentColor" }}
+                  />
+                  <span className="text-xs ml-1">{node.ref.layer.blendMode}</span>
+                </div>
+              )}
+              {node.ref.layer.opacity < 255 && (
+                <div className="ml-2 flex items-center">
+                  <Lightbulb
+                    size={14}
+                    style={{ fill: "transparent", stroke: "currentColor" }}
+                  />
+                  <span className="text-xs ml-1">{Math.round(node.ref.layer.opacity / 2.55)}%</span>
+                </div>
+              )}
               {Object.keys(node.ref.layer.effects).length > 0 && (
                 <div className="ml-2 flex items-center">
                   <FlowerIcon
@@ -295,7 +358,7 @@ function TreeNode({
                 </div>
               )}
             </ButtonDiv>
-          </div>
+          </div>)}
           {node.children && (
             <TreeNode
               tree={node.children}

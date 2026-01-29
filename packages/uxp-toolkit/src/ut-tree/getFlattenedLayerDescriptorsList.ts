@@ -21,6 +21,7 @@ const layerDescriptorSchema = z.object({
   background: z.boolean(),
   itemIndex: z.number(),
   visible: z.boolean(),
+  opacity: z.number(),
   layerKind: z.number(),
   layerSection: z.object({
     _value: z.enum([

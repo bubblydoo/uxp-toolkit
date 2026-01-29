@@ -15,6 +15,7 @@ type UTLayerBuilder = {
   blendMode: UTBlendMode;
   effects: Record<string, boolean>;
   isClippingMask: boolean;
+  opacity: number;
   layers?: UTLayerBuilder[];
 };
 
@@ -163,6 +164,7 @@ export const photoshopLayerDescriptorsToUTLayers = async (layers: LayerDescripto
       blendMode: getBlendMode(layer),
       isClippingMask,
       effects: effectsMap.get(layer.layerID) || {},
+      opacity: layer.opacity,
     };
 
     // Add the node to the current level

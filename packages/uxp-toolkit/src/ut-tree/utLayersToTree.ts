@@ -12,6 +12,7 @@ export function utLayersToTree(layer: UTLayer[]): Tree<UTLayerWithoutChildren> {
       visible: layer.visible,
       kind: layer.kind,
       blendMode: layer.blendMode,
+      opacity: layer.opacity,
       isClippingMask: layer.isClippingMask,
       effects: layer.effects,
     },
