@@ -140,11 +140,12 @@ function LayersPanel({ document }: { document: Document }) {
     "exact" | "contains" | "endsWith" | "startsWith"
   >("contains");
   const [filterCaseSensitive, setFilterCaseSensitive] = useState(false);
+  const [filterOnlyModifiers, setFilterOnlyModifiers] = useState(false);
 
   const filteredTree = useMemo(() => {
     if (!treeWithExtraData) return undefined;
-    return createFilteredTree(treeWithExtraData, filter, matchMode, filterCaseSensitive);
-  }, [treeWithExtraData, filter, matchMode, filterCaseSensitive]);
+    return createFilteredTree(treeWithExtraData, filter, matchMode, filterCaseSensitive, filterOnlyModifiers);
+  }, [treeWithExtraData, filter, matchMode, filterCaseSensitive, filterOnlyModifiers]);
 
   const [resultsIndex, setResultsIndex] = useState(0);
 
@@ -206,8 +207,8 @@ function LayersPanel({ document }: { document: Document }) {
 
   return (
     <>
-      <div className="h-12">
-        <div className="p-2 sticky top-0 left-0 right-0 bg-psBackground z-10 pr-8 border-b border-psDark">
+      <div className="h-[70px]">
+        <div className="p-2 fixed top-0 left-0 right-0 bg-psBackground z-10 pr-8 border-b border-psDark">
           <div className="flex flex-row items-center">
             <input
               type="text"
@@ -229,14 +230,14 @@ function LayersPanel({ document }: { document: Document }) {
               <ArrowUp
                 size={20}
                 style={{ fill: "transparent", stroke: "currentColor" }}
-                onClick={previousResult}
+                onMouseDown={previousResult}
               />
             </ButtonDiv>
             <ButtonDiv className="border border-psDark rounded-md">
               <ArrowDown
                 size={20}
                 style={{ fill: "transparent", stroke: "currentColor" }}
-                onClick={nextResult}
+                onMouseDown={nextResult}
               />
             </ButtonDiv>
           </div>
@@ -259,7 +260,7 @@ function LayersPanel({ document }: { document: Document }) {
               />
               Case Sensitive
             </div>
-            <div className="flex flex-row items-center">
+            <div className="flex flex-row items-center mr-1">
               <select
                 value={matchMode}
                 onChange={(e) =>
@@ -278,13 +279,21 @@ function LayersPanel({ document }: { document: Document }) {
                 <option value="startsWith">Starts With</option>
               </select>
             </div>
+            <div className="flex flex-row items-center mr-1">
+              <input
+                type="checkbox"
+                checked={filterOnlyModifiers}
+                onChange={(e) => setFilterOnlyModifiers(e.target.checked)}
+              />
+              Only Modifiers
+            </div>
           </div>
         </div>
       </div>
       <TreeNode
         tree={filteredTree}
         activeLayerRefs={activeLayerRefsQuery.data}
-        filterMode={filter.length > 0 ? filterMode : "none"}
+        filterMode={filter.length > 0 || filterOnlyModifiers ? filterMode : "none"}
         currentResultLayer={filterResults[resultsIndex]}
       />
     </>
@@ -294,25 +303,28 @@ function LayersPanel({ document }: { document: Document }) {
 function createFilteredTree(
   tree: Tree<NodeWithExtraData>,
   filter: string,
-  matchMode: "exact" | "contains" | "endsWith" | "startsWith",
+  filterMatchMode: "exact" | "contains" | "endsWith" | "startsWith",
   filterCaseSensitive: boolean,
+  filterOnlyModifiers: boolean,
 ): Tree<NodeWithExtraDataAndFiltered> {
   return mapTree(tree, (node) => {
     const processedName = filterCaseSensitive ? node.layer.name : node.layer.name.toLowerCase(); 
     const processedFilter = filterCaseSensitive ? filter : filter.toLowerCase();
-    const isFiltered =
-      matchMode === "exact"
+    const doesNameMatch = !filter ||
+      (filterMatchMode === "exact"
         ? processedName === processedFilter
-        : matchMode === "contains"
+        : filterMatchMode === "contains"
           ? processedName.includes(processedFilter)
-          : matchMode === "endsWith"
+          : filterMatchMode === "endsWith"
             ? processedName.endsWith(processedFilter)
-            : matchMode === "startsWith"
+            : filterMatchMode === "startsWith"
               ? processedName.startsWith(processedFilter)
-              : false;
+              : false);
+    const isSpecialBlendMode = node.layer.kind === "group" ? node.layer.blendMode !== "passThrough" : node.layer.blendMode !== "normal";
+    const doModifiersMatch = !filterOnlyModifiers || node.layer.opacity < 255 || Object.keys(node.layer.effects).length > 0 || isSpecialBlendMode;
     return {
       ...node,
-      filtered: isFiltered,
+      filtered: doesNameMatch && doModifiersMatch,
     };
   });
 }
@@ -451,7 +463,7 @@ function TreeNode({
               <>
                 <div
                   className="w-6 border-r border-psDark flex items-center justify-center disabled:opacity-50"
-                  onClick={() =>
+                  onMouseDown={() =>
                     changeLayerVisibilityMutation.mutate({
                       layerRef: {
                         id: node.ref.layer.id,
@@ -477,7 +489,7 @@ function TreeNode({
                 </div>
                 {/* {node.ref.filtered ? "f" : "n"} */}
                 <ButtonDiv
-                  onClick={() => {
+                  onMouseDown={() => {
                     selectLayerMutation.mutate({
                       layerRef: {
                         id: node.ref.layer.id,
