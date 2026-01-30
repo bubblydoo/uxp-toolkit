@@ -1,5 +1,13 @@
 # @bubblydoo/uxp-toolkit-react
 
+## 0.0.7
+
+### Patch Changes
+
+- ee02127: More queries, more commands
+- Updated dependencies [ee02127]
+  - @bubblydoo/uxp-toolkit@0.0.7
+
 ## 0.0.6
 
 ### Patch Changes
