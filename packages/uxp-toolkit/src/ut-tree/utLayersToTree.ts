@@ -14,6 +14,7 @@ export function utLayersToTree(layer: UTLayer[]): Tree<UTLayerWithoutChildren> {
       blendMode: layer.blendMode,
       isClippingMask: layer.isClippingMask,
       effects: layer.effects,
+      background: layer.background,
     },
     name: layer.name,
     children: layer.layers ? utLayersToTree(layer.layers) : undefined,

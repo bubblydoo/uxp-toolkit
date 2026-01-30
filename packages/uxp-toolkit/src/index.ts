@@ -18,14 +18,18 @@ export {
   type CorrectExecuteAsModalOptions,
   type ExtendedExecutionContext,
 } from "./core/executeAsModal";
-export { suspendHistory, type SuspendHistoryContext } from "./core/suspendHistory";
+export {
+  suspendHistory,
+  type SuspendHistoryContext,
+} from "./core/suspendHistory";
 
 // Core wrappers
 export { executeAsModalAndSuspendHistory } from "./core-wrappers/executeAsModalAndSuspendHistory";
 
 // Commands library
-export { getLayerProperties } from "./commands-library/getLayerProperties";
 export { createRenameLayerCommand } from "./commands-library/renameLayer";
+export { createGetDocumentCommand, createGetDocumentHasBackgroundLayerCommand } from "./commands-library/getDocument";
+export { createGetBackgroundLayerCommand } from "./commands-library/getLayer";
 
 // DOM – layers
 export { getFlattenedDomLayersList } from "./dom/getFlattenedDomLayersList";
@@ -48,26 +52,27 @@ export { uxpEntrypointsSchema } from "./other/uxpEntrypoints";
 
 // UT tree – layer descriptors & Photoshop tree
 export {
-  getFlattenedLayerDescriptorsList,
-  type LayerDescriptor,
-} from "./ut-tree/getFlattenedLayerDescriptorsList";
-export {
   createGetLayerPropertiesCommand,
-  getLayerProperties as getLayerPropertiesFromUtTree,
+  getDocumentLayerDescriptors as getLayerPropertiesFromUtTree,
 } from "./ut-tree/getLayerProperties";
-export {
-  createGetLayerCommand as createGetLayerEffectsCommand,
-  getLayerEffects,
-} from "./ut-tree/getLayerEffects";
-export {
-  photoshopLayerDescriptorsToUTLayers,
-  type UTLayer,
-} from "./ut-tree/photoshopLayerDescriptorsToUTLayers";
+export { getLayerEffects } from "./ut-tree/getLayerEffects";
+export { type UTLayer } from "./ut-tree/photoshopLayerDescriptorsToUTLayers";
 export { type PsLayerRef } from "./ut-tree/psLayerRef";
-export { utLayersToTree, type UTLayerWithoutChildren } from "./ut-tree/utLayersToTree";
+export {
+  utLayersToTree,
+  type UTLayerWithoutChildren,
+} from "./ut-tree/utLayersToTree";
+
+// UT tree – text
+export { utLayersToText as utTreeToText } from "./ut-tree/utLayersToText";
 
 // Util
 export { utLayerToDomLayer, utLayersToDomLayers } from "./util/utLayerToLayer";
+export { type UTLayerPickKeys } from "./util/utLayerPickKeysType";
 
 // Error sourcemaps
-export { parseUxpErrorSourcemaps, getBasicStackFrameAbsoluteFilePath, type BasicStackFrame } from "./error-sourcemaps/sourcemaps";
+export {
+  parseUxpErrorSourcemaps,
+  getBasicStackFrameAbsoluteFilePath,
+  type BasicStackFrame,
+} from "./error-sourcemaps/sourcemaps";

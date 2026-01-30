@@ -1,8 +1,4 @@
-import { type LayerDescriptor } from "./getFlattenedLayerDescriptorsList";
-import { executeAsModal } from "../core/executeAsModal";
-import { createGetLayerCommand } from "./getLayerEffects";
-import { batchPlayCommands, type UTCommandResult } from "../core/command";
-import type z from "zod";
+import type { LayerDescriptor } from "./getLayerProperties";
 
 type UTLayerKind = "pixel" | "adjustment-layer" | "text" | "curves" | "smartObject" | "video" | "group" | "threeD" | "gradientFill" | "pattern" | "solidColor" | "background";
 
@@ -17,6 +13,7 @@ type UTLayerBuilder = {
   blendMode: UTBlendMode;
   effects: Record<string, boolean>;
   isClippingMask: boolean;
+  background: boolean;
   layers?: UTLayerBuilder[];
 };
 
@@ -88,46 +85,7 @@ const getBlendMode = (layer: LayerDescriptor): UTBlendMode => {
   return mode as UTBlendMode;
 };
 
-// Generate a tree from a flat list of layer descriptors
-export const photoshopLayerDescriptorsToUTLayers = async (layers: LayerDescriptor[]): Promise<UTLayer[]> => {
-  // 1. Prepare a single batch request for all layers
-  const commands = layers.map((layer) => createGetLayerCommand({ docId: layer.docId, id: layer.layerID }));
-
-  // 2. Execute one batch command instead of N commands
-  const getCommandResults = await batchPlayCommands(commands);
-
-  // 3. Create a fast lookup map for the results
-  const extra = turnGetCommandResultsToExtraLayerData(getCommandResults);
-
-  return photoshopLayerDescriptorsToUTLayersCore(layers, extra);
-};
-
-type ExtraLayerData = {
-  effects: UTLayerBuilder["effects"];
-  /** Whether it's a clipping mask or not. For some reason called "group" in the command result. */
-  group: boolean;
-};
-
-// type GetLayerCommandResult = z.infer<ReturnType<typeof createGetLayerCommand>['schema']>;
-type GetLayerCommandResult = UTCommandResult<ReturnType<typeof createGetLayerCommand>>;
-
-function turnGetCommandResultsToExtraLayerData(results: GetLayerCommandResult[]): Map<number, ExtraLayerData> {
-  const map = new Map<number, ExtraLayerData>();
-  results.forEach((result) => {
-    const layerId = result.layerID;
-    const data = result.layerEffects;
-    const effects: UTLayerBuilder["effects"] = {};
-    if (data) {
-      for (const effect in data) {
-        effects[effect] = Array.isArray(data[effect]) ? data[effect].some((e) => e.enabled) : !!data[effect]?.enabled;
-      }
-    }
-    map.set(layerId, { effects, group: !!result.group });
-  });
-  return map;
-}
-
-export function photoshopLayerDescriptorsToUTLayersCore(layers: LayerDescriptor[], extra: Map<number, ExtraLayerData>): UTLayer[] {
+export function photoshopLayerDescriptorsToUTLayers(layers: LayerDescriptor[]): UTLayer[] {
   const root: UTLayerBuilder[] = [];
   const stack: {
     layers: UTLayerBuilder[];
@@ -136,8 +94,6 @@ export function photoshopLayerDescriptorsToUTLayersCore(layers: LayerDescriptor[
   for (const layer of layers) {
     // Determine if the layer is a group start or end
     const sectionType = determineLayerSection(layer);
-
-    const isClippingMask = !!extra.get(layer.layerID)?.group;
 
     // Handle group end
     if (sectionType === "end") {
@@ -155,8 +111,9 @@ export function photoshopLayerDescriptorsToUTLayersCore(layers: LayerDescriptor[
       visible: layer.visible,
       kind: getLayerKind(layer),
       blendMode: getBlendMode(layer),
-      isClippingMask,
-      effects: extra.get(layer.layerID)?.effects ?? {},
+      isClippingMask: layer.group,
+      effects: getEffects(layer),
+      background: layer.background,
     };
 
     // Add the node to the current level
@@ -185,3 +142,13 @@ const determineLayerSection = (layer: LayerDescriptor): "start" | "end" | "norma
   const isGroupStart = section === "layerSectionStart";
   return isGroupStart ? "start" : isGroupEnd ? "end" : "normal";
 };
+
+function getEffects(layer: LayerDescriptor): Record<string, boolean> {
+  const effects: Record<string, boolean> = {};
+  if (layer.layerEffects) {
+    for (const effect in layer.layerEffects) {
+      effects[effect] = Array.isArray(layer.layerEffects[effect]) ? layer.layerEffects[effect].some((e) => e.enabled) : !!layer.layerEffects[effect]?.enabled;
+    }
+  }
+  return effects;
+}

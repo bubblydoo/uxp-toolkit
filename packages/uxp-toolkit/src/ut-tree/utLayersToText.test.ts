@@ -1,31 +1,27 @@
 import { expect, it } from "vitest";
-import { utTreeToText } from "./utTreeToText";
+import { utLayersToText } from "./utLayersToText";
 
 it("converts a single layer to text", () => {
-  expect(utTreeToText([
+  expect(utLayersToText([
     {
       name: "circle",
       effects: {},
       blendMode: "normal",
       isClippingMask: false,
       kind: "pixel",
-      docId: 1,
-      id: 1,
       visible: true,
     },
   ])).toMatchInlineSnapshot(`"◯ circle"`)
 });
 
 it("converts a nested layer to text", () => {
-  expect(utTreeToText([
+  expect(utLayersToText([
     {
       name: "group",
       effects: {},
       blendMode: "passThrough",
       isClippingMask: false,
       kind: "group",
-      docId: 1,
-      id: 1,
       visible: true,
       layers: [
         {
@@ -34,8 +30,6 @@ it("converts a nested layer to text", () => {
           blendMode: "normal",
           isClippingMask: false,
           kind: "pixel",
-          docId: 1,
-          id: 1,
           visible: true,
         },
         {
@@ -44,8 +38,6 @@ it("converts a nested layer to text", () => {
           blendMode: "normal",
           isClippingMask: false,
           kind: "pixel",
-          docId: 1,
-          id: 1,
           visible: true,
         },
         {
@@ -54,8 +46,6 @@ it("converts a nested layer to text", () => {
           blendMode: "passThrough",
           isClippingMask: false,
           kind: "group",
-          docId: 1,
-          id: 1,
           visible: true,
           layers: [
             {
@@ -64,8 +54,6 @@ it("converts a nested layer to text", () => {
               blendMode: "normal",
               isClippingMask: false,
               kind: "pixel",
-              docId: 1,
-              id: 1,
               visible: true,
             },
           ],
@@ -82,15 +70,13 @@ it("converts a nested layer to text", () => {
 });
 
 it("converts a nested layer with a clipping mask to text", () => {
-  expect(utTreeToText([
+  expect(utLayersToText([
     {
       name: "clipper",
       effects: {},
       blendMode: "normal",
       isClippingMask: true,
       kind: "pixel",
-      docId: 1,
-      id: 1,
       visible: true,
     },
     {
@@ -99,8 +85,6 @@ it("converts a nested layer with a clipping mask to text", () => {
       blendMode: "normal",
       isClippingMask: false,
       kind: "pixel",
-      docId: 1,
-      id: 1,
       visible: true,
     },
   ])).toMatchInlineSnapshot(`

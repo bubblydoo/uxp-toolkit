@@ -1,11 +1,11 @@
 import { expect, it } from "vitest";
-import { photoshopLayerDescriptorsToUTLayersCore } from "./photoshopLayerDescriptorsToUTLayers";
-import { utTreeToText } from "./utTreeToText";
+import { photoshopLayerDescriptorsToUTLayers } from "./photoshopLayerDescriptorsToUTLayers";
+import { utLayersToText } from "./utLayersToText";
 
 it("parses a flat list correctly", async () => {
   expect(
-    utTreeToText(
-      photoshopLayerDescriptorsToUTLayersCore(
+    utLayersToText(
+      photoshopLayerDescriptorsToUTLayers(
         [
           {
             name: "circle",
@@ -23,6 +23,8 @@ it("parses a flat list correctly", async () => {
               _enum: "layerSectionType",
             },
             docId: 70,
+            layerEffects: {},
+            group: true,
           },
           {
             name: "group",
@@ -40,6 +42,8 @@ it("parses a flat list correctly", async () => {
               _enum: "layerSectionType",
             },
             docId: 70,
+            layerEffects: {},
+            group: false,
           },
           {
             name: "green square",
@@ -57,6 +61,8 @@ it("parses a flat list correctly", async () => {
               _enum: "layerSectionType",
             },
             docId: 70,
+            layerEffects: {},
+            group: true,
           },
           {
             name: "red square",
@@ -74,6 +80,8 @@ it("parses a flat list correctly", async () => {
               _enum: "layerSectionType",
             },
             docId: 70,
+            layerEffects: {},
+            group: false,
           },
           {
             name: "</Layer group>",
@@ -91,15 +99,10 @@ it("parses a flat list correctly", async () => {
               _enum: "layerSectionType",
             },
             docId: 70,
+            layerEffects: {},
+            group: true,
           },
         ],
-        new Map([
-          [4, { group: true, effects: {} }],
-          [6, { group: false, effects: {} }],
-          [3, { group: true, effects: {} }],
-          [2, { group: false, effects: {} }],
-          [7, { group: false, effects: {} }],
-        ]),
       ),
     ),
   ).toMatchInlineSnapshot(`

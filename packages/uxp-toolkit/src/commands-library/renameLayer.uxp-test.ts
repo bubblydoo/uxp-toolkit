@@ -1,13 +1,13 @@
 import { executeAsModal } from "../core/executeAsModal";
 import { openFileByPath } from "../filesystem/openFileByPath";
-import { getLayerProperties } from "../ut-tree/getLayerProperties";
+import { getDocumentLayerDescriptors } from "../ut-tree/getLayerProperties";
 import type { Test } from "@bubblydoo/uxp-test-framework";
 import { expect } from "chai";
 import { app } from "photoshop";
 import { createRenameLayerCommand } from "./renameLayer";
 
 async function getFirstLayer() {
-  const allLayers = await getLayerProperties(app.activeDocument.id);
+  const allLayers = await getDocumentLayerDescriptors(app.activeDocument.id);
   return {
     ref: {
       id: allLayers[0]!.layerID,
@@ -15,7 +15,7 @@ async function getFirstLayer() {
     },
     name: allLayers[0]!.name,
   };
-} 
+}
 
 export const renameLayerTest: Test = {
   name: "Rename Layer",
