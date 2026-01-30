@@ -1,13 +1,14 @@
 name: Add UXP Toolkit Release Artifacts
 
 on:
-  push:
-    tags:
-      - '@bubblydoo/uxp-toolkit@*'
+  release:
+    types: [published]
 
 jobs:
   add-artifacts:
     runs-on: ubuntu-latest
+
+    if: github.event_name == 'release' && contains(github.ref, '/@bubblydoo/uxp-toolkit@')
 
     steps:
       - name: Checkout code repository
