@@ -1,0 +1,76 @@
+name: Add UXP Toolkit Release Artifacts
+
+on:
+  push:
+    tags:
+      - '@bubblydoo/uxp-toolkit@*'
+
+jobs:
+  add-artifacts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Setup node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
+
+      - name: Build @bubblydoo/uxp-toolkit test plugin
+        run: pnpm -C packages/uxp-toolkit uxp-test:build
+
+      - name: Create and publish versions
+        uses: changesets/action@v1
+        with:
+          commit: "chore: update versions"
+          title: "chore: update versions"
+          publish: pnpm changeset publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Zip the artifacts
+        run: |
+          pushd packages/uxp-toolkit/uxp-tests-plugin
+          zip -r $OLDPWD/uxp-toolkit-tests-plugin.zip *
+          popd
+          pushd packages/example-layers-plugin/dist
+          zip -r $OLDPWD/example-layers-plugin.zip *
+          popd
+
+      - name: Upload @bubblydoo/uxp-toolkit test-plugin to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: uxp-toolkit-tests-plugin.zip
+          asset_name: uxp-toolkit-tests-plugin.zip
+          tag: ${{ github.ref }}
+
+      # this is a private package so it doesn't have its own release, so we upload it to the UXP Toolkit release
+      - name: Upload example layers plugin to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: example-layers-plugin.zip
+          asset_name: example-layers-plugin.zip
+          tag: ${{ github.ref }}
