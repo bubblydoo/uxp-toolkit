@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.8
+
+### Patch Changes
+
+- efb98a5: Setup adding artifacts to release
+
 ## 0.0.7
 
 ### Patch Changes
