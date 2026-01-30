@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.6
+
+### Patch Changes
+
+- 31534d4: Fix layer descriptors exorts
+
 ## 0.0.5
 
 ### Patch Changes
