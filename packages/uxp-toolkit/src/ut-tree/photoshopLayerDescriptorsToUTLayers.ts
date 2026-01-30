@@ -1,4 +1,4 @@
-import type { LayerDescriptor } from "./getLayerProperties";
+import type { LayerDescriptor } from "./getDocumentLayerDescriptors";
 
 type UTLayerKind = "pixel" | "adjustment-layer" | "text" | "curves" | "smartObject" | "video" | "group" | "threeD" | "gradientFill" | "pattern" | "solidColor" | "background";
 

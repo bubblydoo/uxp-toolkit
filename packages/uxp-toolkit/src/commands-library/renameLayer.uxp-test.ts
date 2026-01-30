@@ -1,6 +1,6 @@
 import { executeAsModal } from "../core/executeAsModal";
 import { openFileByPath } from "../filesystem/openFileByPath";
-import { getDocumentLayerDescriptors } from "../ut-tree/getLayerProperties";
+import { getDocumentLayerDescriptors } from "../ut-tree/getDocumentLayerDescriptors";
 import type { Test } from "@bubblydoo/uxp-test-framework";
 import { expect } from "chai";
 import { app } from "photoshop";

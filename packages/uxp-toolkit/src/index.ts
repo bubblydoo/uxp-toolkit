@@ -28,7 +28,10 @@ export { executeAsModalAndSuspendHistory } from "./core-wrappers/executeAsModalA
 
 // Commands library
 export { createRenameLayerCommand } from "./commands-library/renameLayer";
-export { createGetDocumentCommand, createGetDocumentHasBackgroundLayerCommand } from "./commands-library/getDocument";
+export {
+  createGetDocumentCommand,
+  createGetDocumentHasBackgroundLayerCommand,
+} from "./commands-library/getDocument";
 export { createGetBackgroundLayerCommand } from "./commands-library/getLayer";
 
 // DOM – layers
@@ -51,12 +54,13 @@ export { copyToClipboard, readFromClipboard } from "./other/clipboard";
 export { uxpEntrypointsSchema } from "./other/uxpEntrypoints";
 
 // UT tree – layer descriptors & Photoshop tree
-export {
-  createGetLayerPropertiesCommand,
-  getDocumentLayerDescriptors as getLayerPropertiesFromUtTree,
-} from "./ut-tree/getLayerProperties";
+export { createMultiGetDocumentCommand } from "./commands-library/multiGetDocument";
+export { getDocumentLayerDescriptors } from "./ut-tree/getDocumentLayerDescriptors";
 export { getLayerEffects } from "./ut-tree/getLayerEffects";
-export { type UTLayer } from "./ut-tree/photoshopLayerDescriptorsToUTLayers";
+export {
+  type UTLayer,
+  photoshopLayerDescriptorsToUTLayers,
+} from "./ut-tree/photoshopLayerDescriptorsToUTLayers";
 export { type PsLayerRef } from "./ut-tree/psLayerRef";
 export {
   utLayersToTree,

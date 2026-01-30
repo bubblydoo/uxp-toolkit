@@ -31,8 +31,7 @@ import type { Document } from "photoshop/dom/Document";
 import { Fragment, useMemo, useState } from "react";
 import { z } from "zod";
 import { cn } from "./lib/cn";
-import { getDocumentLayerDescriptors } from "../../uxp-toolkit/src/ut-tree/getLayerProperties";
-import { photoshopLayerDescriptorsToUTLayers } from "../../uxp-toolkit/src/ut-tree/photoshopLayerDescriptorsToUTLayers";
+import { photoshopLayerDescriptorsToUTLayers, getDocumentLayerDescriptors } from "@bubblydoo/uxp-toolkit";
 
 export function App() {
   return (

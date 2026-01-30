@@ -2,7 +2,7 @@ import type { Test } from "@bubblydoo/uxp-test-framework";
 import { photoshopLayerDescriptorsToUTLayers } from "./photoshopLayerDescriptorsToUTLayers";
 import { openFileByPath } from "../filesystem/openFileByPath";
 import { expect } from "chai";
-import { getDocumentLayerDescriptors } from "./getLayerProperties";
+import { getDocumentLayerDescriptors } from "./getDocumentLayerDescriptors";
 
 export const photoshopLayerDescriptorsToUTLayersTest: Test = {
   name: "photoshopLayerDescriptorsToUTLayers",
