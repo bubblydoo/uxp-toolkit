@@ -1,0 +1,186 @@
+{
+    "layerID": 1,
+    "group": false,
+    "name": "Background",
+    "color": {
+        "_enum": "color",
+        "_value": "none"
+    },
+    "visible": true,
+    "mode": {
+        "_enum": "blendMode",
+        "_value": "normal"
+    },
+    "opacity": 255,
+    "itemIndex": 1,
+    "count": 2,
+    "preserveTransparency": true,
+    "layerFXVisible": false,
+    "globalAngle": 90,
+    "background": true,
+    "layerSection": {
+        "_enum": "layerSectionType",
+        "_value": "layerSectionContent"
+    },
+    "layerLocking": {
+        "_obj": "layerLocking",
+        "protectTransparency": true,
+        "protectComposite": false,
+        "protectPosition": true,
+        "protectArtboardAutonest": true,
+        "protectAll": false
+    },
+    "targetChannels": [
+        {
+            "_ref": "channel",
+            "_index": 1
+        },
+        {
+            "_ref": "channel",
+            "_index": 2
+        },
+        {
+            "_ref": "channel",
+            "_index": 3
+        }
+    ],
+    "visibleChannels": [
+        {
+            "_ref": "channel",
+            "_index": 1
+        },
+        {
+            "_ref": "channel",
+            "_index": 2
+        },
+        {
+            "_ref": "channel",
+            "_index": 3
+        }
+    ],
+    "channelRestrictions": [
+        {
+            "_enum": "channel",
+            "_value": "red"
+        },
+        {
+            "_enum": "channel",
+            "_value": "grain"
+        },
+        {
+            "_enum": "channel",
+            "_value": "blue"
+        }
+    ],
+    "fillOpacity": 255,
+    "hasUserMask": false,
+    "hasVectorMask": false,
+    "proportionalScaling": false,
+    "layerKind": 1,
+    "hasFilterMask": false,
+    "userMaskDensity": 255,
+    "userMaskFeather": 0,
+    "vectorMaskDensity": 255,
+    "vectorMaskFeather": 0,
+    "filterMaskDensity": 255,
+    "filterMaskFeather": 0,
+    "bounds": {
+        "_obj": "rectangle",
+        "top": {
+            "_unit": "pixelsUnit",
+            "_value": 0
+        },
+        "left": {
+            "_unit": "pixelsUnit",
+            "_value": 0
+        },
+        "bottom": {
+            "_unit": "pixelsUnit",
+            "_value": 100
+        },
+        "right": {
+            "_unit": "pixelsUnit",
+            "_value": 100
+        },
+        "width": {
+            "_unit": "pixelsUnit",
+            "_value": 100
+        },
+        "height": {
+            "_unit": "pixelsUnit",
+            "_value": 100
+        }
+    },
+    "boundsNoEffects": {
+        "_obj": "rectangle",
+        "top": {
+            "_unit": "pixelsUnit",
+            "_value": 0
+        },
+        "left": {
+            "_unit": "pixelsUnit",
+            "_value": 0
+        },
+        "bottom": {
+            "_unit": "pixelsUnit",
+            "_value": 100
+        },
+        "right": {
+            "_unit": "pixelsUnit",
+            "_value": 100
+        },
+        "width": {
+            "_unit": "pixelsUnit",
+            "_value": 100
+        },
+        "height": {
+            "_unit": "pixelsUnit",
+            "_value": 100
+        }
+    },
+    "boundsNoMask": {
+        "_obj": "rectangle",
+        "top": {
+            "_unit": "pixelsUnit",
+            "_value": 0
+        },
+        "left": {
+            "_unit": "pixelsUnit",
+            "_value": 0
+        },
+        "bottom": {
+            "_unit": "pixelsUnit",
+            "_value": 100
+        },
+        "right": {
+            "_unit": "pixelsUnit",
+            "_value": 100
+        },
+        "width": {
+            "_unit": "pixelsUnit",
+            "_value": 100
+        },
+        "height": {
+            "_unit": "pixelsUnit",
+            "_value": 100
+        }
+    },
+    "useAlignedRendering": false,
+    "generatorSettings": {
+        "_obj": "generatorSettings"
+    },
+    "keyOriginType": [],
+    "fillEnabled": false,
+    "animationProtection": {
+        "_obj": "animationProtection",
+        "animationUnifyPosition": false,
+        "animationUnifyEffects": false,
+        "animationUnifyVisibility": false,
+        "animationPropagate": true
+    },
+    "isSyntheticFill": false,
+    "artboardEnabled": false,
+    "vectorMaskEmpty": true,
+    "textWarningLevel": 0,
+    "parentLayerID": -1
+}

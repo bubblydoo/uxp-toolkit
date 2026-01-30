@@ -5,7 +5,8 @@
   "private": true,
   "packageManager": "pnpm@10.21.0",
   "scripts": {
-    "build": "turbo run build"
+    "build": "turbo run build",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",

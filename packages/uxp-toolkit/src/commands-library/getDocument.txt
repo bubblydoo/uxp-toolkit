@@ -1,0 +1,62 @@
+// Object
+// EXIF: "EXIF tag 100274 Normal\rEXIF tag 100282 72.0\rEXIF tag 100283 72.0\rEXIF tag 100296 Inches\rEXIF tag 100305 Adobe Photoshop 27.3 (20251221.m.3348 0256c3c)  (Macintosh)\rEXIF tag 100306 2026:01:30 11:20:57\rEXIF tag 140961 Uncalibrated\rEXIF tag 140962 100\rEXIF tag 140963 100\r"
+// XMPMetadataAsUTF8: "<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc
+// backgroundSaveInfo: {isPendingNormalSave: false}
+// bigNudgeH: 655360
+// bigNudgeV: 655360
+// center: {_obj: "paint", horizontal: {…}, vertical: {…}}
+// clippingPathInfo: {_obj: "clippingInfo", clippingPathIndex: -1, clippingPathFlatness: 0}
+// contentCredentialsEnabled: false
+// copyright: false
+// count: 3
+// depth: 8
+// documentID: 101
+// duotoneInk: 0
+// extension: (3) ["PSD", "PDD", "PSDT"]
+// fileInfo: {_obj: "fileInfo"}
+// fileReference: {_path: "/Users/otto/Code/projects/bubbly/uxp-toolkit/packa…t/uxp-tests-plugin/fixtures/one-layer-with-bg.psd", _kind: "local"}
+// format: "Photoshop"
+// genTechModelsUsed: []
+// generatorSettings: {_obj: "generatorSettings"}
+// guidesVisibility: true
+// hasBackgroundLayer: true
+// height: {_unit: "distanceUnit", _value: 100}
+// histogram: (256) [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1698, 19, 5, 10, 3, 11, 6, 7, 4, 1, 2, 2, 4, 2, 3, 0, 2, 4, 2, 0, 4, 1, 4, 1, 3, 4, 0, …]
+// isCloudDoc: false
+// isDirty: false
+// isUsingGenTech: false
+// itemIndex: 2
+// manage: {_enum: "manage", _value: "none"}
+// measurementScale: {_obj: "measurementScale", _target: Array(2), to: {…}}
+// mimeType: "application/vnd.adobe.photoshop"
+// mode: {_enum: "colorSpace", _value: "RGBColor"}
+// numberOfChannels: 3
+// numberOfLayers: 1
+// numberOfPaths: 0
+// patternPreviewMode: false
+// pixelScaleFactor: {_unit: "noneUnit", _value: 1}
+// printColorHandling: {_enum: "printColorHandling", _value: "printerManaged"}
+// printCopies: 1
+// printCurrentPrinter: "EPSON ET-8500 Series"
+// printOutput: {_obj: "printOutput", postScriptColor: true, intent: {…}, printSixteenBit: false, printerName: "", …}
+// printOutputOptions: {_obj: "printOutputOptions", caption: false, calibrationBars: false, registrationMarks: false, cornerCropMarks: false, …}
+// printerList: ["Brother MFC-L3750CDW series"]
+// quickMask: false
+// resolution: {_unit: "densityUnit", _value: 72}
+// rulerOriginH: 0
+// rulerOriginV: 0
+// rulersVisibility: true
+// selectionEdgesVisible: false
+// slices: {bounds: {…}, slices: Array(1)}
+// smartGuidesVisibility: true
+// targetLayers: [{…}]
+// targetLayersIDs: [{…}]
+// targetLayersIndexes: [{…}]
+// targetPathIndex: -1
+// targetPathVisibility: true
+// title: "one-layer-with-bg.psd"
+// visible: true
+// watermark: false
+// width: {_unit: "distanceUnit", _value: 100}
+// workPathIndex: -1
+// zoom: {_unit: "percentUnit", _value: 30.830188679245282}

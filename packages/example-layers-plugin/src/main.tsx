@@ -1,18 +1,14 @@
 import {
   createCommand,
   executeAsModal,
-  getFlattenedLayerDescriptorsList,
-  photoshopLayerDescriptorsToUTLayers,
   utLayersToTree,
   type PsLayerRef,
   type Tree,
-  type UTLayer,
   type UTLayerWithoutChildren,
 } from "@bubblydoo/uxp-toolkit";
 import {
   useActiveDocument,
   useOnDocumentEdited,
-  useOnEvent,
 } from "@bubblydoo/uxp-toolkit-react";
 import {
   QueryClient,
@@ -28,12 +24,15 @@ import {
   EyeOff,
   FlowerIcon,
   Folder,
+  LockIcon,
 } from "lucide-react";
 import { app } from "photoshop";
 import type { Document } from "photoshop/dom/Document";
 import { Fragment, useMemo, useState } from "react";
 import { z } from "zod";
 import { cn } from "./lib/cn";
+import { getDocumentLayerDescriptors } from "../../uxp-toolkit/src/ut-tree/getLayerProperties";
+import { photoshopLayerDescriptorsToUTLayers } from "../../uxp-toolkit/src/ut-tree/photoshopLayerDescriptorsToUTLayers";
 
 export function App() {
   return (
@@ -73,8 +72,8 @@ function LayersPanel({ document }: { document: Document }) {
   const layersQuery = useQuery({
     queryKey: ["layers", activeDocumentId],
     queryFn: async () => {
-      const utLayers = await photoshopLayerDescriptorsToUTLayers(
-        await getFlattenedLayerDescriptorsList(activeDocumentId),
+      const utLayers = photoshopLayerDescriptorsToUTLayers(
+        await getDocumentLayerDescriptors(activeDocumentId),
       );
 
       return utLayersToTree(utLayers);
@@ -289,6 +288,14 @@ function TreeNode({
               {Object.keys(node.ref.layer.effects).length > 0 && (
                 <div className="ml-2 flex items-center">
                   <FlowerIcon
+                    size={14}
+                    style={{ fill: "transparent", stroke: "currentColor" }}
+                  />
+                </div>
+              )}
+              {node.ref.layer.background && (
+                <div className="ml-2 flex items-center">
+                  <LockIcon
                     size={14}
                     style={{ fill: "transparent", stroke: "currentColor" }}
                   />

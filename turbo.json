@@ -4,6 +4,11 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
+    },
+    "test": {
+      "dependsOn": ["^test"],
+      "outputs": ["test-results/**"],
+      "env": ["CI"]
     }
   }
 }

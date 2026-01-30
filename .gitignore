@@ -7,3 +7,4 @@ build
 tsconfig.tsbuildinfo
 .pnpm-store
 *.tgz
+test-results

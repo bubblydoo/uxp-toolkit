@@ -5,10 +5,11 @@
 This is a toolkit for building UXP extensions for Adobe Photoshop. It has been created because the experience building extensions for Adobe Photoshop is pretty terrible: nothing works as expected and the documentation is lacking.
 
 With the code in this repo, we fix a few things:
-- A large amount of functions, including automated tests, for common actions in Photoshop, like interacting with layers and files. 
+- A large amount of functions, including automated tests, for common actions in Photoshop, like interacting with layers and files.
 - A way to interact with batchPlay in a typesafe way, with Zod schemas for the output.
 - A unified way to represent layers in your code, without using document.layers (which gets very slow, see below)
 - A testing framework for UXP, which you can also use for your own tests.
+- Vitest integration for running unit tests without Photoshop, with CI/CD support.
 
 
 ```bash
@@ -29,7 +30,7 @@ There are a lot of issues with the API:
 
 ## What we did
 
-We made functions for building typesafe UXP projects. Instead of just running `batchPlay`, and trusting what the output is, we verify what the output is:
+We made functions for building typesafe UXP projects. Instead of just running `batchPlay`, and trusting what the output is, we verify what the output is.
 
 ### Core Functions
 
@@ -108,7 +109,7 @@ For better ergonomics, we put the document first, then the name, and then the fu
 
 ```ts
 await suspendHistory(document, "Action that suspends history", async (ctx) => {
-  
+  await ctx.batchPlayCommand(createRenameLayerCommand({ id: 123, docId: document.id }, "New Name"));
 });
 ```
 
@@ -127,16 +128,26 @@ await executeAsModalAndSuspendHistory("Combined action", document, async (ctx, s
 As `document.layers` can get slow, we provide a parser for a layer tree, built on `batchPlay` commands.
 
 ```ts
+//    LayerDescriptor[]
+//    ^
+const descriptors = await getDocumentLayerDescriptors(document.id);
+
 //    UTLayer[]
 //    ^
-const tree = await photoshopLayerDescriptorsToTree(await getFlattenedLayerDescriptorsList(document));
+const layers = photoshopLayerDescriptorsToUTLayers(descriptors);
 ```
+
 
 ### Commands library
 
 We have a library of commands for common actions in Photoshop.
 
-- `getRenameLayerCommand` to rename layers
+- `createRenameLayerCommand` – Rename layers
+- `createGetDocumentCommand` – Get document properties
+- `createGetDocumentHasBackgroundLayerCommand` – Check if document has a background layer
+- `createGetLayerCommand` – Get layer properties
+- `createGetBackgroundLayerCommand` – Get the background layer
+- `createGetLayerPropertiesCommand` – Get properties for all layers in a document
 
 ### Error sourcemaps
 
@@ -162,13 +173,30 @@ try {
 }
 ```
 
-### Testing framework and plugin
+### Testing
+
+#### Vitest Integration
+
+We now support Vitest for unit testing TypeScript code without Photoshop:
+
+```bash
+pnpm test
+```
+
+The test suite includes:
+- Unit tests (`.test.ts`) for pure TypeScript functions
+- Type tests (`.test-d.ts`) for compile-time type checking
+- Photoshop builtin module aliases for testing code that imports `photoshop` or `uxp` modules
+
+Tests run in CI via GitHub Actions with JUnit reporting.
+
+#### UXP Testing Framework and Plugin
 
 ```bash
 pnpm add @bubblydoo/uxp-test-framework
 ```
 
-We have developed a plugin specifically for testing UXP plugins. It allows you to run tests inside of Photoshop, and see the results in a panel.
+For integration tests that require Photoshop, we have developed a plugin specifically for testing UXP plugins. It allows you to run tests inside of Photoshop, and see the results in a panel.
 
 <img src="res/screenshot-test-plugin.png" alt="Screenshot of the test plugin" width="400" />
 
@@ -196,12 +224,20 @@ import { app } from "photoshop";
 const renameLayerTest: Test = {
   name: "Should rename layer",
   async run() {
-    await openFileByPath("plugin:/fixtures/one-layer.psd");
-    expect(app.activeDocument.layers[0].name).to.equal("Layer 1");
+    const doc = await openFileByPath("plugin:/fixtures/one-layer.psd");
+    const descriptors = await getDocumentLayerDescriptors(doc.id);
+    const firstLayer = descriptors[0];
+
+    expect(firstLayer.name).to.equal("Layer 1");
+
     await executeAsModal("Rename Layer", async (ctx) => {
-      await ctx.batchPlayCommand(createRenameLayerCommand(layer.ref, "New Name"));
+      await ctx.batchPlayCommand(
+        createRenameLayerCommand({ id: firstLayer.layerID, docId: firstLayer.docId }, "New Name")
+      );
     });
-    expect(app.activeDocument.layers[0].name)).to.equal("New Name");
+
+    const updatedDescriptors = await getDocumentLayerDescriptors(doc.id);
+    expect(updatedDescriptors[0].name).to.equal("New Name");
   },
 };
 
