@@ -140,14 +140,11 @@ const layers = photoshopLayerDescriptorsToUTLayers(descriptors);
 
 ### Commands library
 
-We have a library of commands for common actions in Photoshop.
+We have a library of commands for common actions in Photoshop, which you can import from `@bubblydoo/uxp-toolkit/commands`.
 
-- `createRenameLayerCommand` – Rename layers
-- `createGetDocumentCommand` – Get document properties
-- `createGetDocumentHasBackgroundLayerCommand` – Check if document has a background layer
-- `createGetLayerCommand` – Get layer properties
-- `createGetBackgroundLayerCommand` – Get the background layer
-- `createGetLayerPropertiesCommand` – Get properties for all layers in a document
+Examples are `createRenameLayerCommand` and `createSelectLayerCommand`.
+
+See the [commands library](./packages/uxp-toolkit/src/commands-library/index.ts) index file for a complete list.
 
 ### Error sourcemaps
 

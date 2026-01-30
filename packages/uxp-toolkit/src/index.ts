@@ -26,14 +26,6 @@ export {
 // Core wrappers
 export { executeAsModalAndSuspendHistory } from "./core-wrappers/executeAsModalAndSuspendHistory";
 
-// Commands library
-export { createRenameLayerCommand } from "./commands-library/renameLayer";
-export {
-  createGetDocumentCommand,
-  createGetDocumentHasBackgroundLayerCommand,
-} from "./commands-library/getDocument";
-export { createGetBackgroundLayerCommand } from "./commands-library/getLayer";
-
 // DOM – layers
 export { getFlattenedDomLayersList } from "./dom/getFlattenedDomLayersList";
 export { photoshopDomLayersToTree } from "./dom/photoshopDomLayersToTree";
@@ -55,7 +47,7 @@ export { uxpEntrypointsSchema } from "./other/uxpEntrypoints";
 
 // UT tree – layer descriptors & Photoshop tree
 export { createMultiGetDocumentCommand } from "./commands-library/multiGetDocument";
-export { getDocumentLayerDescriptors } from "./ut-tree/getDocumentLayerDescriptors";
+export { getDocumentLayerDescriptors, type LayerDescriptor } from "./ut-tree/getDocumentLayerDescriptors";
 export { getLayerEffects } from "./ut-tree/getLayerEffects";
 export {
   type UTLayer,

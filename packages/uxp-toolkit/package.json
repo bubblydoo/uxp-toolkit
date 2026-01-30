@@ -20,6 +20,10 @@
       "types": "./src/index.ts",
       "import": "./src/index.ts"
     },
+    "./commands": {
+      "types": "./src/commands-library/index.ts",
+      "import": "./src/commands-library/index.ts"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -28,6 +32,10 @@
       ".": {
         "types": "./dist/index.d.ts",
         "import": "./dist/index.js"
+      },
+      "./commands": {
+        "types": "./dist/commands-library/index.d.ts",
+        "import": "./dist/commands-library/index.js"
       },
       "./package.json": "./package.json"
     }
