@@ -4,10 +4,12 @@ import {
   utLayersToTree,
   type PsLayerRef,
   type Tree,
+  type UTLayer,
   type UTLayerWithoutChildren,
 } from "@bubblydoo/uxp-toolkit";
 import {
   useActiveDocument,
+  useDocumentTreeQuery,
   useOnDocumentEdited,
 } from "@bubblydoo/uxp-toolkit-react";
 import {
@@ -31,7 +33,6 @@ import type { Document } from "photoshop/dom/Document";
 import { Fragment, useMemo, useState } from "react";
 import { z } from "zod";
 import { cn } from "./lib/cn";
-import { photoshopLayerDescriptorsToUTLayers, getDocumentLayerDescriptors } from "@bubblydoo/uxp-toolkit";
 
 export function App() {
   return (
@@ -68,19 +69,10 @@ function LayersPanel({ document }: { document: Document }) {
   const queryClient = useQueryClient();
   const activeDocumentId = document.id;
 
-  const layersQuery = useQuery({
-    queryKey: ["layers", activeDocumentId],
-    queryFn: async () => {
-      const utLayers = photoshopLayerDescriptorsToUTLayers(
-        await getDocumentLayerDescriptors(activeDocumentId),
-      );
-
-      return utLayersToTree(utLayers);
-    },
-  });
+  const treeQuery = useDocumentTreeQuery(document, { select: utLayersToTree });
 
   const treeWithExtraData = useMemo(() => {
-    if (!layersQuery.data) return undefined;
+    if (!treeQuery.data) return undefined;
 
     function crawl(tree: Tree<UTLayerWithoutChildren>) {
       const newTree: Tree<NodeWithExtraData> = [];
@@ -100,8 +92,8 @@ function LayersPanel({ document }: { document: Document }) {
       return newTree;
     }
 
-    return crawl(layersQuery.data);
-  }, [layersQuery.data]);
+    return crawl(treeQuery.data);
+  }, [treeQuery.data]);
 
   const activeLayerRefsQuery = useQuery({
     queryKey: ["activeLayers", activeDocumentId],

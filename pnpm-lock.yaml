@@ -76,7 +76,7 @@ importers:
         version: 8.18.1
       '@vitejs/plugin-react':
         specifier: ^4.5.1
-        version: 4.7.0(vite@6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3))
+        version: 4.7.0(vite@6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3))
       autoprefixer:
         specifier: ^10
         version: 10.4.23(postcss@8.5.6)
@@ -103,10 +103,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^6.3.5
-        version: 6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3)
+        version: 6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3)
       vite-tsconfig-paths:
         specifier: ^6.0.5
-        version: 6.0.5(typescript@5.9.3)(vite@6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3))
+        version: 6.0.5(typescript@5.9.3)(vite@6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3))
       vite-uxp-plugin:
         specifier: ^1.2.5
         version: 1.2.5(patch_hash=5e86cbd2de876a2a76073a7d326f55b6738061d6b34670fa42187917adb968e2)(@types/node@20.19.30)
@@ -187,7 +187,7 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^6.4.1
-        version: 6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3)
+        version: 6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3)
     devDependencies:
       '@adobe/cc-ext-uxp-types':
         specifier: https://github.com/justintaylor-dev/cc-ext-uxp-types.git
@@ -236,7 +236,7 @@ importers:
         version: 8.18.1
       '@vitejs/plugin-react':
         specifier: ^5.1.2
-        version: 5.1.2(vite@6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3))
+        version: 5.1.2(vite@6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3))
       arg:
         specifier: ^5.0.2
         version: 5.0.2
@@ -275,10 +275,10 @@ importers:
         version: 2.8.1
       vite-plugin-static-copy:
         specifier: ^3.1.6
-        version: 3.1.6(vite@6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3))
+        version: 3.1.6(vite@6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3))
       vite-tsconfig-paths:
         specifier: ^6.0.5
-        version: 6.0.5(typescript@5.9.3)(vite@6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3))
+        version: 6.0.5(typescript@5.9.3)(vite@6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3))
       vite-uxp-plugin:
         specifier: ^1.2.5
         version: 1.2.5(patch_hash=5e86cbd2de876a2a76073a7d326f55b6738061d6b34670fa42187917adb968e2)(@types/node@20.19.30)
@@ -342,6 +342,10 @@ importers:
         version: 4.3.6
 
   packages/uxp-toolkit-react:
+    dependencies:
+      '@lukemorales/query-key-factory':
+        specifier: ^1.3.4
+        version: 1.3.4(@tanstack/query-core@5.90.20)(@tanstack/react-query@5.90.20(react@19.2.4))
     devDependencies:
       '@adobe-uxp-types/uxp':
         specifier: ^0.0.9
@@ -945,6 +949,13 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@lukemorales/query-key-factory@1.3.4':
+    resolution: {integrity: sha512-A3frRDdkmaNNQi6mxIshsDk4chRXWoXa05US8fBo4kci/H+lVmujS6QrwQLLGIkNIRFGjMqp2uKjC4XsLdydRw==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@tanstack/query-core': '>= 4.0.0'
+      '@tanstack/react-query': '>= 4.0.0'
 
   '@manypkg/find-root@1.1.0':
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
@@ -4093,6 +4104,11 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@lukemorales/query-key-factory@1.3.4(@tanstack/query-core@5.90.20)(@tanstack/react-query@5.90.20(react@19.2.4))':
+    dependencies:
+      '@tanstack/query-core': 5.90.20
+      '@tanstack/react-query': 5.90.20(react@19.2.4)
+
   '@manypkg/find-root@1.1.0':
     dependencies:
       '@babel/runtime': 7.28.6
@@ -4483,7 +4499,7 @@ snapshots:
     dependencies:
       '@types/node': 20.19.30
 
-  '@vitejs/plugin-react@4.7.0(vite@6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3))':
+  '@vitejs/plugin-react@4.7.0(vite@6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3))':
     dependencies:
       '@babel/core': 7.28.6
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.6)
@@ -4491,11 +4507,11 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3)
+      vite: 6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-react@5.1.2(vite@6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3))':
+  '@vitejs/plugin-react@5.1.2(vite@6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3))':
     dependencies:
       '@babel/core': 7.28.6
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.6)
@@ -4503,7 +4519,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.53
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3)
+      vite: 6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3)
     transitivePeerDependencies:
       - supports-color
 
@@ -6602,13 +6618,13 @@ snapshots:
       spdx-correct: 3.2.0
       spdx-expression-parse: 3.0.1
 
-  vite-plugin-static-copy@3.1.6(vite@6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3)):
+  vite-plugin-static-copy@3.1.6(vite@6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3)):
     dependencies:
       chokidar: 3.6.0
       p-map: 7.0.4
       picocolors: 1.1.1
       tinyglobby: 0.2.15
-      vite: 6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3)
+      vite: 6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3)
 
   vite-tsconfig-paths@6.0.5(typescript@5.9.3)(vite@6.4.1(@types/node@20.19.30)(jiti@1.21.7)(lightningcss@1.30.2)(sass@1.97.3)):
     dependencies:

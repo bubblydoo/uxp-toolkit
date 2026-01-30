@@ -32,6 +32,9 @@
       "./package.json": "./package.json"
     }
   },
+  "dependencies": {
+    "@lukemorales/query-key-factory": "^1.3.4"
+  },
   "peerDependencies": {
     "@bubblydoo/uxp-toolkit": "workspace:*",
     "@tanstack/react-query": "^5.0.0",
