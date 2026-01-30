@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.7
+
+### Patch Changes
+
+- ee02127: More queries, more commands
+
 ## 0.0.6
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-test-framework
 
+## 0.0.7
+
+### Patch Changes
+
+- @bubblydoo/uxp-test-framework-plugin@0.0.7
+
 ## 0.0.6
 
 ### Patch Changes
