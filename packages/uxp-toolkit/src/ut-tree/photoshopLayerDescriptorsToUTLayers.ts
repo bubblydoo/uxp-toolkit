@@ -1,6 +1,7 @@
 import { type LayerDescriptor } from "./getFlattenedLayerDescriptorsList";
 import { executeAsModal } from "../core/executeAsModal";
 import { createGetLayerCommand } from "./getLayerEffects";
+import type z from "zod";
 
 type UTLayerKind = "pixel" | "adjustment-layer" | "text" | "curves" | "smartObject" | "video" | "group" | "threeD" | "gradientFill" | "pattern" | "solidColor" | "background";
 
@@ -21,6 +22,8 @@ type UTLayerBuilder = {
 export type UTLayer = Readonly<Omit<UTLayerBuilder, "layers">> & {
   layers?: UTLayer[];
 };
+
+export type UTLayerMultiGetOnly = Omit<UTLayer, "effects">;
 
 const layerKindMap = new Map<number, UTLayerKind>([
   [1, "pixel"],
@@ -109,24 +112,25 @@ const determineLayerSection = (layer: LayerDescriptor): string => {
   return isGroupStart ? "start" : isGroupEnd ? "end" : "normal";
 };
 
+type GetLayerCommandResult = z.infer<ReturnType<(typeof createGetLayerCommand)>['schema']>;
+
 // Generate a tree from a flat list of layer descriptors
 export const photoshopLayerDescriptorsToUTLayers = async (layers: LayerDescriptor[]): Promise<UTLayer[]> => {
-  const root: UTLayerBuilder[] = [];
-  const stack: {
-    layers: UTLayerBuilder[];
-  }[] = [{ layers: root }];
-
   // 1. Prepare a single batch request for all layers
   const commands = layers.map((layer) => createGetLayerCommand({ docId: layer.docId, id: layer.layerID }));
 
   // 2. Execute one batch command instead of N commands
-  const batchResults = await executeAsModal("Get Layer Effects Data", async (ctx) => {
+  const getCommandResults = await executeAsModal("Get Layer Effects Data", async (ctx) => {
     return await ctx.batchPlayCommands(commands);
   });
 
+  return photoshopLayerDescriptorsToUTLayersCore(layers, getCommandResults);
+};
+
+export function photoshopLayerDescriptorsToUTLayersCore(layers: LayerDescriptor[], getCommandResults: GetLayerCommandResult[]): UTLayer[] {
   // 3. Create a fast lookup map for the results
   const effectsMap = new Map<number, UTLayerBuilder["effects"]>();
-  batchResults.forEach((result, index) => {
+  getCommandResults.forEach((result, index) => {
     const layerId = layers[index]!.layerID;
     const data = result.layerEffects;
     const effects: UTLayerBuilder["effects"] = {};
@@ -138,11 +142,16 @@ export const photoshopLayerDescriptorsToUTLayers = async (layers: LayerDescripto
     effectsMap.set(layerId, effects);
   });
 
+  const root: UTLayerBuilder[] = [];
+  const stack: {
+    layers: UTLayerBuilder[];
+  }[] = [{ layers: root }];
+
   for (const layer of layers) {
     // Determine if the layer is a group start or end
     const sectionType = determineLayerSection(layer);
 
-    const isClippingMask = !!batchResults.find((res, index) => {
+    const isClippingMask = !!getCommandResults.find((res, index) => {
       return layer.layerID === res.layerID;
     })?.group;
 
