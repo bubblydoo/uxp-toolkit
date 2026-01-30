@@ -11,6 +11,7 @@
   "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-toolkit",
   "scripts": {
     "build": "tsup",
+    "test": "vitest run",
     "uxp-test:build": "uxp-test build",
     "uxp-test:dev": "uxp-test dev"
   },
@@ -47,6 +48,7 @@
     "@types/node": "^20.8.7",
     "@types/photoshop": "^25.0.2",
     "chai": "^6.2.2",
+    "dedent": "^1.7.1",
     "rollup": "^4.57.0",
     "tsup": "^8.5.1",
     "typescript": "^5.8.3",

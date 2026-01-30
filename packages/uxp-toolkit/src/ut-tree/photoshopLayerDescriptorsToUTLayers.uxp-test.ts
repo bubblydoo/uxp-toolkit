@@ -10,6 +10,9 @@ export const photoshopLayerDescriptorsToUTLayersTest: Test = {
   run: async () => {
     const doc = await openFileByPath("plugin:/fixtures/clipping-layers.psd");
     const descriptors = await getFlattenedLayerDescriptorsList(doc.id);
+
+    console.log(descriptors);
+
     const layers = await photoshopLayerDescriptorsToUTLayers(descriptors);
     expect(layers).to.containSubset([
       {
