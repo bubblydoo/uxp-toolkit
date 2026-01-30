@@ -1,5 +1,12 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.5
+
+### Patch Changes
+
+- c98453b: Get all layers with one batchPlay command
+  Add utLayersToText helper
+
 ## 0.0.4
 
 ### Patch Changes
