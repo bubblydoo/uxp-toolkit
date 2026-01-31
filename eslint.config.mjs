@@ -43,8 +43,10 @@ export default antfu(
       'packages/types-uxp/**/*.d.ts',
     ],
     rules: {
+      'jsdoc/require-rejects': 'error',
       'ts/method-signature-style': 'warn',
       'accessor-pairs': 'off',
+      'unused-imports/no-unused-vars': 'off',
     },
   },
   {
@@ -55,7 +57,6 @@ export default antfu(
     rules: {
       'ts/no-unused-expressions': 'off',
       'unused-imports/no-unused-imports': 'off',
-      'unused-imports/no-unused-vars': 'off',
     },
   },
 );
