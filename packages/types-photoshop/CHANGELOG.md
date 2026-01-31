@@ -1,5 +1,11 @@
 # @adobe-uxp-types/photoshop
 
+## 0.1.2
+
+### Patch Changes
+
+- 4c8ae39: Fix typo in types
+
 ## 0.1.1
 
 ### Patch Changes
