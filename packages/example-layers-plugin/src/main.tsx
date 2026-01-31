@@ -1,24 +1,24 @@
+import type { PsLayerRef, Tree, UTLayerWithoutChildren } from '@bubblydoo/uxp-toolkit';
+import type { Document } from 'photoshop/dom/Document';
 import {
   createCommand,
   executeAsModal,
+
   utLayersToTree,
-  type PsLayerRef,
-  type Tree,
-  type UTLayer,
-  type UTLayerWithoutChildren,
-} from "@bubblydoo/uxp-toolkit";
+
+} from '@bubblydoo/uxp-toolkit';
 import {
   useActiveDocument,
   useDocumentTreeQuery,
   useOnDocumentEdited,
-} from "@bubblydoo/uxp-toolkit-react";
+} from '@bubblydoo/uxp-toolkit-react';
 import {
   QueryClient,
   QueryClientProvider as ReactQueryClientProvider,
   useMutation,
   useQuery,
   useQueryClient,
-} from "@tanstack/react-query";
+} from '@tanstack/react-query';
 import {
   ChevronDown,
   CornerLeftDown,
@@ -27,12 +27,11 @@ import {
   FlowerIcon,
   Folder,
   LockIcon,
-} from "lucide-react";
-import { app } from "photoshop";
-import type { Document } from "photoshop/dom/Document";
-import { Fragment, useMemo, useState } from "react";
-import { z } from "zod";
-import { cn } from "./lib/cn";
+} from 'lucide-react';
+import { app } from 'photoshop';
+import { Fragment, useMemo, useState } from 'react';
+import { z } from 'zod';
+import { cn } from './lib/cn';
 
 export function App() {
   return (
@@ -45,7 +44,8 @@ export function App() {
 function Router() {
   const activeDocument = useActiveDocument();
 
-  if (!activeDocument) return <div>No active document</div>;
+  if (!activeDocument)
+    return <div>No active document</div>;
 
   return <LayersPanel document={activeDocument} />;
 }
@@ -60,10 +60,10 @@ function QueryClientProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-type NodeWithExtraData = {
+interface NodeWithExtraData {
   layer: UTLayerWithoutChildren;
   isClipped: boolean;
-};
+}
 
 function LayersPanel({ document }: { document: Document }) {
   const queryClient = useQueryClient();
@@ -72,7 +72,8 @@ function LayersPanel({ document }: { document: Document }) {
   const treeQuery = useDocumentTreeQuery(document, { select: utLayersToTree });
 
   const treeWithExtraData = useMemo(() => {
-    if (!treeQuery.data) return undefined;
+    if (!treeQuery.data)
+      return undefined;
 
     function crawl(tree: Tree<UTLayerWithoutChildren>) {
       const newTree: Tree<NodeWithExtraData> = [];
@@ -96,13 +97,13 @@ function LayersPanel({ document }: { document: Document }) {
   }, [treeQuery.data]);
 
   const activeLayerRefsQuery = useQuery({
-    queryKey: ["activeLayers", activeDocumentId],
+    queryKey: ['activeLayers', activeDocumentId],
     queryFn: async (): Promise<PsLayerRef[]> => {
       // return [];
-      const doc = app.documents.find((d) => d.id === activeDocumentId);
+      const doc = app.documents.find(d => d.id === activeDocumentId);
       if (!doc)
         throw new Error(`Document with id ${activeDocumentId} not found`);
-      return doc.activeLayers.map((l) => ({
+      return doc.activeLayers.map(l => ({
         id: l.id,
         docId: l._docId,
       }));
@@ -110,13 +111,14 @@ function LayersPanel({ document }: { document: Document }) {
   });
 
   useOnDocumentEdited(document, () => {
-    queryClient.invalidateQueries({ queryKey: ["layers", activeDocumentId] });
+    queryClient.invalidateQueries({ queryKey: ['layers', activeDocumentId] });
     queryClient.invalidateQueries({
-      queryKey: ["activeLayers", activeDocumentId],
+      queryKey: ['activeLayers', activeDocumentId],
     });
   });
 
-  if (!treeWithExtraData) return <div>Loading...</div>;
+  if (!treeWithExtraData)
+    return <div>Loading...</div>;
 
   return (
     <TreeNode
@@ -133,10 +135,10 @@ function createSetLayerVisibilityCommand(
   return createCommand({
     modifying: true,
     descriptor: {
-      _obj: visible ? "show" : "hide",
+      _obj: visible ? 'show' : 'hide',
       _target: [
-        { _ref: "layer", _id: layerRef.id },
-        { _ref: "document", _id: layerRef.docId },
+        { _ref: 'layer', _id: layerRef.id },
+        { _ref: 'document', _id: layerRef.docId },
       ],
     },
     schema: z.unknown(),
@@ -156,7 +158,7 @@ function TreeNode({
 
   const changeLayerVisibilityMutation = useMutation({
     mutationFn: async (options: { layerRef: PsLayerRef; visible: boolean }) => {
-      await executeAsModal("Change Layer Visibility", async (ctx) => {
+      await executeAsModal('Change Layer Visibility', async (ctx) => {
         await ctx.batchPlayCommand(
           createSetLayerVisibilityCommand(options.layerRef, options.visible),
         );
@@ -164,22 +166,22 @@ function TreeNode({
     },
     onSuccess: (_data, variables) => {
       const docId = variables.layerRef.docId;
-      queryClient.invalidateQueries({ queryKey: ["layers", docId] });
-      queryClient.invalidateQueries({ queryKey: ["activeLayers", docId] });
+      queryClient.invalidateQueries({ queryKey: ['layers', docId] });
+      queryClient.invalidateQueries({ queryKey: ['activeLayers', docId] });
     },
   });
 
   const selectLayerMutation = useMutation({
     mutationFn: async (options: { layerRef: PsLayerRef }) => {
-      await executeAsModal("Select Layer", async (ctx) => {
+      await executeAsModal('Select Layer', async (ctx) => {
         await ctx.batchPlayCommand(
           createCommand({
             modifying: true,
             descriptor: {
-              _obj: "select",
+              _obj: 'select',
               _target: [
-                { _ref: "layer", _id: options.layerRef.id },
-                { _ref: "document", _id: options.layerRef.docId },
+                { _ref: 'layer', _id: options.layerRef.id },
+                { _ref: 'document', _id: options.layerRef.docId },
               ],
             },
             schema: z.unknown(),
@@ -189,13 +191,13 @@ function TreeNode({
     },
     onSuccess: (_data, variables) => {
       const docId = variables.layerRef.docId;
-      queryClient.invalidateQueries({ queryKey: ["activeLayers", docId] });
+      queryClient.invalidateQueries({ queryKey: ['activeLayers', docId] });
     },
   });
 
   function isActiveLayer(ref: NodeWithExtraData) {
     return activeLayerRefs?.some(
-      (l) => l.id === ref.layer.id && l.docId === ref.layer.docId,
+      l => l.id === ref.layer.id && l.docId === ref.layer.docId,
     );
   }
 
@@ -206,8 +208,8 @@ function TreeNode({
           <div
             key={idx}
             className={cn(
-              "border-b border-psDark bg-psNeutral hover:bg-psHover flex flex-row items-stretch h-6",
-              isActiveLayer(node.ref) && "bg-psActive hover:bg-psActive",
+              'border-b border-psDark bg-psNeutral hover:bg-psHover flex flex-row items-stretch h-6',
+              isActiveLayer(node.ref) && 'bg-psActive hover:bg-psActive',
             )}
           >
             <div
@@ -219,21 +221,22 @@ function TreeNode({
                     docId: node.ref.layer.docId,
                   },
                   visible: !node.ref.layer.visible,
-                })
-              }
+                })}
             >
               <ButtonDiv className="text-white">
-                {node.ref.layer.visible ? (
-                  <Eye
-                    size={14}
-                    style={{ fill: "transparent", stroke: "currentColor" }}
-                  />
-                ) : (
-                  <EyeOff
-                    size={14}
-                    style={{ fill: "transparent", stroke: "currentColor" }}
-                  />
-                )}
+                {node.ref.layer.visible
+                  ? (
+                      <Eye
+                        size={14}
+                        style={{ fill: 'transparent', stroke: 'currentColor' }}
+                      />
+                    )
+                  : (
+                      <EyeOff
+                        size={14}
+                        style={{ fill: 'transparent', stroke: 'currentColor' }}
+                      />
+                    )}
               </ButtonDiv>
             </div>
             <ButtonDiv
@@ -252,26 +255,26 @@ function TreeNode({
                 <div className="mr-2 ml-1 flex items-center">
                   <CornerLeftDown
                     size={14}
-                    style={{ fill: "transparent", stroke: "currentColor" }}
+                    style={{ fill: 'transparent', stroke: 'currentColor' }}
                   />
                 </div>
               )}
-              {node.ref.layer.kind === "group" && (
+              {node.ref.layer.kind === 'group' && (
                 <div className="mr-2 flex items-center">
                   <ChevronDown
                     size={14}
-                    style={{ fill: "transparent", stroke: "currentColor" }}
+                    style={{ fill: 'transparent', stroke: 'currentColor' }}
                     className="mr-[2px] ml-[-2px]"
                   />
                   <Folder
                     size={14}
-                    style={{ fill: "transparent", stroke: "currentColor" }}
+                    style={{ fill: 'transparent', stroke: 'currentColor' }}
                   />
                 </div>
               )}
-              <div className={cn("flex-1 flex items-center")}>
+              <div className={cn('flex-1 flex items-center')}>
                 <span
-                  className={cn(node.ref.isClipped && "border-b border-white")}
+                  className={cn(node.ref.isClipped && 'border-b border-white')}
                 >
                   {node.name}
                 </span>
@@ -280,7 +283,7 @@ function TreeNode({
                 <div className="ml-2 flex items-center">
                   <FlowerIcon
                     size={14}
-                    style={{ fill: "transparent", stroke: "currentColor" }}
+                    style={{ fill: 'transparent', stroke: 'currentColor' }}
                   />
                 </div>
               )}
@@ -288,7 +291,7 @@ function TreeNode({
                 <div className="ml-2 flex items-center">
                   <LockIcon
                     size={14}
-                    style={{ fill: "transparent", stroke: "currentColor" }}
+                    style={{ fill: 'transparent', stroke: 'currentColor' }}
                   />
                 </div>
               )}
@@ -308,5 +311,5 @@ function TreeNode({
 }
 
 function ButtonDiv(props: React.ButtonHTMLAttributes<HTMLDivElement>) {
-  return <div {...props} className={cn("cursor-pointer", props.className)} />;
+  return <div {...props} className={cn('cursor-pointer', props.className)} />;
 }

@@ -3,5 +3,3 @@ export type Tree<TRef = unknown> = {
   name: string;
   children?: Tree<TRef>;
 }[];
-
-

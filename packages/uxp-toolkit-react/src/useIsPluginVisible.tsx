@@ -1,11 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
-import { entrypoints } from "uxp";
-import { photoshopGetApplicationInfo, uxpEntrypointsSchema } from "@bubblydoo/uxp-toolkit";
-import { createQueryKeys } from "@lukemorales/query-key-factory";
+import { photoshopGetApplicationInfo, uxpEntrypointsSchema } from '@bubblydoo/uxp-toolkit';
+import { createQueryKeys } from '@lukemorales/query-key-factory';
+import { useQuery } from '@tanstack/react-query';
+import { entrypoints } from 'uxp';
 
 const applicationQueries = createQueryKeys('application', {
   info: () => ({
-    queryKey: ["info"],
+    queryKey: ['info'],
     queryFn: async () => {
       const appInfo = await photoshopGetApplicationInfo();
       return appInfo;
@@ -25,14 +25,16 @@ export function useApplicationInfoQuery({ refetchInterval }: { refetchInterval?:
 export function useIsPluginPanelVisible(panelId: string) {
   const appInfoQuery = useApplicationInfoQuery({ refetchInterval: 1000 });
 
-  if (!appInfoQuery.data) return null;
+  if (!appInfoQuery.data)
+    return null;
 
   const pluginPanel = appInfoQuery.data.panelList.find((panel) => {
-    const idParts = panel.ID.split("/");
+    const idParts = panel.ID.split('/');
     return idParts.includes(pluginInfo.id) && idParts.includes(panelId);
   });
 
-  if (!pluginPanel) return false;
+  if (!pluginPanel)
+    return false;
 
   return pluginPanel.visible;
 }
@@ -40,14 +42,16 @@ export function useIsPluginPanelVisible(panelId: string) {
 export function useIsAnyPluginPanelVisible() {
   const appInfoQuery = useApplicationInfoQuery({ refetchInterval: 1000 });
 
-  if (!appInfoQuery.data) return null;
+  if (!appInfoQuery.data)
+    return null;
 
   const pluginPanel = appInfoQuery.data.panelList.find((panel) => {
-    const idParts = panel.ID.split("/");
+    const idParts = panel.ID.split('/');
     return idParts.includes(pluginInfo.id);
   });
 
-  if (!pluginPanel) return false;
+  if (!pluginPanel)
+    return false;
 
   return pluginPanel.visible;
 }

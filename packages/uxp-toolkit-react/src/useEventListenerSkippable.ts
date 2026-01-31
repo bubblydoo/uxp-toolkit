@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 export function useEventListenerSkippable({
   subscribe,
@@ -20,7 +20,8 @@ export function useEventListenerSkippable({
       if (filter) {
         if (skip) {
           setQueuedWhileSkipped(true);
-        } else {
+        }
+        else {
           trigger();
         }
       }
@@ -31,6 +32,7 @@ export function useEventListenerSkippable({
   useEffect(() => {
     if (queuedWhileSkipped && !skip) {
       trigger();
+      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
       setQueuedWhileSkipped(false);
     }
   }, [queuedWhileSkipped, trigger, skip]);

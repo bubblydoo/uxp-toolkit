@@ -1,13 +1,13 @@
-import { action, app } from "photoshop";
-import type { Document } from "photoshop/dom/Document";
-import { useSyncExternalStore } from "react";
+import type { Document } from 'photoshop/dom/Document';
+import { action, app } from 'photoshop';
+import { useSyncExternalStore } from 'react';
 
 const DOCUMENT_CHANGE_EVENTS = [
-  "select",
-  "open",
-  "close",
-  "smartBrushWorkspace",
-  "layersFiltered",
+  'select',
+  'open',
+  'close',
+  'smartBrushWorkspace',
+  'layersFiltered',
 ];
 
 const activeDocumentExternalStore = {
@@ -23,6 +23,6 @@ const activeDocumentExternalStore = {
 export function useActiveDocument() {
   return useSyncExternalStore(
     activeDocumentExternalStore.subscribe,
-    activeDocumentExternalStore.getSnapshot
+    activeDocumentExternalStore.getSnapshot,
   );
 }

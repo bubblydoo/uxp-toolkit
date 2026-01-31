@@ -1,11 +1,11 @@
-import { useCallback } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getDocumentLayerDescriptors, Tree } from '@bubblydoo/uxp-toolkit';
-import { photoshopLayerDescriptorsToUTLayers, UTLayer } from '@bubblydoo/uxp-toolkit';
-import { Document } from 'photoshop/dom/Document';
+import type { UTLayer } from '@bubblydoo/uxp-toolkit';
+import type { Document } from 'photoshop/dom/Document';
+import { getDocumentLayerDescriptors, photoshopLayerDescriptorsToUTLayers } from '@bubblydoo/uxp-toolkit';
 import { useOnDocumentLayersEdited } from '@bubblydoo/uxp-toolkit-react';
-import { useIsAnyPluginPanelVisible } from './useIsPluginVisible';
 import { createQueryKeys } from '@lukemorales/query-key-factory';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
+import { useIsAnyPluginPanelVisible } from './useIsPluginVisible';
 
 export const documentQueries = createQueryKeys('document', {
   tree: (documentId: number) => ({

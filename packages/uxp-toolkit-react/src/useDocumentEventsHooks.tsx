@@ -1,10 +1,10 @@
-import type { Document } from "photoshop/dom/Document";
-import { useOnEvent } from "./useOnEvent";
+import type { Document } from 'photoshop/dom/Document';
 import {
   DOCUMENT_EDITED_EVENTS,
   DOCUMENT_LAYERS_EDITED_EVENTS,
-  DOCUMENT_LAYERS_SELECTION_EVENTS
-} from "./events";
+  DOCUMENT_LAYERS_SELECTION_EVENTS,
+} from './events';
+import { useOnEvent } from './useOnEvent';
 
 export function useOnDocumentEdited(document: Document, trigger: () => void) {
   return useOnEvent(document, DOCUMENT_EDITED_EVENTS, trigger);
@@ -14,14 +14,14 @@ export function useOnDocumentEdited(document: Document, trigger: () => void) {
 
 export function useOnDocumentLayersEdited(
   document: Document,
-  trigger: () => void
+  trigger: () => void,
 ) {
   return useOnEvent(document, DOCUMENT_LAYERS_EDITED_EVENTS, trigger);
 }
 
 export function useOnDocumentLayersSelection(
   document: Document,
-  trigger: () => void
+  trigger: () => void,
 ) {
   return useOnEvent(document, DOCUMENT_LAYERS_SELECTION_EVENTS, trigger);
 }

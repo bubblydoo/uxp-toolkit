@@ -1,15 +1,15 @@
-import { z } from "zod";
-import { createCommand } from "../core/command";
+import { z } from 'zod';
+import { createCommand } from '../core/command';
 
 export function createMultiGetDocumentCommand(docId: number) {
   return createCommand({
     modifying: false,
     descriptor: {
-      _obj: "multiGet",
-      _target: { _ref: [{ _ref: "document", _id: docId }] },
+      _obj: 'multiGet',
+      _target: { _ref: [{ _ref: 'document', _id: docId }] },
       extendedReference: [
-        ["name", "layerID", "visible", "group", "layerSection", "layerKind", "itemIndex", "background", "mode", "layerEffects"],
-        { _obj: "layer", index: 1, count: -1 },
+        ['name', 'layerID', 'visible', 'group', 'layerSection', 'layerKind', 'itemIndex', 'background', 'mode', 'layerEffects'],
+        { _obj: 'layer', index: 1, count: -1 },
       ],
     },
     schema: z.object({
@@ -21,17 +21,17 @@ export function createMultiGetDocumentCommand(docId: number) {
           group: z.boolean(),
           layerSection: z.object({
             _value: z.enum([
-              "layerSectionStart",
-              "layerSectionEnd",
-              "layerSectionContent",
+              'layerSectionStart',
+              'layerSectionEnd',
+              'layerSectionContent',
             ]),
-            _enum: z.literal("layerSectionType"),
+            _enum: z.literal('layerSectionType'),
           }),
           layerKind: z.number(),
           itemIndex: z.number(),
           background: z.boolean(),
           mode: z.object({
-            _enum: z.literal("blendMode"),
+            _enum: z.literal('blendMode'),
             _value: z.string(),
           }),
           layerEffects: z.record(z.string(), z.object({
@@ -40,8 +40,8 @@ export function createMultiGetDocumentCommand(docId: number) {
           }).or(z.array(z.object({
             enabled: z.boolean(),
           })))).optional(),
-        })
-      )
-    })
+        }),
+      ),
+    }),
   });
 }

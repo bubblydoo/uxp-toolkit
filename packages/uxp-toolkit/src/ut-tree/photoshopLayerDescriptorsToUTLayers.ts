@@ -1,10 +1,10 @@
-import type { LayerDescriptor } from "./getDocumentLayerDescriptors";
+import type { LayerDescriptor } from './getDocumentLayerDescriptors';
 
-type UTLayerKind = "pixel" | "adjustment-layer" | "text" | "curves" | "smartObject" | "video" | "group" | "threeD" | "gradientFill" | "pattern" | "solidColor" | "background";
+type UTLayerKind = 'pixel' | 'adjustment-layer' | 'text' | 'curves' | 'smartObject' | 'video' | 'group' | 'threeD' | 'gradientFill' | 'pattern' | 'solidColor' | 'background';
 
-type UTBlendMode = "normal" | "dissolve" | "darken" | "multiply" | "colorBurn" | "linearBurn" | "darkerColor" | "lighten" | "screen" | "colorDodge" | "linearDodge" | "lighterColor" | "overlay" | "softLight" | "hardLight" | "vividLight" | "linearLight" | "pinLight" | "hardMix" | "difference" | "exclusion" | "blendSubtraction" | "blendDivide" | "hue" | "saturation" | "color" | "luminosity" | "passThrough";
+type UTBlendMode = 'normal' | 'dissolve' | 'darken' | 'multiply' | 'colorBurn' | 'linearBurn' | 'darkerColor' | 'lighten' | 'screen' | 'colorDodge' | 'linearDodge' | 'lighterColor' | 'overlay' | 'softLight' | 'hardLight' | 'vividLight' | 'linearLight' | 'pinLight' | 'hardMix' | 'difference' | 'exclusion' | 'blendSubtraction' | 'blendDivide' | 'hue' | 'saturation' | 'color' | 'luminosity' | 'passThrough';
 
-type UTLayerBuilder = {
+interface UTLayerBuilder {
   name: string;
   docId: number;
   id: number;
@@ -15,75 +15,75 @@ type UTLayerBuilder = {
   isClippingMask: boolean;
   background: boolean;
   layers?: UTLayerBuilder[];
-};
+}
 
-export type UTLayer = Readonly<Omit<UTLayerBuilder, "layers">> & {
+export type UTLayer = Readonly<Omit<UTLayerBuilder, 'layers'>> & {
   layers?: UTLayer[];
 };
 
-export type UTLayerMultiGetOnly = Omit<UTLayer, "effects">;
+export type UTLayerMultiGetOnly = Omit<UTLayer, 'effects'>;
 
 const layerKindMap = new Map<number, UTLayerKind>([
-  [1, "pixel"],
-  [2, "adjustment-layer"], // All adjustment layers
-  [3, "text"],
-  [4, "curves"],
-  [5, "smartObject"],
-  [6, "video"],
-  [7, "group"],
-  [8, "threeD"],
-  [9, "gradientFill"],
-  [10, "pattern"],
-  [11, "solidColor"],
-  [12, "background"], // according to the internet but the actual value is undefined
+  [1, 'pixel'],
+  [2, 'adjustment-layer'], // All adjustment layers
+  [3, 'text'],
+  [4, 'curves'],
+  [5, 'smartObject'],
+  [6, 'video'],
+  [7, 'group'],
+  [8, 'threeD'],
+  [9, 'gradientFill'],
+  [10, 'pattern'],
+  [11, 'solidColor'],
+  [12, 'background'], // according to the internet but the actual value is undefined
 ]);
 
 const blendModes: string[] = [
-  "normal",
-  "dissolve",
-  "darken",
-  "multiply",
-  "colorBurn",
-  "linearBurn",
-  "darkerColor",
-  "lighten",
-  "screen",
-  "colorDodge",
-  "linearDodge",
-  "lighterColor",
-  "overlay",
-  "softLight",
-  "hardLight",
-  "vividLight",
-  "linearLight",
-  "pinLight",
-  "hardMix",
-  "difference",
-  "exclusion",
-  "blendSubtraction",
-  "blendDivide",
-  "hue",
-  "saturation",
-  "color",
-  "luminosity",
-  "passThrough",
+  'normal',
+  'dissolve',
+  'darken',
+  'multiply',
+  'colorBurn',
+  'linearBurn',
+  'darkerColor',
+  'lighten',
+  'screen',
+  'colorDodge',
+  'linearDodge',
+  'lighterColor',
+  'overlay',
+  'softLight',
+  'hardLight',
+  'vividLight',
+  'linearLight',
+  'pinLight',
+  'hardMix',
+  'difference',
+  'exclusion',
+  'blendSubtraction',
+  'blendDivide',
+  'hue',
+  'saturation',
+  'color',
+  'luminosity',
+  'passThrough',
 ] satisfies UTBlendMode[];
 
-const getLayerKind = (layer: LayerDescriptor): UTLayerKind => {
+function getLayerKind(layer: LayerDescriptor): UTLayerKind {
   const kind = layerKindMap.get(layer.layerKind);
   if (!kind) {
     throw new Error(`Unknown layer kind: ${layer.layerKind}`);
   }
   return kind;
-};
+}
 
-const getBlendMode = (layer: LayerDescriptor): UTBlendMode => {
+function getBlendMode(layer: LayerDescriptor): UTBlendMode {
   const mode = layer.mode._value;
   if (!blendModes.includes(mode)) {
     throw new Error(`Unknown blend mode: ${mode}`);
   }
   return mode as UTBlendMode;
-};
+}
 
 export function photoshopLayerDescriptorsToUTLayers(layers: LayerDescriptor[]): UTLayer[] {
   const root: UTLayerBuilder[] = [];
@@ -96,7 +96,7 @@ export function photoshopLayerDescriptorsToUTLayers(layers: LayerDescriptor[]): 
     const sectionType = determineLayerSection(layer);
 
     // Handle group end
-    if (sectionType === "end") {
+    if (sectionType === 'end') {
       if (stack.length > 1) {
         stack.pop();
       }
@@ -121,7 +121,7 @@ export function photoshopLayerDescriptorsToUTLayers(layers: LayerDescriptor[]): 
     current!.layers.push(node);
 
     // Handle group start
-    if (sectionType === "start") {
+    if (sectionType === 'start') {
       node.layers = [];
       // Push children array to stack to process content
       stack.push({ layers: node.layers });
@@ -132,22 +132,22 @@ export function photoshopLayerDescriptorsToUTLayers(layers: LayerDescriptor[]): 
   return root as UTLayer[];
 };
 
-const determineLayerSection = (layer: LayerDescriptor): "start" | "end" | "normal" => {
+function determineLayerSection(layer: LayerDescriptor): 'start' | 'end' | 'normal' {
   const section = layer.layerSection._value;
-  const isGroupEnd =
-    layer.name === "</Layer group>" ||
-    layer.name === "</Layer set>" ||
-    section === "layerSectionEnd";
+  const isGroupEnd
+    = layer.name === '</Layer group>'
+      || layer.name === '</Layer set>'
+      || section === 'layerSectionEnd';
 
-  const isGroupStart = section === "layerSectionStart";
-  return isGroupStart ? "start" : isGroupEnd ? "end" : "normal";
-};
+  const isGroupStart = section === 'layerSectionStart';
+  return isGroupStart ? 'start' : isGroupEnd ? 'end' : 'normal';
+}
 
 function getEffects(layer: LayerDescriptor): Record<string, boolean> {
   const effects: Record<string, boolean> = {};
   if (layer.layerEffects) {
     for (const effect in layer.layerEffects) {
-      effects[effect] = Array.isArray(layer.layerEffects[effect]) ? layer.layerEffects[effect].some((e) => e.enabled) : !!layer.layerEffects[effect]?.enabled;
+      effects[effect] = Array.isArray(layer.layerEffects[effect]) ? layer.layerEffects[effect].some(e => e.enabled) : !!layer.layerEffects[effect]?.enabled;
     }
   }
   return effects;

@@ -1,26 +1,26 @@
-import { uxp } from "vite-uxp-plugin";
-import { createUxpConfig } from "../uxp.config";
-import path from "node:path";
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { viteStaticCopy } from "vite-plugin-static-copy";
-import tsconfigPaths from "vite-tsconfig-paths";
-import z from "zod";
-import { fileURLToPath } from "node:url";
-import tailwindcss from "tailwindcss";
-import autoprefixer from "autoprefixer";
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import react from '@vitejs/plugin-react';
+import autoprefixer from 'autoprefixer';
+import tailwindcss from 'tailwindcss';
+import { defineConfig } from 'vite';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import { uxp } from 'vite-uxp-plugin';
+import z from 'zod';
+import { createUxpConfig } from '../uxp.config';
 
 const uxpBuiltinModules = [
-  "photoshop",
-  "uxp",
-  "fs",
-  "os",
-  "path",
-  "process",
+  'photoshop',
+  'uxp',
+  'fs',
+  'os',
+  'path',
+  'process',
 ];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(__dirname, "..");
+const root = path.resolve(__dirname, '..');
 
 const resolvedConfigSchema = z.object({
   plugin: z.object({
@@ -29,13 +29,13 @@ const resolvedConfigSchema = z.object({
   }),
   outDir: z
     .string()
-    .refine((val) => path.isAbsolute(val), "Path must be absolute"),
+    .refine(val => path.isAbsolute(val), 'Path must be absolute'),
   testsFile: z
     .string()
-    .refine((val) => path.isAbsolute(val), "Path must be absolute"),
+    .refine(val => path.isAbsolute(val), 'Path must be absolute'),
   testFixturesDir: z
     .string()
-    .refine((val) => path.isAbsolute(val), "Path must be absolute")
+    .refine(val => path.isAbsolute(val), 'Path must be absolute')
     .optional(),
   vite: z
     .object({
@@ -46,22 +46,22 @@ const resolvedConfigSchema = z.object({
           z.string(),
           z
             .string()
-            .refine((val) => path.isAbsolute(val), "Path must be absolute"),
-        )
-    })
+            .refine(val => path.isAbsolute(val), 'Path must be absolute'),
+        ),
+    }),
 });
 
 type ResolvedConfig = z.infer<typeof resolvedConfigSchema>;
 
-export function createViteConfig(config: ResolvedConfig, mode: "dev" | "build") {
+export function createViteConfig(config: ResolvedConfig, mode: 'dev' | 'build') {
   resolvedConfigSchema.parse(config);
 
   console.log({ config });
 
   const uxpConfig = createUxpConfig({
     id: config.plugin.id,
-    name: config.plugin.name + " - UXP Test Framework Plugin",
-    version: "0.0.1",
+    name: `${config.plugin.name} - UXP Test Framework Plugin`,
+    version: '0.0.1',
     hotReloadPort: config.vite.hotReloadPort,
   });
 
@@ -81,7 +81,7 @@ export function createViteConfig(config: ResolvedConfig, mode: "dev" | "build") 
               targets: [
                 {
                   src: config.testFixturesDir,
-                  dest: ".",
+                  dest: '.',
                 },
               ],
             }),
@@ -100,8 +100,8 @@ export function createViteConfig(config: ResolvedConfig, mode: "dev" | "build") 
           tailwindcss({
             config: {
               content: [
-                root + "/src-plugin/index.html",
-                root + "/src-plugin/**/*.{js,ts,jsx,tsx}",
+                `${root}/src-plugin/index.html`,
+                `${root}/src-plugin/**/*.{js,ts,jsx,tsx}`,
               ],
               theme: {
                 extend: {},
@@ -116,17 +116,17 @@ export function createViteConfig(config: ResolvedConfig, mode: "dev" | "build") 
     build: {
       sourcemap: true,
       outDir: config.outDir,
-      watch: mode === "dev" ? {} : undefined,
+      watch: mode === 'dev' ? {} : undefined,
       minify: false,
       emptyOutDir: true,
       rollupOptions: {
-        external: uxpBuiltinModules.map((module) => new RegExp(`^${module}\\b`)),
+        external: uxpBuiltinModules.map(module => new RegExp(`^${module}\\b`)),
         output: {
-          format: "cjs",
+          format: 'cjs',
         },
       },
     },
-    publicDir: "public",
+    publicDir: 'public',
     optimizeDeps: {
       exclude: uxpBuiltinModules,
     },

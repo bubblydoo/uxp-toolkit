@@ -1,22 +1,22 @@
-import { defineConfig } from "vite";
-import { uxp } from "vite-uxp-plugin";
-import react from "@vitejs/plugin-react";
-import tsconfigPaths from "vite-tsconfig-paths";
-import { config } from "./uxp.config";
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import { uxp } from 'vite-uxp-plugin';
+import { config } from './uxp.config';
 
 const mode = process.env.MODE;
 
-const shouldNotEmptyDir =
-  mode === "dev" && config.manifest.requiredPermissions?.enableAddon;
+const shouldNotEmptyDir
+  = mode === 'dev' && config.manifest.requiredPermissions?.enableAddon;
 
 const nativeModules = [
-  "photoshop",
-  "uxp",
-  "fs",
-  "os",
-  "path",
-  "process",
-  "shell",
+  'photoshop',
+  'uxp',
+  'fs',
+  'os',
+  'path',
+  'process',
+  'shell',
 ];
 
 export default defineConfig({
@@ -26,17 +26,17 @@ export default defineConfig({
     BOLT_UXP_MANIFEST_ID: JSON.stringify(config.manifest.id),
   },
   build: {
-    sourcemap: mode && ["dev", "build"].includes(mode) ? true : false,
+    sourcemap: !!(mode && ['dev', 'build'].includes(mode)),
     minify: false,
     emptyOutDir: !shouldNotEmptyDir,
     rollupOptions: {
-      external: nativeModules.map((module) => new RegExp(`^${module}\\b`)),
+      external: nativeModules.map(module => new RegExp(`^${module}\\b`)),
       output: {
-        format: "cjs",
+        format: 'cjs',
       },
     },
   },
-  publicDir: "public",
+  publicDir: 'public',
   optimizeDeps: {
     exclude: nativeModules,
   },

@@ -1,19 +1,13 @@
 {
   "name": "@bubblydoo/uxp-toolkit",
-  "version": "0.0.8",
-  "license": "MIT",
   "type": "module",
+  "version": "0.0.8",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-toolkit",
   "repository": {
     "type": "git",
     "url": "https://github.com/bubblydoo/uxp-toolkit.git"
-  },
-  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-toolkit",
-  "scripts": {
-    "build": "tsup",
-    "test": "vitest run",
-    "uxp-test:build": "uxp-test build",
-    "uxp-test:dev": "uxp-test dev"
   },
   "exports": {
     ".": {
@@ -25,6 +19,12 @@
       "import": "./src/commands-library/index.ts"
     },
     "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "uxp-test:build": "uxp-test build",
+    "uxp-test:dev": "uxp-test dev"
   },
   "publishConfig": {
     "access": "public",

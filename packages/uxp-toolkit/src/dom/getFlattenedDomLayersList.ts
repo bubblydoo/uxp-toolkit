@@ -1,11 +1,9 @@
-import { constants } from "photoshop";
-import type { Layer as DomLayer } from "photoshop/dom/Layer";
+import type { Layer as DomLayer } from 'photoshop/dom/Layer';
+import { constants } from 'photoshop';
 
 // get all layers (including nested in groups)
 // TODO: I would rename this to getAllDOMLayers to avoid confusion with UXPToolkitLayer
-export const getFlattenedDomLayersList = (
-  layers: DomLayer[],
-): DomLayer[] => {
+export function getFlattenedDomLayersList(layers: DomLayer[]): DomLayer[] {
   const allLayers: DomLayer[] = [];
 
   // Use a stack to avoid maximal call stack size (recursion) errors efficiently
@@ -20,7 +18,8 @@ export const getFlattenedDomLayersList = (
 
   while (stack.length > 0) {
     const layer = stack.pop();
-    if (!layer) continue;
+    if (!layer)
+      continue;
 
     allLayers.push(layer);
 
@@ -40,4 +39,4 @@ export const getFlattenedDomLayersList = (
   }
 
   return allLayers;
-};
+}

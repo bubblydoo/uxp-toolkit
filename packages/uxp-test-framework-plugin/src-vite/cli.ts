@@ -1,14 +1,14 @@
-import { build } from "vite";
-import { createViteConfig } from "./create-vite-config";
-import arg from "arg";
-import path from "path";
-import z from "zod";
-import fs from "fs/promises";
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import arg from 'arg';
+import { build } from 'vite';
+import z from 'zod';
+import { createViteConfig } from './create-vite-config';
 
 const configSchema = z.object({
   testsFile: z.string(),
   testFixturesDir: z.string().optional(),
-  outDir: z.string().optional().default("uxp-tests-plugin"),
+  outDir: z.string().optional().default('uxp-tests-plugin'),
   plugin: z.object({
     id: z.string(),
     name: z.string(),
@@ -27,13 +27,13 @@ const configSchema = z.object({
     }),
 });
 
-const actionSchema = z.enum(["build", "dev"]);
+const actionSchema = z.enum(['build', 'dev']);
 
 export async function runCli(processArgv: string[], cwd: string) {
   const args = arg(
     {
-      "--config": String,
-      "-c": "--config",
+      '--config': String,
+      '-c': '--config',
     },
     {
       argv: processArgv,
@@ -42,15 +42,16 @@ export async function runCli(processArgv: string[], cwd: string) {
 
   const action = actionSchema.parse(args._[0]);
 
-  const configFileName = args["--config"] || "uxp-tests.json";
+  const configFileName = args['--config'] || 'uxp-tests.json';
   const configFilePath = path.resolve(cwd, configFileName);
 
   if (!(await fileExists(configFilePath))) {
     console.error(`Config file ${configFilePath} does not exist`);
+
     process.exit(1);
   }
 
-  const configString = await fs.readFile(configFilePath, "utf8");
+  const configString = await fs.readFile(configFilePath, 'utf8');
   const config = configSchema.parse(JSON.parse(configString));
   const configDirName = path.dirname(configFilePath);
 
@@ -78,7 +79,7 @@ export async function runCli(processArgv: string[], cwd: string) {
 
   const viteConfig = createViteConfig(resolvedConfig, action);
 
-  console.log(resolvedConfig)
+  console.log(resolvedConfig);
 
   await build(viteConfig);
 }
@@ -87,7 +88,8 @@ async function fileExists(path: string) {
   try {
     await fs.stat(path);
     return true;
-  } catch {
+  }
+  catch {
     return false;
   }
 }

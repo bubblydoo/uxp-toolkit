@@ -1,10 +1,10 @@
-import { batchPlayCommand, batchPlayCommands } from "../core/command";
-import { createMultiGetDocumentCommand } from "../commands-library/multiGetDocument";
-import { createGetDocumentHasBackgroundLayerCommand } from "../commands-library/getDocument";
-import { createGetBackgroundLayerCommand } from "../commands-library/getLayer";
+import { createGetDocumentHasBackgroundLayerCommand } from '../commands-library/getDocument';
+import { createGetBackgroundLayerCommand } from '../commands-library/getLayer';
+import { createMultiGetDocumentCommand } from '../commands-library/multiGetDocument';
+import { batchPlayCommand, batchPlayCommands } from '../core/command';
 
 // get layer properties like name and layerID for all layers in the document (by index)
-export const getDocumentLayerDescriptors = async (documentId: number) => {
+export async function getDocumentLayerDescriptors(documentId: number) {
   const [layersResult, documentHasBackgroundLayerResult] = await batchPlayCommands([
     createMultiGetDocumentCommand(documentId),
     createGetDocumentHasBackgroundLayerCommand(documentId),
@@ -24,6 +24,6 @@ export const getDocumentLayerDescriptors = async (documentId: number) => {
       docId: documentId,
     };
   });
-};
+}
 
 export type LayerDescriptor = Awaited<ReturnType<typeof getDocumentLayerDescriptors>>[number];

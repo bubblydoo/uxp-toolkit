@@ -1,12 +1,12 @@
-import { action, app } from "photoshop";
-import { useEventListenerSkippable } from "./useEventListenerSkippable";
-import { useIsAnyPluginPanelVisible } from "./useIsPluginVisible";
-import type { Document } from "photoshop/dom/Document";
+import type { Document } from 'photoshop/dom/Document';
+import { action, app } from 'photoshop';
+import { useEventListenerSkippable } from './useEventListenerSkippable';
+import { useIsAnyPluginPanelVisible } from './useIsPluginVisible';
 
 export function useOnEvent(
   document: Document,
   events: string[],
-  trigger: () => void
+  trigger: () => void,
 ) {
   const isPluginPanelVisible = useIsAnyPluginPanelVisible() ?? true;
 

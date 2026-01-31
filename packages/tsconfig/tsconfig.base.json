@@ -1,18 +1,18 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    // "composite": true,
-    "noEmit": true,
-    "noImplicitOverride": true,
-    "moduleDetection": "force",
     "target": "es2022",
     "lib": ["es2022", "dom", "dom.iterable"],
+    "moduleDetection": "force",
     "module": "preserve",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
     "strict": true,
+    "noImplicitOverride": true,
+    // "composite": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
     "skipLibCheck": true
   }
 }

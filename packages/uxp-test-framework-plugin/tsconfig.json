@@ -2,11 +2,11 @@
   "extends": "@bubblydoo/tsconfig/tsconfig.base.json",
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
-    "allowJs": true,
-    "checkJs": true,
     "jsx": "react-jsx",
-    "types": ["@adobe/cc-ext-uxp-types", "photoshop", "node", "react", "react-dom"]
+    "module": "ESNext",
+    "types": ["@adobe/cc-ext-uxp-types", "photoshop", "node", "react", "react-dom"],
+    "allowJs": true,
+    "checkJs": true
   },
   "include": ["src-plugin", "src-vite"]
 }
