@@ -1,0 +1,27 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPointStrategy": "packages",
+  "entryPoints": [
+    "packages/types-uxp",
+    "packages/types-photoshop",
+    "packages/uxp-toolkit",
+    "packages/uxp-toolkit-react",
+    "packages/uxp-polyfills",
+    "packages/uxp-test-framework",
+    "packages/uxp-test-framework-base",
+    "packages/eslint-plugin-uxp"
+  ],
+  "out": "docs",
+  "name": "UXP Toolkit",
+  "includeVersion": false,
+  "cleanOutputDir": true,
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeExternals": true,
+  "skipErrorChecking": true,
+  "validation": {
+    "notExported": false,
+    "invalidLink": false,
+    "notDocumented": false
+  }
+}

@@ -1,3 +1,4 @@
+import type { File } from 'uxp';
 import ErrorStackParser from 'error-stack-parser';
 import { SourceMapConsumer } from 'source-map-js';
 import { storage } from 'uxp';
@@ -14,9 +15,9 @@ export async function parseUxpErrorSourcemaps(error: Error, opts: { unsourcemapp
 
   const unsourcemappedHeaderLines = opts.unsourcemappedHeaderLines ?? 0;
 
-  const loadedFilesCache: Record<string, storage.File> = {};
+  const loadedFilesCache: Record<string, File> = {};
 
-  const fs = (storage as any).localFileSystem;
+  const fs = storage.localFileSystem;
   const parsedMappedError: BasicStackFrame[] = [];
   for (const frame of parsedError) {
     if (!frame.fileName || !frame.lineNumber || !frame.columnNumber) {
@@ -26,7 +27,7 @@ export async function parseUxpErrorSourcemaps(error: Error, opts: { unsourcemapp
     const entryPath = `plugin:${frame.fileName}`;
     const file
       = loadedFilesCache[entryPath]
-        ?? ((await fs.getEntryWithUrl(entryPath)) as storage.File);
+        ?? ((await fs.getEntryWithUrl(entryPath)) as File);
     loadedFilesCache[entryPath] = file;
     if (!file.isFile) {
       parsedMappedError.push(frame);
@@ -35,7 +36,7 @@ export async function parseUxpErrorSourcemaps(error: Error, opts: { unsourcemapp
     const sourcemapFileEntryPath = `${entryPath}.map`;
     const sourcemapFile
       = loadedFilesCache[sourcemapFileEntryPath]
-        ?? ((await fs.getEntryWithUrl(sourcemapFileEntryPath)) as storage.File);
+        ?? ((await fs.getEntryWithUrl(sourcemapFileEntryPath)) as File);
     loadedFilesCache[sourcemapFileEntryPath] = sourcemapFile;
     if (!sourcemapFile.isFile) {
       parsedMappedError.push(frame);
@@ -82,9 +83,7 @@ function parseErrorIntoBasicStackFrames(error: Error): BasicStackFrame[] {
 }
 
 export async function getBasicStackFrameAbsoluteFilePath(frame: BasicStackFrame): Promise<string> {
-  const pluginFolder = await (
-    storage as any
-  ).localFileSystem.getPluginFolder();
+  const pluginFolder = await storage.localFileSystem.getPluginFolder();
   const absoluteFileName = pathResolve(
     pluginFolder.nativePath,
     'index.js',

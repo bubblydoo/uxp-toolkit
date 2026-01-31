@@ -43,8 +43,20 @@ export default antfu(
       'packages/types-uxp/**/*.d.ts',
     ],
     rules: {
+      'jsdoc/require-rejects': 'error',
       'ts/method-signature-style': 'warn',
-      'accessor-pairs': 'warn',
+      'accessor-pairs': 'off',
+      'unused-imports/no-unused-vars': 'off',
+    },
+  },
+  {
+    files: [
+      'packages/types-photoshop/**/*.test-d.ts',
+      'packages/types-uxp/**/*.test-d.ts',
+    ],
+    rules: {
+      'ts/no-unused-expressions': 'off',
+      'unused-imports/no-unused-imports': 'off',
     },
   },
 );

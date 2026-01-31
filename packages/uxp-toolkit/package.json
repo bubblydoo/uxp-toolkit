@@ -25,7 +25,8 @@
     "test": "vitest run",
     "uxp-test:build": "uxp-test build",
     "uxp-test:dev": "uxp-test dev",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docs-json": "typedoc --json docs.json"
   },
   "publishConfig": {
     "access": "public",
