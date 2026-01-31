@@ -1,4 +1,4 @@
-import type { Document } from 'photoshop/dom/Document';
+import type { Document } from 'photoshop';
 import { batchPlayCommand, createCommand, executeAsModal } from '@bubblydoo/uxp-toolkit';
 import { convert } from 'xmlbuilder2';
 import { z } from 'zod';

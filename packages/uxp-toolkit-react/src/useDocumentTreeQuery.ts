@@ -1,5 +1,5 @@
 import type { UTLayer } from '@bubblydoo/uxp-toolkit';
-import type { Document } from 'photoshop/dom/Document';
+import type { Document } from 'photoshop';
 import { getDocumentLayerDescriptors, photoshopLayerDescriptorsToUTLayers } from '@bubblydoo/uxp-toolkit';
 import { useOnDocumentLayersEdited } from '@bubblydoo/uxp-toolkit-react';
 import { createQueryKeys } from '@lukemorales/query-key-factory';

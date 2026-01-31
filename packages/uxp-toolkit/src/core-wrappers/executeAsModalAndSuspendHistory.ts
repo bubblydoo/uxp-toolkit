@@ -1,4 +1,4 @@
-import type { Document } from 'photoshop/dom/Document';
+import type { Document } from 'photoshop';
 import type { ExtendedExecutionContext } from '../core/executeAsModal';
 import type { SuspendHistoryContext } from '../core/suspendHistory';
 import { executeAsModal } from '../core/executeAsModal';

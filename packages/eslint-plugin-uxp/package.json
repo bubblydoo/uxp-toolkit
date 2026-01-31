@@ -25,7 +25,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --outDir dist --target node18"
+    "build": "tsup src/index.ts --format esm --dts --outDir dist --target node18",
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "eslint": ">=8.0.0"

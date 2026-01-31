@@ -20,7 +20,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --outDir dist"
+    "build": "tsup src/index.ts --format esm --dts --outDir dist",
+    "typecheck": "tsc --noEmit"
   },
   "publishConfig": {
     "access": "public",

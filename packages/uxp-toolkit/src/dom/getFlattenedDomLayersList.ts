@@ -1,4 +1,4 @@
-import type { Layer as DomLayer } from 'photoshop/dom/Layer';
+import type { Layer as DomLayer } from 'photoshop';
 import { constants } from 'photoshop';
 
 // get all layers (including nested in groups)
