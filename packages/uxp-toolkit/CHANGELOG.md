@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.9
+
+### Patch Changes
+
+- 54f68b3: Copy types, connect adobe-uxp-types org
+
 ## 0.0.8
 
 ### Patch Changes
