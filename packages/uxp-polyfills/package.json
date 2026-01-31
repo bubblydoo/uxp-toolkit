@@ -1,7 +1,7 @@
 {
   "name": "@bubblydoo/uxp-polyfills",
   "type": "module",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-polyfills",

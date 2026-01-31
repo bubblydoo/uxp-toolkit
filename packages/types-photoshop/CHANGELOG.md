@@ -1,5 +1,13 @@
 # @adobe-uxp-types/photoshop
 
+## 0.1.1
+
+### Patch Changes
+
+- 11de737: Updated uxp types and docs
+- Updated dependencies [11de737]
+  - @adobe-uxp-types/uxp@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes

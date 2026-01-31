@@ -1,5 +1,11 @@
 # @bubblydoo/eslint-plugin-uxp
 
+## 0.0.3
+
+### Patch Changes
+
+- 11de737: Updated uxp types and docs
+
 ## 0.0.2
 
 ### Patch Changes
