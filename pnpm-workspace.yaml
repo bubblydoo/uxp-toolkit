@@ -1,6 +1,7 @@
 shellEmulator: true
 
 trustPolicy: no-downgrade
+trustPolicyIgnoreAfter: 4320
 
 packages:
   - packages/*
