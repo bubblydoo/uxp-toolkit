@@ -26,6 +26,9 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
+  "peerDependencies": {
+    "@adobe-uxp-types/uxp": "workspace:*"
+  },
   "devDependencies": {
     "@adobe-uxp-types/uxp": "workspace:*",
     "@bubblydoo/tsconfig": "workspace:*",

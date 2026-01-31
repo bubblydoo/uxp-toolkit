@@ -782,17 +782,12 @@ export interface ExecuteAsModalOptions {
    */
   commandName: string;
   /**
-   * An object literal that is passed as the second parameter of `targetFunction` following an [executeAsModal](../executeasmodal) call.
-   * Cannot include functions.
-   * @minVersion 22.5
-   */
-  descriptor?: object;
-  /**
    * Optional mode where UI interactions are permissible within the executeAsModal state. Useful for allowing users to input
    * data into invoked dialogs or workspaces. See [Modal Execution](../executeasmodal).
    * @minVersion 23.3
    */
   interactive?: boolean;
+  timeOut?: number;
 }
 /**
  * Options for the history state that [[Document.suspendHistory]] will create.
@@ -835,6 +830,18 @@ export interface ResumeHistorySuspensionOptions extends HistorySuspension {
    */
   finalName?: string;
 }
+
+// copied from devtools:
+// hostControl: {suspendHistory: ƒ, resumeHistory: ƒ, registerAutoCloseDocument: ƒ, unregisterAutoCloseDocument: ƒ}
+// mode: "action"
+// uiMode: "never"
+// finalizeArguments: ƒ ()
+// isCancelled: undefined
+// onCancel: undefined
+// reject: ƒ ()
+// reportProgress: ƒ ()
+// resolve: ƒ ()
+
 /**
  * This object is passed to the callback of `core.executeAsModal` for modality related APIs.
  * @optionobject
@@ -888,6 +895,7 @@ export interface ExecutionContext {
     unregisterAutoCloseDocument: (documentID: number) => Promise<void>;
   };
 }
+
 export interface OnCancelCbArgument {
   reason: string;
 }

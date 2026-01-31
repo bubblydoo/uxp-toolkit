@@ -17,7 +17,7 @@ export async function parseUxpErrorSourcemaps(error: Error, opts: { unsourcemapp
 
   const loadedFilesCache: Record<string, File> = {};
 
-  const fs = (storage as any).localFileSystem;
+  const fs = storage.localFileSystem;
   const parsedMappedError: BasicStackFrame[] = [];
   for (const frame of parsedError) {
     if (!frame.fileName || !frame.lineNumber || !frame.columnNumber) {
@@ -83,9 +83,7 @@ function parseErrorIntoBasicStackFrames(error: Error): BasicStackFrame[] {
 }
 
 export async function getBasicStackFrameAbsoluteFilePath(frame: BasicStackFrame): Promise<string> {
-  const pluginFolder = await (
-    storage as any
-  ).localFileSystem.getPluginFolder();
+  const pluginFolder = await storage.localFileSystem.getPluginFolder();
   const absoluteFileName = pathResolve(
     pluginFolder.nativePath,
     'index.js',

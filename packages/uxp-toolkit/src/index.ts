@@ -18,8 +18,6 @@ export {
 
 // Core – execution context
 export {
-  type CorrectExecuteAsModalOptions,
-  type CorrectExecutionContext,
   executeAsModal,
   type ExtendedExecutionContext,
 } from './core/executeAsModal';
@@ -40,6 +38,7 @@ export {
   parseUxpErrorSourcemaps,
 } from './error-sourcemaps/sourcemaps';
 // Filesystem
+export { isFile, isFolder } from './filesystem/isFileOrFolder';
 export { openFileByPath } from './filesystem/openFileByPath';
 // General tree
 export { flattenTree } from './general-tree/flattenTree';

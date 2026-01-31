@@ -179,7 +179,7 @@ export class File extends Entry {
   /**
    * Indicates that this instance is a file.
    */
-  isFile: boolean;
+  readonly isFile: true;
 
   /**
    * Indicates whether this file is read-only or read-write.
@@ -237,7 +237,7 @@ export class Folder extends Entry {
    * Indicates that this instance is a folder.
    * Useful for type checking.
    */
-  isFolder: boolean;
+  readonly isFolder: true;
 
   /**
    * Returns an array of entries contained within this folder.
@@ -500,6 +500,22 @@ export class FileSystemProvider {
    * @return The corresponding entry for the persistent token.
    */
   getEntryForPersistentToken(token: string): Promise<Entry>;
+
+  /**
+   * Gets an entry of the given url and returns the appropriate instance.
+   * @param url
+   * @return The corresponding entry for the given url.
+   * @throws Error if invalid file url format or value is passed. if the file/folder does not exist at the url.
+   *
+   * @example
+   * ```js
+   * const tmpFolder = await fs.getEntryWithUrl("plugin-temp:/tmp");
+   * const docFolder = await fs.getEntryWithUrl("file:/Users/user/Documents");
+   * const tmpFile = await fs.getEntryWithUrl("plugin-temp:/tmp/test.dat");
+   * const docFile = await fs.getEntryWithUrl("file:/Users/user/Documents/test.txt");
+   * ```
+   */
+  getEntryWithUrl(url: string): Promise<Entry>;
 }
 
 export class LocalFileSystemProvider extends FileSystemProvider {}

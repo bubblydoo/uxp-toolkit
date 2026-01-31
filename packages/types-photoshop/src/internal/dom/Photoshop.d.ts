@@ -1,3 +1,4 @@
+import type { File } from 'uxp';
 import type { Action, ActionSet } from './Actions';
 import type { Documents } from './collections/Documents';
 import type { TextFonts } from './collections/TextFonts';
