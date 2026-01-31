@@ -1,5 +1,14 @@
 # @bubblydoo/example-layers-plugin
 
+## 0.0.9
+
+### Patch Changes
+
+- 54f68b3: Copy types, connect adobe-uxp-types org
+- Updated dependencies [54f68b3]
+  - @bubblydoo/uxp-toolkit-react@0.0.9
+  - @bubblydoo/uxp-toolkit@0.0.9
+
 ## 0.0.8
 
 ### Patch Changes

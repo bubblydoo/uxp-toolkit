@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-test-framework-base
 
+## 0.0.5
+
+### Patch Changes
+
+- 54f68b3: Copy types, connect adobe-uxp-types org
+
 ## 0.0.4
 
 ### Patch Changes
