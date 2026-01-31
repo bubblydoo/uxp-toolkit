@@ -1,7 +1,7 @@
 {
   "name": "@bubblydoo/eslint-plugin-uxp",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/eslint-plugin-uxp",

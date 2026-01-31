@@ -1,5 +1,13 @@
 # @bubblydoo/uxp-toolkit-react
 
+## 0.0.10
+
+### Patch Changes
+
+- 11de737: Updated uxp types and docs
+- Updated dependencies [11de737]
+  - @bubblydoo/uxp-toolkit@0.0.10
+
 ## 0.0.9
 
 ### Patch Changes

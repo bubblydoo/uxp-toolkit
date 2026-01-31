@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-test-framework-base
 
+## 0.0.6
+
+### Patch Changes
+
+- 11de737: Updated uxp types and docs
+
 ## 0.0.5
 
 ### Patch Changes
