@@ -647,7 +647,7 @@ interface GetLayerParentOptions {
 /**
  * @targetfolder objects/returnobjects
  */
-export declare type GetLayerParentResult = {} | {
+export declare type GetLayerParentResult = object | {
   index: number;
   layerID: number;
   layerKind: number;
