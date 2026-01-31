@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { createCommand } from "../core/command";
-import type { PsLayerRef } from "../ut-tree/psLayerRef";
+import type { PsLayerRef } from '../ut-tree/psLayerRef';
+import { z } from 'zod';
+import { createCommand } from '../core/command';
 
 export function createExpandFolderCommand(layerRef: PsLayerRef) {
   return createCommand({
@@ -11,7 +11,7 @@ export function createExpandFolderCommand(layerRef: PsLayerRef) {
         _ref: [
           { _property: 'layerSectionExpanded' },
           { _ref: 'layer', _id: layerRef.id },
-          { _ref: 'document', _id: layerRef.docId }
+          { _ref: 'document', _id: layerRef.docId },
         ],
       },
       to: true,

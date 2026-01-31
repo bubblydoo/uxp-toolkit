@@ -31,8 +31,8 @@
     "eslint": ">=8.0.0"
   },
   "devDependencies": {
-    "@types/eslint": "^9.6.1",
     "@bubblydoo/tsconfig": "workspace:*",
+    "@types/eslint": "^9.6.1",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   }

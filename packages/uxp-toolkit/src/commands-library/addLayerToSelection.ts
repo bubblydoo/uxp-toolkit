@@ -1,10 +1,10 @@
-import { z } from "zod";
-import { createCommand } from "../core/command";
-import type { PsLayerRef } from "../ut-tree/psLayerRef";
+import type { PsLayerRef } from '../ut-tree/psLayerRef';
+import { z } from 'zod';
+import { createCommand } from '../core/command';
 
 export function createAddLayerToSelectionCommand(
   layerRef: PsLayerRef,
-  previousLayerRef: PsLayerRef
+  previousLayerRef: PsLayerRef,
 ) {
   return createCommand({
     modifying: true,

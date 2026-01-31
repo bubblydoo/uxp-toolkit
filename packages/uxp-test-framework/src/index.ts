@@ -1,1 +1,1 @@
-export * from "@bubblydoo/uxp-test-framework-base";
+export * from '@bubblydoo/uxp-test-framework-base';

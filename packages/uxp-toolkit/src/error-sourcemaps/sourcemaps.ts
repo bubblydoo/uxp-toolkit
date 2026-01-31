@@ -1,12 +1,12 @@
-import ErrorStackParser from "error-stack-parser";
-import { SourceMapConsumer } from "source-map-js";
-import { storage } from "uxp";
-import { pathResolve } from "../node-compat/path/resolvePath";
-import { UTError } from "../errors/ut-error";
+import ErrorStackParser from 'error-stack-parser';
+import { SourceMapConsumer } from 'source-map-js';
+import { storage } from 'uxp';
+import { UTError } from '../errors/ut-error';
+import { pathResolve } from '../node-compat/path/resolvePath';
 
 export type BasicStackFrame = Pick<
   ErrorStackParser.StackFrame,
-  "functionName" | "fileName" | "lineNumber" | "columnNumber"
+  'functionName' | 'fileName' | 'lineNumber' | 'columnNumber'
 >;
 
 export async function parseUxpErrorSourcemaps(error: Error, opts: { unsourcemappedHeaderLines?: number } = {}) {
@@ -23,19 +23,19 @@ export async function parseUxpErrorSourcemaps(error: Error, opts: { unsourcemapp
       parsedMappedError.push(frame);
       continue;
     }
-    const entryPath = "plugin:" + frame.fileName;
-    const file =
-      loadedFilesCache[entryPath] ??
-      ((await fs.getEntryWithUrl(entryPath)) as storage.File);
+    const entryPath = `plugin:${frame.fileName}`;
+    const file
+      = loadedFilesCache[entryPath]
+        ?? ((await fs.getEntryWithUrl(entryPath)) as storage.File);
     loadedFilesCache[entryPath] = file;
     if (!file.isFile) {
       parsedMappedError.push(frame);
       continue;
     }
-    const sourcemapFileEntryPath = entryPath + ".map";
-    const sourcemapFile =
-      loadedFilesCache[sourcemapFileEntryPath] ??
-      ((await fs.getEntryWithUrl(sourcemapFileEntryPath)) as storage.File);
+    const sourcemapFileEntryPath = `${entryPath}.map`;
+    const sourcemapFile
+      = loadedFilesCache[sourcemapFileEntryPath]
+        ?? ((await fs.getEntryWithUrl(sourcemapFileEntryPath)) as storage.File);
     loadedFilesCache[sourcemapFileEntryPath] = sourcemapFile;
     if (!sourcemapFile.isFile) {
       parsedMappedError.push(frame);
@@ -55,7 +55,8 @@ export async function parseUxpErrorSourcemaps(error: Error, opts: { unsourcemapp
         lineNumber: mappedFrame.line,
         columnNumber: mappedFrame.column,
       } as ErrorStackParser.StackFrame);
-    } else {
+    }
+    else {
       parsedMappedError.push(frame);
     }
   }
@@ -74,8 +75,9 @@ function parseErrorIntoBasicStackFrames(error: Error): BasicStackFrame[] {
         columnNumber: frame.columnNumber,
       };
     });
-  } catch (e) {
-    throw new UTStacktraceParsingError("Failed to parse error stack trace", { cause: e });
+  }
+  catch (e) {
+    throw new UTStacktraceParsingError('Failed to parse error stack trace', { cause: e });
   }
 }
 
@@ -85,14 +87,14 @@ export async function getBasicStackFrameAbsoluteFilePath(frame: BasicStackFrame)
   ).localFileSystem.getPluginFolder();
   const absoluteFileName = pathResolve(
     pluginFolder.nativePath,
-    "index.js",
+    'index.js',
     frame.fileName!,
-  ).replace(/^plugin:/, "");
+  ).replace(/^plugin:/, '');
   return `${absoluteFileName}:${frame.lineNumber}:${frame.columnNumber}`;
 }
 
 export class UTStacktraceParsingError extends UTError {
-  public override readonly name = "UTStacktraceParsingError";
+  public override readonly name = 'UTStacktraceParsingError';
 
   constructor(message: string, opts: ErrorOptions = {}) {
     super(message, opts);

@@ -1,59 +1,59 @@
-import { expect, it } from "vitest";
-import { utLayersToText } from "./utLayersToText";
+import { expect, it } from 'vitest';
+import { utLayersToText } from './utLayersToText';
 
-it("converts a single layer to text", () => {
+it('converts a single layer to text', () => {
   expect(utLayersToText([
     {
-      name: "circle",
+      name: 'circle',
       effects: {},
-      blendMode: "normal",
+      blendMode: 'normal',
       isClippingMask: false,
-      kind: "pixel",
+      kind: 'pixel',
       visible: true,
     },
-  ])).toMatchInlineSnapshot(`"◯ circle"`)
+  ])).toMatchInlineSnapshot(`"◯ circle"`);
 });
 
-it("converts a nested layer to text", () => {
+it('converts a nested layer to text', () => {
   expect(utLayersToText([
     {
-      name: "group",
+      name: 'group',
       effects: {},
-      blendMode: "passThrough",
+      blendMode: 'passThrough',
       isClippingMask: false,
-      kind: "group",
+      kind: 'group',
       visible: true,
       layers: [
         {
-          name: "circle",
+          name: 'circle',
           effects: {},
-          blendMode: "normal",
+          blendMode: 'normal',
           isClippingMask: false,
-          kind: "pixel",
+          kind: 'pixel',
           visible: true,
         },
         {
-          name: "square",
+          name: 'square',
           effects: {},
-          blendMode: "normal",
+          blendMode: 'normal',
           isClippingMask: false,
-          kind: "pixel",
+          kind: 'pixel',
           visible: true,
         },
         {
-          name: "other",
+          name: 'other',
           effects: {},
-          blendMode: "passThrough",
+          blendMode: 'passThrough',
           isClippingMask: false,
-          kind: "group",
+          kind: 'group',
           visible: true,
           layers: [
             {
-              name: "nested",
+              name: 'nested',
               effects: {},
-              blendMode: "normal",
+              blendMode: 'normal',
               isClippingMask: false,
-              kind: "pixel",
+              kind: 'pixel',
               visible: true,
             },
           ],
@@ -66,29 +66,29 @@ it("converts a nested layer to text", () => {
     ◯    square
     ◯    ▾ other
     ◯      nested"
-  `)
+  `);
 });
 
-it("converts a nested layer with a clipping mask to text", () => {
+it('converts a nested layer with a clipping mask to text', () => {
   expect(utLayersToText([
     {
-      name: "clipper",
+      name: 'clipper',
       effects: {},
-      blendMode: "normal",
+      blendMode: 'normal',
       isClippingMask: true,
-      kind: "pixel",
+      kind: 'pixel',
       visible: true,
     },
     {
-      name: "circle",
+      name: 'circle',
       effects: {},
-      blendMode: "normal",
+      blendMode: 'normal',
       isClippingMask: false,
-      kind: "pixel",
+      kind: 'pixel',
       visible: true,
     },
   ])).toMatchInlineSnapshot(`
     "◯ ⬐ clipper
     ◯ circle"
-  `)
+  `);
 });

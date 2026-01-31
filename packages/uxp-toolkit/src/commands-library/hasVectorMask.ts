@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { createCommand } from "../core/command";
+import { z } from 'zod';
+import { createCommand } from '../core/command';
 
 export function createHasVectorMaskCommand(layerId: number) {
   return createCommand({

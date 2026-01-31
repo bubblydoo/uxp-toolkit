@@ -6,18 +6,18 @@
 
 // 4.1. Convert a mark to a timestamp
 function convertMarkToTimestamp(mark) {
-  if (typeof mark === "string") {
+  if (typeof mark === 'string') {
     const entries = performance
-      .getEntriesByType("mark")
-      .filter((m) => m.name === mark);
+      .getEntriesByType('mark')
+      .filter(m => m.name === mark);
     const entry = entries[entries.length - 1];
     if (!entry) {
-      throw new DOMException(`Cannot find mark: "${mark}".`, "SyntaxError");
+      throw new DOMException(`Cannot find mark: "${mark}".`, 'SyntaxError');
     }
     return entry.startTime;
   }
   if (mark < 0) {
-    throw new TypeError("Mark cannot be negative.");
+    throw new TypeError('Mark cannot be negative.');
   }
   return mark;
 }
@@ -28,37 +28,37 @@ export function performanceMeasurePolyfill(
   startOrMeasureOptions,
   endMark,
 ) {
-  let startTime = undefined;
-  let endTime = undefined;
+  let startTime;
+  let endTime;
 
-  const isOptions = (v) =>
-    typeof v === "object" && v !== null && !Array.isArray(v);
+  const isOptions = v =>
+    typeof v === 'object' && v !== null && !Array.isArray(v);
 
   // 1. If startOrMeasureOptions is a PerformanceMeasureOptions object and at least one of start, end, duration, and detail exist, run the following checks:
   if (isOptions(startOrMeasureOptions)) {
     // 1.1. If endMark is given, throw a TypeError.
     if (endMark) {
       throw new TypeError(
-        "If startOrMeasureOptions is an object, endMark cannot be provided.",
+        'If startOrMeasureOptions is an object, endMark cannot be provided.',
       );
     }
 
     if (
       // 1.2. If startOrMeasureOptions's start and end members are both omitted, throw a TypeError.
-      (startOrMeasureOptions.start === undefined &&
-        startOrMeasureOptions.end === undefined) ||
+      (startOrMeasureOptions.start === undefined
+        && startOrMeasureOptions.end === undefined)
       // 1.3. If startOrMeasureOptions's start, duration, and end members all exist, throw a TypeError.
-      (startOrMeasureOptions.start !== undefined &&
-        startOrMeasureOptions.end !== undefined &&
-        startOrMeasureOptions.duration !== undefined)
+      || (startOrMeasureOptions.start !== undefined
+        && startOrMeasureOptions.end !== undefined
+        && startOrMeasureOptions.duration !== undefined)
     ) {
-      throw new TypeError("Invalid startOrMeasureOptions.");
+      throw new TypeError('Invalid startOrMeasureOptions.');
     }
   }
 
   // 2. Compute end time as follows:
   // 2.1. If endMark is given, let end time be the value returned by running the convert a mark to a timestamp algorithm passing in endMark.
-  if (endMark !== undefined && typeof startOrMeasureOptions === "string") {
+  if (endMark !== undefined && typeof startOrMeasureOptions === 'string') {
     endTime = convertMarkToTimestamp(endMark);
   }
   // 2.2. Otherwise, if startOrMeasureOptions is a PerformanceMeasureOptions object, and if its end member exists, let end time be the value returned by running the convert a mark to a timestamp algorithm passing in startOrMeasureOptions's end.
@@ -67,8 +67,8 @@ export function performanceMeasurePolyfill(
       endTime = convertMarkToTimestamp(startOrMeasureOptions.end);
     } // 2.3. Otherwise, if startOrMeasureOptions is a PerformanceMeasureOptions object, and if its start and duration members both exist:
     else if (
-      startOrMeasureOptions.start !== undefined &&
-      startOrMeasureOptions.duration !== undefined
+      startOrMeasureOptions.start !== undefined
+      && startOrMeasureOptions.duration !== undefined
     ) {
       // 2.3.1. Let start be the value returned by running the convert a mark to a timestamp algorithm passing in start.
       const start = convertMarkToTimestamp(startOrMeasureOptions.start);
@@ -92,8 +92,8 @@ export function performanceMeasurePolyfill(
       startTime = convertMarkToTimestamp(startOrMeasureOptions.start);
     } // 3.2. Otherwise, if startOrMeasureOptions is a PerformanceMeasureOptions object, and if its duration and end members both exist:
     else if (
-      startOrMeasureOptions.duration !== undefined &&
-      startOrMeasureOptions.end !== undefined
+      startOrMeasureOptions.duration !== undefined
+      && startOrMeasureOptions.end !== undefined
     ) {
       // 3.2.1. Let duration be the value returned by running the convert a mark to a timestamp algorithm passing in duration.
       const duration = convertMarkToTimestamp(startOrMeasureOptions.duration);
@@ -103,7 +103,7 @@ export function performanceMeasurePolyfill(
       startTime = end - duration;
     }
   } // 3.3. Otherwise, if startOrMeasureOptions is a DOMString, let start time be the value returned by running the convert a mark to a timestamp algorithm passing in startOrMeasureOptions.
-  else if (typeof startOrMeasureOptions === "string") {
+  else if (typeof startOrMeasureOptions === 'string') {
     startTime = convertMarkToTimestamp(startOrMeasureOptions);
   } // 3.4. Otherwise, let start time be 0.
   else {
@@ -111,7 +111,7 @@ export function performanceMeasurePolyfill(
   }
 
   if (startTime === undefined || endTime === undefined) {
-    throw new TypeError("Invalid startTime or endTime");
+    throw new TypeError('Invalid startTime or endTime');
   }
 
   // 4. Create a new PerformanceMeasure object (entry) with this's relevant realm.
@@ -119,7 +119,7 @@ export function performanceMeasurePolyfill(
     // 5. Set entry's name attribute to measureName.
     name: measureName,
     // 6. Set entry's entryType attribute to DOMString "measure".
-    entryType: "measure",
+    entryType: 'measure',
     // 7. Set entry's startTime attribute to start time.
     startTime,
     // 8. Set entry's duration attribute to the duration from start time to end time. The resulting duration value MAY be negative.

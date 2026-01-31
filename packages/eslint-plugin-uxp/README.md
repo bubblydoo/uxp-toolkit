@@ -60,11 +60,13 @@ const { BlendMode } = require('photoshop/dom/Constants');
 
 ```js
 import { constants } from 'photoshop';
+
 const { BlendMode } = constants;
 ```
 
 ```js
 const { constants } = require('photoshop');
+
 const { BlendMode } = constants;
 ```
 

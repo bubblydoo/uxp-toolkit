@@ -1,5 +1,5 @@
-import { core } from "photoshop";
-import { createModifyingBatchPlayContext } from "./command";
+import { core } from 'photoshop';
+import { createModifyingBatchPlayContext } from './command';
 
 // copied from devtools:
 // hostControl: {suspendHistory: ƒ, resumeHistory: ƒ, registerAutoCloseDocument: ƒ, unregisterAutoCloseDocument: ƒ}
@@ -12,7 +12,7 @@ import { createModifyingBatchPlayContext } from "./command";
 // reportProgress: ƒ ()
 // resolve: ƒ ()
 
-export type CorrectExecutionContext = {
+export interface CorrectExecutionContext {
   /**
    * True if user has cancelled the modal interaction.
    *
@@ -38,8 +38,8 @@ export type CorrectExecutionContext = {
      * Call to suspend history on a target document, returns the suspension ID which can be used for resumeHistory
      */
     suspendHistory: (info: {
-      documentID: number,
-      name: string,
+      documentID: number;
+      name: string;
     }) => Promise<number>;
     /**
      * Call to resume history on a target document
@@ -52,19 +52,19 @@ export type CorrectExecutionContext = {
   };
 }
 
-export type CorrectExecuteAsModalOptions = {
+export interface CorrectExecuteAsModalOptions {
   commandName: string;
   interactive?: boolean;
   timeOut?: number;
 }
 
-export type ExtendedExecutionContext = Omit<CorrectExecutionContext, "onCancel"> & ReturnType<typeof createModifyingBatchPlayContext> & {
+export type ExtendedExecutionContext = Omit<CorrectExecutionContext, 'onCancel'> & ReturnType<typeof createModifyingBatchPlayContext> & {
   signal: AbortSignal;
 };
 
 const originalExecuteAsModal: <T>(fn: (executionContext: CorrectExecutionContext) => Promise<void>, opts: CorrectExecuteAsModalOptions) => Promise<T> = core.executeAsModal as any;
 
-type OptionsWithoutCommandName = Omit<CorrectExecuteAsModalOptions, "commandName">;
+type OptionsWithoutCommandName = Omit<CorrectExecuteAsModalOptions, 'commandName'>;
 
 export async function executeAsModal<T>(commandName: string, fn: (executionContext: ExtendedExecutionContext) => Promise<T>, opts?: OptionsWithoutCommandName): Promise<T> {
   let error: unknown;
@@ -84,8 +84,9 @@ export async function executeAsModal<T>(commandName: string, fn: (executionConte
     };
     try {
       result = await fn(extendedExecutionContext);
-    } catch (e) {
-      console.error("error in executeAsModal");
+    }
+    catch (e) {
+      console.error('error in executeAsModal');
       console.error(e);
       error = e;
     }
@@ -95,7 +96,8 @@ export async function executeAsModal<T>(commandName: string, fn: (executionConte
   });
   if (error) {
     throw error;
-  } else {
+  }
+  else {
     return result!;
   }
 }

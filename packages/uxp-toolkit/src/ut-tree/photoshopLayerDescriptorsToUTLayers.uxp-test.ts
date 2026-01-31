@@ -1,14 +1,14 @@
-import type { Test } from "@bubblydoo/uxp-test-framework";
-import { photoshopLayerDescriptorsToUTLayers } from "./photoshopLayerDescriptorsToUTLayers";
-import { openFileByPath } from "../filesystem/openFileByPath";
-import { expect } from "chai";
-import { getDocumentLayerDescriptors } from "./getDocumentLayerDescriptors";
+import type { Test } from '@bubblydoo/uxp-test-framework';
+import { expect } from 'chai';
+import { openFileByPath } from '../filesystem/openFileByPath';
+import { getDocumentLayerDescriptors } from './getDocumentLayerDescriptors';
+import { photoshopLayerDescriptorsToUTLayers } from './photoshopLayerDescriptorsToUTLayers';
 
 export const photoshopLayerDescriptorsToUTLayersTest: Test = {
-  name: "photoshopLayerDescriptorsToUTLayers",
-  description: "Test the photoshopLayerDescriptorsToUTLayers function",
+  name: 'photoshopLayerDescriptorsToUTLayers',
+  description: 'Test the photoshopLayerDescriptorsToUTLayers function',
   run: async () => {
-    const doc = await openFileByPath("plugin:/fixtures/clipping-layers.psd");
+    const doc = await openFileByPath('plugin:/fixtures/clipping-layers.psd');
     const descriptors = await getDocumentLayerDescriptors(doc.id);
 
     console.log(descriptors);
@@ -16,35 +16,35 @@ export const photoshopLayerDescriptorsToUTLayersTest: Test = {
     const layers = photoshopLayerDescriptorsToUTLayers(descriptors);
     expect(layers).to.containSubset([
       {
-        name: "circle",
+        name: 'circle',
         visible: true,
-        kind: "pixel",
-        blendMode: "normal",
+        kind: 'pixel',
+        blendMode: 'normal',
         isClippingMask: true,
         effects: {},
       },
       {
-        name: "group",
+        name: 'group',
         visible: true,
-        kind: "group",
-        blendMode: "passThrough",
+        kind: 'group',
+        blendMode: 'passThrough',
         isClippingMask: false,
         effects: {},
         layers: [
           {
-            name: "green square",
+            name: 'green square',
             visible: true,
-            kind: "pixel",
-            blendMode: "normal",
+            kind: 'pixel',
+            blendMode: 'normal',
             isClippingMask: true,
             effects: {},
           },
           {
-            name: "red square",
+            name: 'red square',
             id: 2,
             visible: true,
-            kind: "pixel",
-            blendMode: "normal",
+            kind: 'pixel',
+            blendMode: 'normal',
             isClippingMask: false,
             effects: {},
           },
@@ -55,28 +55,28 @@ export const photoshopLayerDescriptorsToUTLayersTest: Test = {
 };
 
 export const photoshopLayerDescriptorsToUTLayersTest2: Test = {
-  name: "photoshopLayerDescriptorsToUTLayers",
-  description: "Test the photoshopLayerDescriptorsToUTLayers function",
+  name: 'photoshopLayerDescriptorsToUTLayers',
+  description: 'Test the photoshopLayerDescriptorsToUTLayers function',
   run: async () => {
-    const doc = await openFileByPath("plugin:/fixtures/one-layer-with-bg.psd");
+    const doc = await openFileByPath('plugin:/fixtures/one-layer-with-bg.psd');
     const descriptors = await getDocumentLayerDescriptors(doc.id);
     console.log(descriptors);
     const layers = photoshopLayerDescriptorsToUTLayers(descriptors);
     console.log(layers);
     expect(layers).to.containSubset([
       {
-        name: "Layer 1",
+        name: 'Layer 1',
         visible: true,
-        kind: "pixel",
-        blendMode: "normal",
+        kind: 'pixel',
+        blendMode: 'normal',
         isClippingMask: false,
         effects: {},
       },
       {
-        name: "Background",
+        name: 'Background',
         visible: true,
-        kind: "background",
-        blendMode: "normal",
+        kind: 'background',
+        blendMode: 'normal',
         isClippingMask: false,
         effects: {},
       },

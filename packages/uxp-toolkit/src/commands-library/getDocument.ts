@@ -1,12 +1,12 @@
-import z from "zod";
-import { createCommand } from "../core/command";
+import z from 'zod';
+import { createCommand } from '../core/command';
 
 export function createGetDocumentCommand(documentId: number) {
   return createCommand({
     modifying: false,
     descriptor: {
-      _obj: "get",
-      _target: { _ref: [{ _ref: "document", _id: documentId }] },
+      _obj: 'get',
+      _target: { _ref: [{ _ref: 'document', _id: documentId }] },
     },
     schema: z.object({
       title: z.string(),
@@ -21,11 +21,11 @@ export function createGetDocumentHasBackgroundLayerCommand(documentId: number) {
   return createCommand({
     modifying: false,
     descriptor: {
-      _obj: "get",
+      _obj: 'get',
       _target: {
         _ref: [
-          { _property: "hasBackgroundLayer" },
-          { _ref: "document", _id: documentId },
+          { _property: 'hasBackgroundLayer' },
+          { _ref: 'document', _id: documentId },
         ],
       },
     },

@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { createCommand } from "../core/command";
+import { z } from 'zod';
+import { createCommand } from '../core/command';
 
 export type LUTExportFormat = 'CUBE' | 'ICC' | '3DL' | 'CSP';
 
@@ -13,7 +13,7 @@ export interface ExportLUTsOptions {
 
 export function createExportLUTsCommand(
   path: string,
-  options: ExportLUTsOptions = {}
+  options: ExportLUTsOptions = {},
 ) {
   const {
     description = 'Exported LUT',
@@ -32,7 +32,7 @@ export function createExportLUTsCommand(
         $fpth: path,
         $dscr: description,
         $gPts: gridPoints,
-        copyright: copyright,
+        copyright,
         $wICC: exportFormats.includes('ICC'),
         $w3DL: exportFormats.includes('3DL'),
         $wCUB: exportFormats.includes('CUBE'),

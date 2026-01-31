@@ -1,16 +1,17 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { BasicStackFrame, copyToClipboard, getBasicStackFrameAbsoluteFilePath, parseUxpErrorSourcemaps } from "@bubblydoo/uxp-toolkit";
+import type { BasicStackFrame } from '@bubblydoo/uxp-toolkit';
+import { copyToClipboard, getBasicStackFrameAbsoluteFilePath, parseUxpErrorSourcemaps } from '@bubblydoo/uxp-toolkit';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 declare const __UNSOURCEMAPPED_HEADER_LINES__: number;
 
-const UNSOURCEMAPPED_HEADER_LINES =
-  typeof __UNSOURCEMAPPED_HEADER_LINES__ === "number"
+const UNSOURCEMAPPED_HEADER_LINES
+  = typeof __UNSOURCEMAPPED_HEADER_LINES__ === 'number'
     ? __UNSOURCEMAPPED_HEADER_LINES__
     : 0;
 
 export function ErrorView({ error }: { error: Error }) {
   const sourcemappedError = useQuery({
-    queryKey: ["sourcemappedError", error],
+    queryKey: ['sourcemappedError', error],
     queryFn: async () => {
       return await parseUxpErrorSourcemaps(error, {
         unsourcemappedHeaderLines: UNSOURCEMAPPED_HEADER_LINES,
@@ -35,7 +36,10 @@ export function ErrorView({ error }: { error: Error }) {
       <div className="p-2">
         <div>Sourcemapped error:</div>
         {copyMutation.error && (
-          <>Copy error: {errorToString(copyMutation.error)}</>
+          <>
+            Copy error:
+            {errorToString(copyMutation.error)}
+          </>
         )}
         {sourcemappedError.isPending && (
           <div>⏳ Loading sourcemapped error...</div>
@@ -45,15 +49,24 @@ export function ErrorView({ error }: { error: Error }) {
         )}
         {sourcemappedError.data && (
           <div className="text-red-500 whitespace-pre-wrap">
-            {error.name}: {error.message}
+            {error.name}
+            :
+            {error.message}
             {sourcemappedError.data.map((frame, i) => (
               <div key={i}>
-                {frame.functionName} @{" "}
+                {frame.functionName}
+                {' '}
+                @
+                {' '}
                 <span
                   className="underline"
                   onClick={() => copyMutation.mutate(frame)}
                 >
-                  {frame.fileName}:{frame.lineNumber}:{frame.columnNumber}
+                  {frame.fileName}
+                  :
+                  {frame.lineNumber}
+                  :
+                  {frame.columnNumber}
                 </span>
               </div>
             ))}

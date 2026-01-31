@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { createCommand } from "../core/command";
+import { z } from 'zod';
+import { createCommand } from '../core/command';
 
 export type LUTFormatType = 'LUTFormatCUBE' | 'LUTFormat3DL' | 'LUTFormatCSP';
 

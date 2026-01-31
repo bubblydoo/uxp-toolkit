@@ -1,16 +1,13 @@
 {
   "name": "@bubblydoo/uxp-polyfills",
-  "version": "0.0.4",
   "type": "module",
-  "license": "MIT",
+  "version": "0.0.4",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-polyfills",
   "repository": {
     "type": "git",
     "url": "https://github.com/bubblydoo/uxp-toolkit.git"
-  },
-  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-polyfills",
-  "scripts": {
-    "build": "tsup src/index.js --format esm --outDir dist --target chrome80 && cp src/index.d.ts dist/index.d.ts"
   },
   "exports": {
     ".": {
@@ -31,10 +28,13 @@
   "files": [
     "dist"
   ],
+  "scripts": {
+    "build": "tsup src/index.js --format esm --outDir dist --target chrome80 && cp src/index.d.ts dist/index.d.ts"
+  },
   "devDependencies": {
-    "mutationobserver-shim": "^0.3.7",
-    "matchmedia-polyfill": "^0.3.2",
     "core-js": "^3.48.0",
+    "matchmedia-polyfill": "^0.3.2",
+    "mutationobserver-shim": "^0.3.7",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   }

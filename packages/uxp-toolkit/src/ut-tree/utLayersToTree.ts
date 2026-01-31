@@ -1,10 +1,10 @@
-import type { Tree } from "../general-tree/treeTypes";
-import type { UTLayer } from "./photoshopLayerDescriptorsToUTLayers";
+import type { Tree } from '../general-tree/treeTypes';
+import type { UTLayer } from './photoshopLayerDescriptorsToUTLayers';
 
-export type UTLayerWithoutChildren = Omit<UTLayer, "layers">;
+export type UTLayerWithoutChildren = Omit<UTLayer, 'layers'>;
 
 export function utLayersToTree(layer: UTLayer[]): Tree<UTLayerWithoutChildren> {
-  return layer.map((layer) => ({
+  return layer.map(layer => ({
     ref: {
       name: layer.name,
       docId: layer.docId,

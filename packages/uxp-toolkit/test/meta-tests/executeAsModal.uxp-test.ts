@@ -1,37 +1,39 @@
-import { core } from "photoshop";
-import type { Test } from "@bubblydoo/uxp-test-framework";
-import { expect } from "chai";
+import type { Test } from '@bubblydoo/uxp-test-framework';
+import { expect } from 'chai';
+import { core } from 'photoshop';
 
 export const executeAsModalErrorTest: Test = {
-  name: "meta: executeAsModal should throw correctly",
+  name: 'meta: executeAsModal should throw correctly',
   async run() {
     let threw = false;
     try {
       await core.executeAsModal(
         async () => {
-          throw new Error("Uncaught error");
+          throw new Error('Uncaught error');
         },
         {
-          commandName: "Test",
-        }
+          commandName: 'Test',
+        },
       );
-    } catch (e) {
+    }
+    catch (_e) {
       threw = true;
     }
+    // eslint-disable-next-line ts/no-unused-expressions
     expect(threw).to.be.true;
   },
 };
 
 export const executeAsModalReturnTest: Test = {
-  name: "meta: executeAsModal should return correctly",
+  name: 'meta: executeAsModal should return correctly',
   async run() {
     const result = await core.executeAsModal(
       async () => {
-        return 'test'
+        return 'test';
       },
       {
-        commandName: "Test",
-      }
+        commandName: 'Test',
+      },
     );
     expect(result).to.equal('test');
   },
