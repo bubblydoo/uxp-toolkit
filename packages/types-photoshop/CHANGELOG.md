@@ -1,5 +1,11 @@
 # @adobe-uxp-types/photoshop
 
+## 0.1.3
+
+### Patch Changes
+
+- 87bd004: Fix missing constants types
+
 ## 0.1.2
 
 ### Patch Changes
