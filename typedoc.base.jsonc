@@ -1,0 +1,9 @@
+// Base TypeDoc configuration shared by all packages
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeExternals": true,
+  "includeVersion": true,
+  "skipErrorChecking": true
+}

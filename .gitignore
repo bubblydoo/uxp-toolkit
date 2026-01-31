@@ -9,5 +9,9 @@ tsconfig.tsbuildinfo
 *.tgz
 test-results
 
+# TypeDoc generated files
+docs
+docs.json
+
 # for eslint ignore
 dist-vite

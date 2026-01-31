@@ -12,6 +12,10 @@
     },
     "typecheck": {
       "dependsOn": ["^typecheck"]
+    },
+    "docs-json": {
+      "dependsOn": ["^docs-json"],
+      "outputs": ["docs.json"]
     }
   }
 }

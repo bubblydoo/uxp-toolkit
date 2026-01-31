@@ -24,7 +24,8 @@
   ],
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docs-json": "typedoc --json docs.json"
   },
   "devDependencies": {
     "@bubblydoo/tsconfig": "workspace:*",

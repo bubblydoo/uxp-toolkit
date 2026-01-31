@@ -29,7 +29,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.js --format esm --outDir dist --target chrome80 && cp src/index.d.ts dist/index.d.ts"
+    "build": "tsup src/index.js --format esm --outDir dist --target chrome80 && cp src/index.d.ts dist/index.d.ts",
+    "docs-json": "typedoc --json docs.json"
   },
   "devDependencies": {
     "core-js": "^3.48.0",

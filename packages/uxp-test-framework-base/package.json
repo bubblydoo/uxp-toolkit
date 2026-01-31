@@ -21,7 +21,8 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --outDir dist",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docs-json": "typedoc --json docs.json"
   },
   "publishConfig": {
     "access": "public",
