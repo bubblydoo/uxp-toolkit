@@ -10,10 +10,11 @@ With the code in this repo, we fix a few things:
 - A unified way to represent layers in your code, without using document.layers (which gets very slow, see below)
 - A testing framework for UXP, which you can also use for your own tests.
 - Vitest integration for running unit tests without Photoshop, with CI/CD support.
-
+- Typescript types for the `uxp` and `photoshop` modules.
 
 ```bash
 pnpm add @bubblydoo/uxp-toolkit
+pnpm add -D @adobe-uxp-types/uxp @adobe-uxp-types/photoshop
 ```
 
 ## What is wrong with UXP?
@@ -144,6 +145,19 @@ We publish our own types for the `uxp` and `photoshop` modules, which are based 
 
 ```bash
 pnpm add -D @adobe-uxp-types/uxp @adobe-uxp-types/photoshop
+```
+
+`tsconfig.json`:
+```json
+{
+  "compilerOptions": {
+    "types": ["photoshop", "uxp"],
+    "typeRoots": [
+      "./node_modules/@adobe-uxp-types",
+      "./node_modules/@types"
+    ]
+  }
+}
 ```
 
 ### Commands library
