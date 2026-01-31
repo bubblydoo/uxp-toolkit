@@ -8,3 +8,6 @@ tsconfig.tsbuildinfo
 .pnpm-store
 *.tgz
 test-results
+
+# for eslint ignore
+dist-vite

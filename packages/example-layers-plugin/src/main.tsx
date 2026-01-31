@@ -33,6 +33,7 @@ import type { Document } from "photoshop/dom/Document";
 import { Fragment, useMemo, useState } from "react";
 import { z } from "zod";
 import { cn } from "./lib/cn";
+import { BlendMode } from "photoshop/dom/Constants";
 
 export function App() {
   return (
