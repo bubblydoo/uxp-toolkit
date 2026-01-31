@@ -14,12 +14,12 @@
  * The method to use for bitmap interpolation.
  *
  * Pass to
- * - [[PreferencesGeneral.imageInterpolation]]
- * - [[Layer.scale]]()
- * - [[Layer.skew]]()
- * - [[Layer.rotate]]()
- * - [[Selection.resizeBoundary]]()
- * - [[Selection.rotateBoundary]]()
+ * - {@link PreferencesGeneral.imageInterpolation}
+ * - {@link Layer.scale}()
+ * - {@link Layer.skew}()
+ * - {@link Layer.rotate}()
+ * - {@link Selection.resizeBoundary}()
+ * - {@link Selection.rotateBoundary}()
  *
  * @minVersion 24.0
  */
@@ -52,7 +52,7 @@ export enum InterpolationMethod {
 /**
  * The method to use for document interpolation
  *
- * Pass to [[Document.resizeImage]]()
+ * Pass to {@link Document.resizeImage}()
  *
  * @minVersion 22.5
  */
@@ -158,7 +158,7 @@ export enum BitsPerChannelType {
 }
 /**
  * The source to use for the depth map. Pass to
- * [[Layer.applyLensBlur]]().
+ * {@link Layer.applyLensBlur}().
  * @minVersion 23.5
  */
 export enum DepthMapSource {
@@ -168,7 +168,7 @@ export enum DepthMapSource {
   TRANSPARENCYCHANNEL = 'transparency',
 }
 /**
- * The target operating system in [[BMPSaveOptions]].
+ * The target operating system in {@link BMPSaveOptions}.
  * @minVersion 22.5
  */
 export enum OperatingSystem {
@@ -288,7 +288,7 @@ export enum AnchorPosition {
   TOPRIGHT = 'top-right',
 }
 /**
- * Type of pixels to trim around an image, passed to [[Document.trim]].
+ * Type of pixels to trim around an image, passed to {@link Document.trim}.
  * @minVersion 23.0
  */
 export enum TrimType {
@@ -355,7 +355,7 @@ export enum BlendMode {
 }
 /**
  * The kind of blending used in a fill or stroke operation.
- * Pass to [[PathItem.fillPath]]()
+ * Pass to {@link PathItem.fillPath}()
  * @minVersion 23.3
  */
 export enum ColorBlendMode {
@@ -388,7 +388,7 @@ export enum ColorBlendMode {
   VIVIDLIGHT = 'vividLight',
 }
 /**
- * The kind of blending used in a [[Document.calculations]] operation.
+ * The kind of blending used in a {@link Document.calculations} operation.
  * @minVersion 24.5
  */
 export enum CalculationsBlendMode {
@@ -417,7 +417,7 @@ export enum CalculationsBlendMode {
   DIVIDE = 'blendDivide',
 }
 /**
- * The kind of blending used in a [[Layer.applyImage]] operation.
+ * The kind of blending used in a {@link Layer.applyImage} operation.
  * @minVersion 24.5
  */
 export enum ApplyImageBlendMode {
@@ -446,7 +446,7 @@ export enum ApplyImageBlendMode {
   DIVIDE = 'blendDivide',
 }
 /**
- * Color mode of an open document. See also [[Document.mode]] and [[Document.changeMode]]
+ * Color mode of an open document. See also {@link Document.mode} and {@link Document.changeMode}
  * @minVersion 22.5
  */
 export enum DocumentMode {
@@ -471,7 +471,7 @@ export enum NewDocumentMode {
   LAB = 'labColorMode',
 }
 /**
- * Valid Units for convertUnits method, used in [[Photoshop.convertUnits]]
+ * Valid Units for convertUnits method, used in {@link Photoshop.convertUnits}
  * @minVersion 23.4
  */
 export enum Units {
@@ -483,7 +483,7 @@ export enum Units {
   POINTS = 'pt',
 }
 /**
- * The new color profile or mode for a document, specified in [[Document.changeMode]]
+ * The new color profile or mode for a document, specified in {@link Document.changeMode}
  *
  * NOTE: Color images must be changed to GRAYSCALE mode before you can change them to BITMAP mode.
  * @minVersion 22.5
@@ -566,7 +566,7 @@ export enum ElementPlacement {
   PLACEINSIDE = 'placeInside',
 }
 /**
- * Type of color profile used to manage a document, used in [[Document.colorProfileType]]
+ * Type of color profile used to manage a document, used in {@link Document.colorProfileType}
  * @minVersion 22.5
  */
 export enum ColorProfileType {
@@ -584,7 +584,7 @@ export enum ColorProfileType {
   WORKING = 'workingSpaceCode',
 }
 /**
- * Specifies the quality of an image you are converting to bitmap mode. Used in [[BitmapConversionOptions]]
+ * Specifies the quality of an image you are converting to bitmap mode. Used in {@link BitmapConversionOptions}
  * @minVersion 22.5
  */
 export enum BitmapConversionType {
@@ -595,7 +595,7 @@ export enum BitmapConversionType {
   PATTERNDITHER = 'patternDither',
 }
 /**
- * Specifies the shape of the dots (ink deposits) in the halftone screen. Used in [[BitmapConversionOptions]]
+ * Specifies the shape of the dots (ink deposits) in the halftone screen. Used in {@link BitmapConversionOptions}
  * @minVersion 22.5
  */
 export enum BitmapHalfToneType {
@@ -608,7 +608,7 @@ export enum BitmapHalfToneType {
 }
 /**
  * The rendering intent to use when converting from one color space to another with
- * [[Document.convertProfile]]
+ * {@link Document.convertProfile}
  * @minVersion 22.5
  */
 export enum Intent {
@@ -620,7 +620,7 @@ export enum Intent {
 /**
  * Used in multiple places to represent orientation.
  *
- * Orientation of a guide in [[Guide.direction]]
+ * Orientation of a guide in {@link Guide.direction}
  * @minVersion 22.5
  */
 export enum Direction {
@@ -629,7 +629,7 @@ export enum Direction {
 }
 /**
  * Used in multiple places to represent orientation
- * e.g., [[TextItem.orientation]]
+ * e.g., {@link TextItem.orientation}
  * @minVersion 24.1
  */
 export enum Orientation {
@@ -638,7 +638,7 @@ export enum Orientation {
 }
 /**
  * The color model representing the current color space
- * of a [[SolidColor]] object.
+ * of a {@link SolidColor} object.
  * @minVersion 22.5
  */
 export enum ColorModel {
@@ -687,7 +687,7 @@ export enum DialogModes {
 /**
  * Describes how the displacement map fits the
  * image if the image is not the same size as
- * the map. Pass to [[Layer.applyDisplace]].
+ * the map. Pass to {@link Layer.applyDisplace}.
  * @minVersion 23.5
  */
 export enum DisplacementMapType {
@@ -717,7 +717,7 @@ export enum ChannelType {
   SPOTCOLOR = 'spot',
 }
 /**
- * Distribution model to use when applying an Add Noise filter. Pass to [[Layer.applyAddNoise]].
+ * Distribution model to use when applying an Add Noise filter. Pass to {@link Layer.applyAddNoise}.
  * @minVersion 23.5
  */
 export enum NoiseDistribution {
@@ -725,7 +725,7 @@ export enum NoiseDistribution {
   UNIFORM = 'uniformDistribution',
 }
 /**
- * The type of field to eliminate. Pass to [[Layer.applyDeInterlace]].
+ * The type of field to eliminate. Pass to {@link Layer.applyDeInterlace}.
  * @minVersion 23.5
  */
 export enum EliminateFields {
@@ -734,7 +734,7 @@ export enum EliminateFields {
 }
 /**
  * Geometric options for shapes, such as the iris shape in the
- * Lens Blur filter. Pass to [[Layer.applyLensBlur]]().
+ * Lens Blur filter. Pass to {@link Layer.applyLensBlur}().
  * @minVersion 23.5
  */
 export enum Geometry {
@@ -746,7 +746,7 @@ export enum Geometry {
   TRIANGLE = 'triangle',
 }
 /**
- * The method used for creating fields. Pass to [[Layer.applyDeInterlace]].
+ * The method used for creating fields. Pass to {@link Layer.applyDeInterlace}.
  * @minVersion 23.5
  */
 export enum CreateFields {
@@ -754,7 +754,7 @@ export enum CreateFields {
   INTERPOLATION = 'createInterpolation',
 }
 /**
- * The type of a [[PathItem]]
+ * The type of a {@link PathItem}
  * @minVersion 23.5
  */
 export enum PathKind {
@@ -768,7 +768,7 @@ export enum PathKind {
 }
 /**
  * The selection behavior when a selection already exists.
- * Used in [[PathItem.makeSelection]](), [[Selection.saveTo]]() and [[Selection.load]]()
+ * Used in {@link PathItem.makeSelection}(), {@link Selection.saveTo}() and {@link Selection.load}()
  * @minVersion 23.3
  */
 export enum SelectionType {
@@ -790,7 +790,7 @@ export enum SelectionType {
   REPLACE = 'set',
 }
 /**
- * The tool to use with [[PathItem.strokePath]]()
+ * The tool to use with {@link PathItem.strokePath}()
  * @minVersion 23.3
  */
 export enum ToolType {
@@ -812,7 +812,7 @@ export enum ToolType {
   SPONGE = 'saturationTool',
 }
 /**
- * The role a [[PathPoint]] plays in a [[PathItem]]
+ * The role a {@link PathPoint} plays in a {@link PathItem}
  * @minVersion 23.3
  */
 export enum PointKind {
@@ -822,7 +822,7 @@ export enum PointKind {
 /**
  * How to combine the shapes if the destination path already has a selection.
  *
- * Set for [[SubPathInfo.operation]], stored in the resulting [[SubPathItem]]
+ * Set for {@link SubPathInfo.operation}, stored in the resulting {@link SubPathItem}
  * @minVersion 23.3
  */
 export enum ShapeOperation {
@@ -833,7 +833,7 @@ export enum ShapeOperation {
 }
 /**
  * The type of texture or glass surface image to load for a texturizer
- * or glass filter. Pass to [[Layer.applyGlassEffect]]().
+ * or glass filter. Pass to {@link Layer.applyGlassEffect}().
  * @minVersion 23.5
  */
 export enum TextureType {
@@ -845,7 +845,7 @@ export enum TextureType {
 /**
  * How to treat undistorted areas or areas left blank in an image
  * to which a filter in the Distort category has been applied. Pass
- * to [[Layer.applyDisplace]](), [[Layer.applyShear]](), [[Layer.applyWave]]()
+ * to {@link Layer.applyDisplace}(), {@link Layer.applyShear}(), {@link Layer.applyWave}()
  * @minVersion 23.5
  */
 export enum UndefinedAreas {
@@ -854,7 +854,7 @@ export enum UndefinedAreas {
 }
 /**
  * The kind of polar conversion.
- * Pass to [[Layer.applyPolarCoordinates]]().
+ * Pass to {@link Layer.applyPolarCoordinates}().
  * @minVersion 23.5
  */
 export enum PolarConversionType {
@@ -873,7 +873,7 @@ export enum PolarConversionType {
  * Radial blur comes in two flavors: spin and zoom.
  * Spin provides the effect of pinning the image at the designated center and rotating it.
  * Zoom provides the effect of motion towards the designated center point.
- * Pass to [[Layer.applyRadialBlur]]().
+ * Pass to {@link Layer.applyRadialBlur}().
  *
  * @ignore
  */
@@ -883,7 +883,7 @@ export enum RadialBlurMethod {
 }
 /**
  * The radial blur quality.
- * Pass to [[Layer.applyRadialBlur]]().
+ * Pass to {@link Layer.applyRadialBlur}().
  *
  * @ignore
  */
@@ -894,7 +894,7 @@ export enum RadialBlurQuality {
 }
 /**
  * The size of undulations.
- * Pass to [[Layer.applyRipple]]().
+ * Pass to {@link Layer.applyRipple}().
  * @minVersion 23.5
  */
 export enum RippleSize {
@@ -904,7 +904,7 @@ export enum RippleSize {
 }
 /**
  * The smart blur quality.
- * Pass to [[Layer.applySmartBlur]]().
+ * Pass to {@link Layer.applySmartBlur}().
  * @minVersion 23.5
  */
 export enum SmartBlurQuality {
@@ -914,7 +914,7 @@ export enum SmartBlurQuality {
 }
 /**
  * The method to use for smart blurring.
- * Pass to [[Layer.applySmartBlur]]().
+ * Pass to {@link Layer.applySmartBlur}().
  * @minVersion 23.5
  */
 export enum SmartBlurMode {
@@ -924,7 +924,7 @@ export enum SmartBlurMode {
 }
 /**
  * The curve (or stretch shape) to use for the distortion.
- * Pass to [[Layer.applySpherize]]().
+ * Pass to {@link Layer.applySpherize}().
  * @minVersion 23.5
  */
 export enum SpherizeMode {
@@ -934,7 +934,7 @@ export enum SpherizeMode {
 }
 /**
  * The type of wave.
- * Pass to [[Layer.applyWave]]().
+ * Pass to {@link Layer.applyWave}().
  * @minVersion 23.5
  */
 export enum WaveType {
@@ -944,7 +944,7 @@ export enum WaveType {
 }
 /**
  * The method of zigzagging.
- * Pass to [[Layer.applyZigZag]]().
+ * Pass to {@link Layer.applyZigZag}().
  * @minVersion 23.5
  */
 export enum ZigZagType {
@@ -953,7 +953,7 @@ export enum ZigZagType {
   PONDRIPPLES = 'pondRipples',
 }
 /**
- * The type of Lens to use. Pass to [[Layer.applyLensFlare]]().
+ * The type of Lens to use. Pass to {@link Layer.applyLensFlare}().
  * @minVersion 23.5
  */
 export enum LensType {
@@ -964,7 +964,7 @@ export enum LensType {
 }
 /**
  * Favor the promotion of either corners or curves.
- * Pass to [[Layer.applyMaximum]]() and [[Layer.applyMinimum]]().
+ * Pass to {@link Layer.applyMaximum}() and {@link Layer.applyMinimum}().
  * @minVersion 23.5
  */
 export enum PreserveShape {
@@ -973,7 +973,7 @@ export enum PreserveShape {
 }
 /**
  * Method to use to fill the empty space left by offsetting an image or selection.
- * Pass to [[Layer.applyOffset]]()
+ * Pass to {@link Layer.applyOffset}()
  * @minVersion 23.5
  */
 export enum OffsetUndefinedAreas {
@@ -997,7 +997,7 @@ export enum SampleSize {
 }
 /**
  * The application's behavior regarding image previews.
- * Pass to [[PreferencesFileHandling.imagePreviews]]
+ * Pass to {@link PreferencesFileHandling.imagePreviews}
  * @minVersion 24.0
  */
 export enum SavePreview {
@@ -1016,7 +1016,7 @@ export enum SavePreview {
 }
 /**
  * The kind of color picker dialog to use.
- * Pass to [[PreferencesGeneral.colorPicker]]
+ * Pass to {@link PreferencesGeneral.colorPicker}
  * @minVersion 24.0
  */
 export enum ColorPicker {
@@ -1035,7 +1035,7 @@ export enum ColorPicker {
 }
 /**
  * The history log edit options.
- * Pass to [[PreferencesHistory.editLogItems]]
+ * Pass to {@link PreferencesHistory.editLogItems}
  * @minVersion 24.0
  */
 export enum EditLogItemsType {
@@ -1057,7 +1057,7 @@ export enum EditLogItemsType {
 }
 /**
  * The size of grid squares.
- * Pass to [[PreferencesTransparencyAndGamut.gridSize]]
+ * Pass to {@link PreferencesTransparencyAndGamut.gridSize}
  * @minVersion 24.0
  */
 export enum GridSize {
@@ -1080,7 +1080,7 @@ export enum GridSize {
 }
 /**
  * The line style for nonprinting grids displayed over images.
- * Pass to [[PreferencesGuidesGridsAndSlices.gridStyle]]
+ * Pass to {@link PreferencesGuidesGridsAndSlices.gridStyle}
  * @minVersion 24.0
  */
 export enum GridLineStyle {
@@ -1090,7 +1090,7 @@ export enum GridLineStyle {
 }
 /**
  * The line style for nonprinting guides displayed over images.
- * Pass to [[PreferencesGuidesGridsAndSlices.guideStyle]]
+ * Pass to {@link PreferencesGuidesGridsAndSlices.guideStyle}
  * @minVersion 24.0
  */
 export enum GuideLineStyle {
@@ -1099,7 +1099,7 @@ export enum GuideLineStyle {
 }
 /**
  * The permission state for queries.
- * Pass to [[PreferencesFileHandling.maximizeCompatibility]]
+ * Pass to {@link PreferencesFileHandling.maximizeCompatibility}
  * @minVersion 24.0
  */
 export enum MaximizeCompatibility {
@@ -1120,7 +1120,7 @@ export enum MaximizeCompatibility {
  * The style of the cursors for the following tools: Marquee, Lasso, Polygonal Lasso, Magic Wand, Crop, Slice,
  * Patch Eyedropper, Pen, Gradient, Line, Paint Bucket, Magnetic Lasso, Magnetic Pen, Freeform Pen,
  * Measure, and Color Sampler.
- * Pass to [[PreferencesCursors.otherCursors]]
+ * Pass to {@link PreferencesCursors.otherCursors}
  * @minVersion 24.0
  */
 export enum OtherCursors {
@@ -1136,7 +1136,7 @@ export enum OtherCursors {
 /**
  * The style of the cursors for the following tools: Eraser, Pencil, Paintbrush, Healing Brush,
  * Rubber Stamp, Pattern Stamp, Smudge, Blur, Sharpen, Dodge, Burn, Sponge.
- * Pass to [[PreferencesCursors.paintingCursors]]
+ * Pass to {@link PreferencesCursors.paintingCursors}
  * @minVersion 24.0
  */
 export enum PaintingCursors {
@@ -1160,7 +1160,7 @@ export enum PaintingCursors {
 }
 /**
  * The point/pica size: either 72 or 72.27 points per inch.
- * Pass to [[PreferencesUnitsAndRulers.pointSize]]
+ * Pass to {@link PreferencesUnitsAndRulers.pointSize}
  * @minVersion 24.0
  */
 export enum PointType {
@@ -1175,7 +1175,7 @@ export enum PointType {
 }
 /**
  * Options for logging the history items.
- * Pass to [[PreferencesHistory.saveLogItems]]
+ * Pass to {@link PreferencesHistory.saveLogItems}
  * @minVersion 24.0
  */
 export enum SaveLogItemsType {
@@ -1194,7 +1194,7 @@ export enum SaveLogItemsType {
 }
 /**
  * Font size in panels and dialogs.
- * Pass to [[PreferencesInterface.textFontSize]]
+ * Pass to {@link PreferencesInterface.textFontSize}
  * @minVersion 24.0
  */
 export enum FontSize {
@@ -1217,7 +1217,7 @@ export enum FontSize {
 }
 /**
  * The measurement unit for type.
- * Pass to [[PreferencesUnitsAndRulers.typeUnits]]
+ * Pass to {@link PreferencesUnitsAndRulers.typeUnits}
  * @minVersion 24.0
  */
 export enum TypeUnits {
@@ -1227,7 +1227,7 @@ export enum TypeUnits {
 }
 /**
  * The measurement unit for ruler increments.
- * Pass to [[PreferencesUnitsAndRulers.rulerUnits]]
+ * Pass to {@link PreferencesUnitsAndRulers.rulerUnits}
  * @minVersion 24.0
  */
 export enum RulerUnits {
@@ -1242,7 +1242,7 @@ export enum RulerUnits {
 /**
  * Options for changing user interface of Character and Paragraph panels.
  * This option is not in Preferences dialog but instead it is located in: Main menu > Type > Language Options
- * Pass to [[PreferencesType.showTextFeatures]]
+ * Pass to {@link PreferencesType.showTextFeatures}
  * @minVersion 24.0
  */
 export enum TypeInterfaceFeatures {
@@ -1251,7 +1251,7 @@ export enum TypeInterfaceFeatures {
   MIDDLEEASTERN = 'middleEasternInterface',
 }
 /**
- * The result of [[Document.calculations]] can go into a new document,
+ * The result of {@link Document.calculations} can go into a new document,
  *  a new channel in the active document, or a new selection in the active document.
  * @minVersion 24.5
  */
@@ -1261,7 +1261,7 @@ export enum CalculationsResult {
   SELECTION = 'selection',
 }
 /**
- * Special channels used in [[Document.calculations]].
+ * Special channels used in {@link Document.calculations}.
  * @minVersion 24.5
  */
 export enum CalculationsChannel {
@@ -1270,7 +1270,7 @@ export enum CalculationsChannel {
   GRAY = 'gray',
 }
 /**
- * Special channels used in [[Layer.applyImage]].
+ * Special channels used in {@link Layer.applyImage}.
  * @minVersion 24.5
  */
 export enum ApplyImageChannel {
@@ -1288,7 +1288,7 @@ export enum CalculationsLayer {
   MERGED = 'merged',
 }
 /**
- * Use merged layers as a source in [[Layer.applyImage]].
+ * Use merged layers as a source in {@link Layer.applyImage}.
  * @minVersion 24.5
  */
 export enum ApplyImageLayer {
@@ -1296,7 +1296,7 @@ export enum ApplyImageLayer {
 }
 /**
  * Method to use to smooth edges by softening the color transition between edge pixels
- * and the background. Used in a [[CharacterStyle.antiAliasMethod]]
+ * and the background. Used in a {@link CharacterStyle.antiAliasMethod}
  * @minVersion 24.1
  */
 export enum AntiAlias {
@@ -1307,7 +1307,7 @@ export enum AntiAlias {
   SMOOTH = 'antiAliasSmooth',
 }
 /**
- * The warp style to use with Text. Used in a [[WarpStyle.style]]
+ * The warp style to use with Text. Used in a {@link WarpStyle.style}
  * @minVersion 24.1
  */
 export enum WarpStyle {
@@ -1329,7 +1329,7 @@ export enum WarpStyle {
   WAVE = 'warpWave',
 }
 /**
- * The type of kerning to use for characters. Used in [[CharacterStyle.autoKerning]]
+ * The type of kerning to use for characters. Used in {@link CharacterStyle.autoKerning}
  * @minVersion 24.1
  */
 export enum AutoKernType {
@@ -1338,7 +1338,7 @@ export enum AutoKernType {
   OPTICAL = 'opticalKern',
 }
 /**
- * The capitalization style to use in text. Used in [[CharacterStyle.capitalization]]
+ * The capitalization style to use in text. Used in {@link CharacterStyle.capitalization}
  * @minVersion 24.1
  */
 export enum TextCase {
@@ -1347,7 +1347,7 @@ export enum TextCase {
   SMALLCAPS = 'smallCaps',
 }
 /**
- * The baseline style to use in text. Used in [[CharacterStyle.baseline]]
+ * The baseline style to use in text. Used in {@link CharacterStyle.baseline}
  * @minVersion 24.1
  */
 export enum Baseline {
@@ -1356,7 +1356,7 @@ export enum Baseline {
   SUBSCRIPT = 'subScript',
 }
 /**
- * The underline style to use in text. Used in [[CharacterStyle.underline]]
+ * The underline style to use in text. Used in {@link CharacterStyle.underline}
  * @minVersion 24.1
  */
 export enum Underline {
@@ -1365,7 +1365,7 @@ export enum Underline {
   LEFTINVERTICAL = 'underlineOnLeftInVertical',
 }
 /**
- * The language to use for text. Used in [[CharacterStyle.language]]
+ * The language to use for text. Used in {@link CharacterStyle.language}
  * @minVersion 24.1
  */
 export enum Language {
@@ -1431,7 +1431,7 @@ export enum Language {
 }
 /**
  * The placement of paragraph text within the bounding box.
- * Used in [[ParagraphStyle.justification]]
+ * Used in {@link ParagraphStyle.justification}
  * @minVersion 24.1
  */
 export enum Justification {
@@ -1444,7 +1444,7 @@ export enum Justification {
   FULLYJUSTIFIED = 'justifyAll',
 }
 /**
- * The text strikethrough style to use in text. Used in [[CharacterStyle.strikeThrough]]
+ * The text strikethrough style to use in text. Used in {@link CharacterStyle.strikeThrough}
  * @minVersion 24.1
  */
 export enum StrikeThrough {
@@ -1454,7 +1454,7 @@ export enum StrikeThrough {
 }
 /**
  * The character alignment to use in text.
- * Used in [[CharacterStyle.characterAlignment]]
+ * Used in {@link CharacterStyle.characterAlignment}
  * @minVersion 24.1
  */
 export enum CharacterAlignment {
@@ -1467,7 +1467,7 @@ export enum CharacterAlignment {
 }
 /**
  * The paragraph layout to use in text.
- * Used in [[ParagraphStyle.layoutMode]]
+ * Used in {@link ParagraphStyle.layoutMode}
  * @minVersion 24.1
  */
 export enum ParagraphLayout {
@@ -1476,7 +1476,7 @@ export enum ParagraphLayout {
 }
 /**
  * The paragraph features to use in text.
- * Used in [[ParagraphStyle.features]]
+ * Used in {@link ParagraphStyle.features}
  * @minVersion 24.1
  */
 export enum ParagraphFeatures {
@@ -1486,7 +1486,7 @@ export enum ParagraphFeatures {
 }
 /**
  * Text flow direction (Middle Eastern features).
- * Used in [[CharacterStyle.middleEasternTextDirection]]
+ * Used in {@link CharacterStyle.middleEasternTextDirection}
  * @minVersion 24.1
  */
 export enum MiddleEasternTextDirection {
@@ -1496,7 +1496,7 @@ export enum MiddleEasternTextDirection {
 }
 /**
  * Digit type to use in text (Middle Eastern features).
- * Used in [[CharacterStyle.middleEasternDigitsType]]
+ * Used in {@link CharacterStyle.middleEasternDigitsType}
  * @minVersion 24.1
  */
 export enum MiddleEasternDigitsType {
@@ -1507,7 +1507,7 @@ export enum MiddleEasternDigitsType {
 }
 /**
  * The width of kashida (tatweel) character
- * Used in [[ParagraphStyle.kashidaWidth]]
+ * Used in {@link ParagraphStyle.kashidaWidth}
  * @minVersion 24.1
  */
 export enum KashidaWidthType {
@@ -1519,7 +1519,7 @@ export enum KashidaWidthType {
 }
 /**
  * Line breaking rules in Japanese text
- * Used in [[ParagraphStyle.kinsoku]]
+ * Used in {@link ParagraphStyle.kinsoku}
  * @minVersion 24.1
  */
 export enum Kinsoku {
@@ -1530,7 +1530,7 @@ export enum Kinsoku {
 /**
  * Spacing between punctuation, symbols, numbers,
  * and other character classes in Japanese text
- * Used in [[ParagraphStyle.mojikumi]]
+ * Used in {@link ParagraphStyle.mojikumi}
  * @minVersion 24.1
  */
 export enum Mojikumi {

@@ -2,6 +2,7 @@ import { PreferencesBase } from './PreferencesBase';
 /**
  * Performance preferences. Options that could possibly affect speed of Photoshop.
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/preferences/#performance}
  * @targetfolder classes/preferences
  * @minVersion 24.0
  */

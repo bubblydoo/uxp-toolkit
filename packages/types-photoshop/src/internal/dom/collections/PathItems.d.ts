@@ -1,10 +1,12 @@
 import type { SubPathInfo } from '../objects/SubPathInfo';
 import type { PathItem } from '../PathItem';
 /**
- * The collection of [[PathItem]] objects in a document.
+ * The collection of {@link PathItem} objects in a document.
  *
- * Access through the [[Document.pathItems]] collection property. To create new paths,
- * see [[PathPointInfo]] and [[SubPathInfo]] classes and pass them to [[PathItems.add]]() method.
+ * Access through the {@link Document.pathItems} collection property. To create new paths,
+ * see {@link PathPointInfo} and {@link SubPathInfo} classes and pass them to {@link PathItems.add}() method.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/pathitems/}
  */
 export class PathItems extends Array<PathItem> {
   /**
@@ -31,7 +33,7 @@ export class PathItems extends Array<PathItem> {
     get: (obj: any, key: any) => any;
   };
   /**
-   * Number of [[PathItem]] objects in this collection.
+   * Number of {@link PathItem} objects in this collection.
    * @minVersion 23.3
    */
   get length(): number;
@@ -43,9 +45,9 @@ export class PathItems extends Array<PathItem> {
   /**
    * Creates a new path item object and adds it to this collection.
    *
-   * A new [[SubPathItem]] object is created for each [[SubPathInfo]] object provided in `entirePath`,
-   * and those [[SubPathItem]] objects are added to the [[PathItem.subPathItems]] collection of the returned
-   * [[PathItem]].
+   * A new {@link SubPathItem} object is created for each {@link SubPathInfo} object provided in `entirePath`,
+   * and those {@link SubPathItem} objects are added to the {@link PathItem.subPathItems} collection of the returned
+   * {@link PathItem}.
    * @minVersion 23.3
    */
   add(name: string, entirePath: SubPathInfo[]): PathItem;

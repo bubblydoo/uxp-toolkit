@@ -1,16 +1,16 @@
 import type * as Constants from '../Constants';
 import type { PathPointInfo } from './PathPointInfo';
 /**
- * An array of [[PathPointInfo]] objects that describes a straight or curved segment of a path, used to create
- * a [[SubPathItem]].
+ * An array of {@link PathPointInfo} objects that describes a straight or curved segment of a path, used to create
+ * a {@link SubPathItem}.
  *
- * Pass an array of these objects to the [[PathItems.add]]() method. This method creates a [[SubPathItem]] object
- * for each `SubPathInfo` object, and creates and returns a new [[PathItem]] object for the path represented by
+ * Pass an array of these objects to the {@link PathItems.add}() method. This method creates a {@link SubPathItem} object
+ * for each `SubPathInfo` object, and creates and returns a new {@link PathItem} object for the path represented by
  * all of the subpaths.
  *
  *  - Use `SubPathInfo` to create subpaths; the properties are read-write.
  *
- *  - Use the [[SubPathItem]] object to retrieve information about existing subpaths. The properties are read-only.
+ *  - Use the {@link SubPathItem} object to retrieve information about existing subpaths. The properties are read-only.
  * @minVersion 23.3
  */
 export class SubPathInfo {
@@ -24,7 +24,7 @@ export class SubPathInfo {
   get closed(): boolean;
   set closed(value: boolean);
   /**
-   * An array composed of the sub-path's [[PathPoint]] objects.
+   * An array composed of the sub-path's {@link PathPoint} objects.
    *
    * @minVersion 23.3
    */

@@ -2,7 +2,9 @@ import type { TextFont } from '../objects/TextFont';
 import type { Photoshop } from '../Photoshop';
 /**
  * The collection of fonts available on your computer. Fonts are represented by
- *  [[TextFont]] objects. Access this object in the [[Photoshop.fonts]] property.
+ *  {@link TextFont} objects. Access this object in the {@link Photoshop.fonts} property.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/textfonts/}
  */
 export class TextFonts extends Array<TextFont> {
   /** @ignore */
@@ -24,7 +26,7 @@ export class TextFonts extends Array<TextFont> {
    */
   getByName(name: string): TextFont;
   /**
-   * Number of [[TextFont]] elements in this collection.
+   * Number of {@link TextFont} elements in this collection.
    * @minVersion 23.0
    */
   get length(): number;

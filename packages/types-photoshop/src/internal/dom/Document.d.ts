@@ -27,19 +27,23 @@ export interface SuspendHistoryContext extends ExecutionContext {
   document: Document;
 }
 /**
- * Represents a single Photoshop document that is currently open
+ * Represents a single Photoshop document that is currently open.
+ *
  * You can access instances of documents using one of these methods:
  *
- * ```javascript
- * const app = require('photoshop').app;
- * const constants = require('photoshop').constants;
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/}
  *
+ * @example
+ * ```js
+ * const {app, constants} = require('photoshop');
  * // The currently active document from the Photoshop object
  * const currentDocument = app.activeDocument;
- *
  * // Choose one of the open documents from the Photoshop object
  * const secondDocument = app.documents[1];
+ * ```
  *
+ * @example
+ * ```js
  * // You can also create an instance of a document via a UXP File entry
  * let fileEntry = require('uxp').storage.localFileSystem.getFileForOpening();
  * const newDocument = await app.open('/project.psd');
@@ -48,32 +52,46 @@ export interface SuspendHistoryContext extends ExecutionContext {
 export class Document {
   /**
    * The class name of the referenced object: *"Document"*.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#typename}
    * @minVersion 23.0
    */
   get typename(): 'Document';
   /**
    * The internal ID of this document will remain valid as long as this document is open.
    * It can be used for batchPlay calls to refer to this document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#id}
    * @minVersion 22.5
    */
   get id(): number;
   /**
    * True if the document has been saved since the last change.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#saved}
    * @minVersion 23.0
    */
   get saved(): boolean;
   /**
    * The selected layers in the document.
+   *
+   * Updates: [(26.9)](https://developer.adobe.com/photoshop/uxp/2022/ps_reference/changelog/#photoshop-269-july-2025)
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#activelayers}
    * @minVersion 22.5
    */
   get activeLayers(): Layers;
   /**
-   * The artboards in the document
+   * The artboards in the document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#artboards}
    * @minVersion 22.5
    */
   get artboards(): Layers;
   /**
-   * The name of the document
+   * The name of the document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#name}
    * @minVersion 23.0
    */
   get name(): string;
@@ -82,121 +100,167 @@ export class Document {
    * intensity level for the component channel. The array contains 256
    * members.
    *
-   * Valid only when [[mode]] = `DocumentMode.{RGB,CMYK,INDEXEDCOLOR}`
+   * Valid only when mode = `DocumentMode.{RGB,CMYK,INDEXEDCOLOR}`
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#histogram}
    * @minVersion 23.0
    */
   get histogram(): number[];
   /**
    * The state of Quick Mask mode. If true, the app is in Quick Mask mode.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#quickmaskmode}
    * @minVersion 23.0
    */
   get quickMaskMode(): boolean;
   set quickMaskMode(qmMode: boolean);
   /**
    * The collection of Guides present in the document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#guides}
    * @minVersion 23.0
    */
   get guides(): Guides;
   /**
    * The collection of CountItems present in the document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#countitems}
    * @minVersion 24.1
    */
   get countItems(): CountItems;
   /**
    * The collection of ColorSamplers present in the document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#colorsamplers}
    * @minVersion 24.0
    */
   get colorSamplers(): ColorSamplers;
   /**
-   * The color mode. To change it, please use [[Document.changeMode]].
+   * The color mode. To change it, please use Document.changeMode.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#mode}
    * @minVersion 23.0
    */
   get mode(): Constants.DocumentMode;
   /**
    * The bits per color channel.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#bitsperchannel}
    * @minVersion 23.0
    */
   get bitsPerChannel(): Constants.BitsPerChannelType;
   set bitsPerChannel(bitDepth: Constants.BitsPerChannelType);
   /**
    * Check whether this a [Photoshop cloud document](https://helpx.adobe.com/photoshop/using/cloud-documents-faq.html).
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#clouddocument}
    * @minVersion 23.0
    */
   get cloudDocument(): boolean;
   /**
    * Local directory for this cloud document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#cloudworkareadirectory}
    * @minVersion 23.0
    */
   get cloudWorkAreaDirectory(): string;
   /**
    * The layers in the document at the top level of the layer/group hierarchy.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#layers}
    * @minVersion 22.5
    */
   get layers(): Layers;
   /**
    * The layer comps present in the document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#layercomps}
    * @minVersion 24.0
    */
   get layerComps(): LayerComps;
   /**
    * Background layer, if it exists.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#backgroundlayer}
    * @minVersion 22.5
    */
   get backgroundLayer(): Layer | null;
   /**
    * Full file system path to this document, or the identifier if it is a cloud document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#path}
    * @minVersion 22.5
    */
   get path(): string;
   /**
    * The collection of paths in this document, as shown in the
    * Paths panel.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#pathitems}
    * @minVersion 23.3
    */
   get pathItems(): PathItems;
   /**
    * History states of the document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#historystates}
    * @minVersion 22.5
    */
   get historyStates(): HistoryStates;
   /**
    * Currently active history state of the document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#activehistorystate}
    * @minVersion 22.5
    */
   get activeHistoryState(): HistoryState;
   /**
    * Selects the given history state to be the active one.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#activehistorystate}
    * @minVersion 22.5
    */
   set activeHistoryState(historyState: HistoryState);
   /**
    * The history state that history brush tool will use as its source.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#activehistorybrushsource}
    * @minVersion 22.5
    */
   get activeHistoryBrushSource(): HistoryState;
   set activeHistoryBrushSource(historyState: HistoryState);
   /**
-   * Document title
+   * Document title.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#title}
    * @minVersion 22.5
    */
   get title(): string;
   /**
    * Document's resolution (in pixels per inch).
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#resolution}
    * @minVersion 22.5
    */
   get resolution(): number;
   /**
    * Document's width in pixels.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#width}
    * @minVersion 22.5
    */
   get width(): number;
   /**
    * Document's height in pixels.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#height}
    * @minVersion 22.5
    */
   get height(): number;
   /**
    * The (custom) pixel aspect ratio to use.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#pixelaspectratio}
    * @minVersion 22.5
    */
   get pixelAspectRatio(): number;
@@ -204,19 +268,25 @@ export class Document {
   /**
    * Name of the color profile.
    *
-   * Valid only when [[colorProfileType]] is `CUSTOM` or `WORKING`, returns "None" otherwise.
+   * Valid only when colorProfileType is `CUSTOM` or `WORKING`, returns "None" otherwise.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#colorprofilename}
    * @minVersion 23.0
    */
   get colorProfileName(): string;
   set colorProfileName(profile: string);
   /**
    * Whether the document uses the working color profile, a custom profile, or no profile.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#colorprofiletype}
    * @minVersion 23.0
    */
   get colorProfileType(): Constants.ColorProfileType;
   set colorProfileType(type: Constants.ColorProfileType);
   /**
-   * The object containing the document's currently active selection
+   * The object containing the document's currently active selection.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#selection}
    * @minVersion 25.0
    */
   readonly selection: Selection;
@@ -231,24 +301,38 @@ export class Document {
    * @param saveDialogOptions By default, prompts a save dialog
    *                    if there are unsaved changes.
    *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#close}
+   *
    * @async
    * @minVersion 22.5
    */
   close(saveDialogOptions?: Constants.SaveOptions): Promise<void>;
   /**
    * Close the document, discarding all unsaved changes.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#closewithoutsaving}
    * @minVersion 22.5
    */
   closeWithoutSaving(): void;
   /**
-   * Crops the document to given bounds
+   * Crops the document to the given bounds.
+   *
+   * @param bounds The crop area bounds.
+   * @param angle Angle to rotate the crop area (default: 0).
+   * @param width Width of the crop area (default: 0).
+   * @param height Height of the crop area (default: 0).
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#crop}
    *
    * @async
    * @minVersion 23.0
    */
   crop(bounds: ImagingBounds, angle?: number, width?: number, height?: number): Promise<void>;
   /**
-   * Flatten all layers in the document.
+   * Flatten all layers in the document. The remaining layer will become Background.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#flatten}
+   *
    * @async
    * @minVersion 22.5
    */
@@ -259,11 +343,24 @@ export class Document {
    * The optional parameter `name` provides the name for the duplicated document.
    *
    * The optional parameter `mergeLayersOnly` indicates whether to only duplicate merged layers.
+   *
+   * @param name Name for the duplicated document.
+   * @param mergeLayersOnly Whether to only duplicate merged layers.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#duplicate}
+   *
    * @minVersion 23.0
    */
   duplicate(name?: string, mergeLayersOnly?: boolean): Promise<Document>;
   /**
    * Merges all visible layers in the document into a single layer.
+   *
+   * In contrast to flatten, `mergeVisibleLayers` will not convert the remaining layer
+   * to Background if no Background already exists. If not Background, then the name of the
+   * merged layer will be either that of the top of the selected layers or the top layer.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#mergevisiblelayers}
+   *
    * @async
    * @minVersion 23.0
    */
@@ -271,24 +368,39 @@ export class Document {
   /**
    * Splits the document channels into separate, single-channel
    * documents.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#splitchannels}
+   *
    * @async
    * @minVersion 23.0
    */
   splitChannels(): Promise<Document[]>;
   /**
    * Expands the document to show clipped sections.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#revealall}
+   *
    * @async
    * @minVersion 23.0
    */
   revealAll(): Promise<void>;
   /**
-   * Rasterizes all layers.
+   * Converts all layers to pixel layers.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#rasterizealllayers}
+   *
    * @async
    * @minVersion 23.0
    */
   rasterizeAllLayers(): Promise<void>;
   /**
    * Changes the color mode of the document.
+   *
+   * @param mode The color mode to change to.
+   * @param options Optional conversion options.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#changemode}
+   *
    * @async
    * @minVersion 23.0
    */
@@ -300,6 +412,13 @@ export class Document {
    * or one of these below, meaning of the working color spaces or Lab color.
    *
    * `"Working RGB", "Working CMYK", "Working Gray", "Lab Color"`
+   *
+   * @param destinationProfile The profile name or working space.
+   * @param intent The rendering intent.
+   * @param blackPointCompensation Whether to use black point compensation.
+   * @param dither Whether to use dithering.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#convertprofile}
    *
    * @async
    * @minVersion 23.0
@@ -313,41 +432,52 @@ export class Document {
   /**
    * Applies trapping to a CMYK document.
    *
-   * Valid only when [[Document.mode]] is `Constants.DocumentMode.CMYK`
+   * Valid only when Document.mode is `Constants.DocumentMode.CMYK`
+   *
+   * @param width The trap width.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#trap}
    *
    * @async
    * @minVersion 23.0
    */
   trap(width: number): Promise<void>;
   /**
-   * Changes the size of the canvas, but does not change image size
-   * To change the image size, see [[resizeImage]]
+   * Changes the size of the document, but does not scale the image.
+   * To scale the image size, see resizeImage.
    *
-   * ```javascript
-   * // grow the canvas by 400px
-   * let width = await document.width
-   * let height = await document.height
-   * await document.resizeCanvas(width + 400, height + 400)
-   * ```
-   * @param width Numeric value of new width in pixels
-   * @param height Numeric value of new height in pixels
+   * @param width Numeric value of new width in pixels.
+   * @param height Numeric value of new height in pixels.
    * @param anchor Anchor point for resizing, by default will resize an equal amount on all sides.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#resizecanvas}
+   *
+   * @example
+   * ```js
+   * // grow the canvas by 400px
+   * const {width, height} = await app.activeDocument;
+   * await document.resizeCanvas(width + 400, height + 400);
+   * ```
    *
    * @async
    * @minVersion 23.0
    */
   resizeCanvas(width: number, height: number, anchor?: Constants.AnchorPosition): Promise<void>;
   /**
-   * Changes the size of the image
+   * Changes the size of the image by scaling the dimensions to meet the targeted number of pixels.
    *
-   * ```javascript
+   * @param width Numeric value of new width in pixels.
+   * @param height Numeric value of new height in pixels.
+   * @param resolution Image resolution in pixels per inch (ppi).
+   * @param resampleMethod Method used during image interpolation.
+   * @param amount Numeric value that controls the amount of noise value when using preserve details 0..100.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#resizeimage}
+   *
+   * @example
+   * ```js
    * await document.resizeImage(800, 600)
    * ```
-   * @param width Numeric value of new width in pixels
-   * @param height Numeric value of new height in pixels
-   * @param resolution Image resolution in pixels per inch (ppi)
-   * @param resampleMethod Method used during image interpolation.
-   * @param amount Numeric value that controls the amount of noise value when using preserve details 0..100
    *
    * @async
    * @minVersion 23.0
@@ -360,14 +490,23 @@ export class Document {
     amount?: number,
   ): Promise<void>;
   /**
-   * Trims the transparent area around the image on the specified sides of the canvas
-   * base on trimType
+   * Trims the area around the image according to the type of pixels given.
+   * All sides of the image are targeted by default.
+   * Optionally, the sides may be individually specified for exclusion.
    *
-   * @param trimType
-   * @param top
-   * @param left
-   * @param bottom
-   * @param right
+   * @param trimType Defaults to the top left pixel color.
+   * @param top Trim the top side (default: true).
+   * @param left Trim the left side (default: true).
+   * @param bottom Trim the bottom side (default: true).
+   * @param right Trim the right side (default: true).
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#trim}
+   *
+   * @example
+   * ```js
+   * // trim transparent pixels from only the bottom of the image
+   * app.activeDocument.trim(constants.TrimType.TRANSPARENT, false, false, true, false);
+   * ```
    *
    * @async
    * @minVersion 23.0
@@ -375,7 +514,10 @@ export class Document {
   trim(trimType: Constants.TrimType, top?: boolean, left?: boolean, bottom?: boolean, right?: boolean): Promise<void>;
   /**
    * Rotates the image clockwise in given angle, expanding canvas if necessary. (Previously rotateCanvas)
-   * @param angle
+   *
+   * @param angles The angle in degrees to rotate.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#rotate}
    *
    * @async
    * @minVersion 23.0
@@ -384,7 +526,10 @@ export class Document {
   /**
    * Pastes the contents of the clipboard into the document. If the optional argument is
    * set to true and a selection is active, the contents are pasted into the selection.
-   * @param intoSelection
+   *
+   * @param intoSelection Whether to use an active selection as the target for the paste.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#paste}
    *
    * @async
    * @minVersion 23.0
@@ -394,10 +539,12 @@ export class Document {
    * Performs a save of the document. The user will be presented with
    * a Save dialog if the file has yet to be saved on disk.
    *
-   * ```javascript
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#save}
+   *
+   * @example
+   * ```js
    * // To save a document in the current location
    * document.save()
-   *
    * // Shows the save dialog
    * unsavedDocument.save()
    * ```
@@ -412,16 +559,18 @@ export class Document {
    * For operations that require a UXP File token, use the
    * [UXP storage APIs](https://www.adobe.com/go/ps-api-uxp-filesystemprovider) to generate one.
    *
-   * ```javascript
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#saveas}
+   *
+   * @example
+   * ```js
    * let entry = await require('uxp').storage.localFileSystem.getFileForSaving("target.psd");
    * document.saveAs.psd(entry);
-   *
    * // Save as a Copy (High JPG quality)
-   * document.saveAs.jpg(entryJpg, { quality: 12 }, true);
-   *
+   * document.saveAs.jpg(entryJpg, {quality: 12}, true);
    * // Save a PSB, with some options:
-   * document.saveAs.psb(entryPsb, { embedColorProfile: true });
+   * document.saveAs.psb(entryPsb, {embedColorProfile: true});
    * ```
+   *
    * @minVersion 23.0
    */
   saveAs: {
@@ -481,39 +630,65 @@ export class Document {
      */
     bmp: (entry: File, saveOptions?: BMPSaveOptions, asCopy?: boolean) => Promise<void>;
   };
-    /**
-     * Duplicates given layer(s), creating all copies above the top most one in layer stack,
-     * and returns the newly created layers.
-     *
-     * ```javascript
-     * // duplicate some layers
-     * const layerCopies = await document.duplicateLayers([layer1, layer3])
-     * layerCopies.forEach((layer) => { layer.blendMode = 'multiply' })
-     * // ...to another document
-     * const finalDoc = await photoshop.open('~/path/to/collated/image.psd')
-     * await document.duplicateLayers([logo1, textLayer1], finalDoc)
-     * await finalDoc.close(SaveOptions.SAVECHANGES)
-     * ```
-     * @param layers
-     * @param targetDocument if specified, duplicate to a different document target.
-     *
-     * @async
-     * @minVersion 23.0
-     */
+  /**
+   * Duplicates given layer(s), creating all copies above the top most one in layer stack,
+   * and returns the newly created layers.
+   *
+   * @param layers The array of layers to duplicate.
+   * @param targetDocument If specified, send the duplicates to a different document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#duplicatelayers}
+   *
+   * @example
+   * ```js
+   * // duplicate some layers
+   * const layerCopies = await document.duplicateLayers([layer1, layer3])
+   * layerCopies.forEach((layer) => { layer.blendMode = 'multiply' })
+   * ```
+   *
+   * @example
+   * ```js
+   * // ...to another document
+   * const finalDoc = await photoshop.open('~/path/to/collated/image.psd')
+   * await document.duplicateLayers([logo1, textLayer1], finalDoc)
+   * await finalDoc.close(SaveOptions.SAVECHANGES)
+   * ```
+   *
+   * @async
+   * @minVersion 23.0
+   */
   duplicateLayers(layers: Layer[], targetDocument?: Document): Promise<Layer[]>;
   /**
    * Links layers together if possible, and returns a list of linked layers.
-   * @param layers array of layers to link together
-   * @returns array of successfully linked layers
+   *
+   * @param layers Array of layers to link together.
+   * @returns Array of successfully linked layers.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#linklayers}
    * @minVersion 23.0
    */
   linkLayers(layers: Layer[]): Layer[];
   /**
-   * Create a new layer.
+   * General form of the kind-specific methods below. See those methods for more information.
+   * Create a new layer of the given kind. With no arguments, a pixel layer will be created.
    *
-   * ```javascript
-   * await doc.createLayer() // defaults to pixel layer
+   * The options object will have properties specific to the kind,
+   * though all layers share a basic set of properties common to all.
+   *
+   * The override signatures below are provided as type guardrails to
+   * help ensure the options provided match the layer kind.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#createlayer}
+   *
+   * @example
+   * ```js
+   * await doc.createLayer(); // defaults to pixel layer
+   * await doc.createLayer(
+   *   constants.LayerKind.NORMAL, // pixel layer
+   *   {name: "myLayer", opacity: 80, blendMode: constants.BlendMode.COLORDODGE}
+   * );
    * ```
+   *
    * @async
    * @minVersion 23.0
    */
@@ -521,60 +696,81 @@ export class Document {
   /**
    * Create a new pixel layer.
    *
-   * ```javascript
-   * await doc.createLayer(
-   *   Constants.LayerKind.NORMAL,
-   *   { name: "myLayer", opacity: 80, blendMode: Constants.BlendMode.COLORDODGE })
-   * ```
-   * @async
-   * @param kind The kind of layer to create [[Constants.LayerKind]].
+   * @param kind The kind of layer to create.
    * @param options The options for creation, including general layer options and those specific to the layer kind.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#createlayer}
+   *
+   * @async
    * @minVersion 23.0
    */
   createLayer(kind: Constants.LayerKind.NORMAL, options?: PixelLayerCreateOptions): Promise<Layer | null>;
   /**
    * Create a new layer group.
    *
-   * ```javascript
-   * await doc.createLayer( Constants.LayerKind.GROUP, { name: "myLayer", opacity: 80 })
-   * ```
-   * @async
-   * @param kind The kind of layer to create [[Constants.LayerKind]].
+   * @param kind The kind of layer to create.
    * @param options The options for creation, including general layer options and those specific to the layer kind.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#createlayer}
+   *
+   * @example
+   * ```js
+   * await doc.createLayer(constants.LayerKind.GROUP, {name: "myLayer", opacity: 80});
+   * ```
+   *
+   * @async
    * @minVersion 24.1
    */
   createLayer(kind: Constants.LayerKind.GROUP, options?: GroupLayerCreateOptions): Promise<Layer | null>;
   /**
-   * Create a pixel layer using options described by [[PixelLayerCreateOptions]].
+   * Create a pixel layer using options described by PixelLayerCreateOptions.
    *
-   * ```javascript
+   * @param options The options for creation.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#createpixellayer}
+   *
+   * @example
+   * ```js
    * await doc.createPixelLayer()
-   * await doc.createPixelLayer({ name: "myLayer", opacity: 80, fillNeutral: true })
+   * await doc.createPixelLayer({name: "myLayer", opacity: 80, fillNeutral: true})
    * ```
+   *
    * @async
    * @minVersion 24.1
    */
   createPixelLayer(options?: PixelLayerCreateOptions): Promise<Layer | null>;
   /**
-   * Create a text layer using options described by [[TextLayerCreateOptions]].
+   * Create a text layer using options described by TextLayerCreateOptions.
    *
-   * ```javascript
+   * @param options The options for creation.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#createtextlayer}
+   *
+   * @example
+   * ```js
    * await doc.createTextLayer()
-   * await doc.createTextLayer({ name: "myTextLayer", contents: "Hello, World!", fontSize: 32 })
+   * await doc.createTextLayer({name: "myTextLayer", contents: "Hello, World!", fontSize: 32})
    * ```
+   *
    * @async
    * @minVersion 24.2
    */
   createTextLayer(options?: TextLayerCreateOptions): Promise<Layer | null>;
   /**
-   * Create a layer group using options described by [[GroupLayerCreateOptions]].
+   * Create a layer group using options described by GroupLayerCreateOptions.
    *
-   * ```javascript
+   * @param options The options for creation.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#createlayergroup}
+   *
+   * @example
+   * ```js
    * const myEmptyGroup = await doc.createLayerGroup()
-   * const myGroup = await doc.createLayerGroup({ name: "myLayer", opacity: 80, blendMode: "colorDodge" })
-   * const nonEmptyGroup = await doc.createLayerGroup({ name: "group", fromLayers: [layer1, layer2] })
-   * const selectedGroup = await doc.createLayerGroup({ name: "group", fromLayers: doc.activeLayers })
+   * const myGroup = await doc.createLayerGroup({name: "myLayer", opacity: 80, blendMode: "colorDodge"})
+   * const nonEmptyGroup = await doc.createLayerGroup({name: "group", fromLayers: [layer1, layer2]})
+   * const selectedGroup = await doc.createLayerGroup({name: "group", fromLayers: doc.activeLayers})
    * ```
+   *
    * @async
    * @minVersion 23.0
    */
@@ -582,10 +778,16 @@ export class Document {
   /**
    * Create a layer group from existing layers.
    *
-   * ```javascript
+   * @param layers Array of layers to group.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#grouplayers}
+   *
+   * @example
+   * ```js
    * const layers = doc.layers
    * const group = await doc.groupLayers([layers[1], layers[2], layers[4]])
    * ```
+   *
    * @async
    * @minVersion 23.0
    */
@@ -601,36 +803,49 @@ export class Document {
    * The callback is passed in a SuspendHistoryContext object,
    * which contains the current document in a variable `document`.
    *
-   * For more info and advanced context, see [`core.executeAsModal`](../media/executeAsModal)
-   * API, for which this API is a simple wrapper for.
+   * For more info and advanced context, see `core.executeAsModal`
+   * API, for which `suspendHistory` is a simple wrapper.
    *
-   * ```javascript
-   *    require("photoshop").app.activeDocument.suspendHistory(async (context) => {
-   *        // context.document is the `app.activeDocument`
-   *        context.document.activeLayers[0].name = "Changed name";
-   *    });
+   * @param callback The callback function.
+   * @param historyStateName The name for the history state.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#suspendhistory}
+   *
+   * @example
+   * ```js
+   * app.activeDocument.suspendHistory(async (context) => {
+   *   // context.document below is, in this case, `app.activeDocument`
+   *   context.document.activeLayers[0].name = "Changed name";
+   * });
    * ```
+   *
    * @minVersion 23.0
    */
   suspendHistory(callback: (e: SuspendHistoryContext) => void, historyStateName: string): Promise<void>;
   /**
    * Returns a SolidColor object sampled from the document at the given position.
    *
-   * ```javascript
+   * @param position The point to sample `{x: number, y: number}`.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#samplecolor}
+   *
+   * @example
+   * ```js
    * let col = await app.activeDocument.sampleColor({x: 100, y: 100});
    * console.log(col.rgb);
    * // {
-   * //    red: 233,
-   * //    green: 179,
-   * //    blue: 135,
-   * //    hexValue: "E9B387"
+   * //   red: 233,
+   * //   green: 179,
+   * //   blue: 135,
+   * //   hexValue: "E9B387"
    * // }
    * ```
    *
    * @param position The point to sample `{x: number, y: number}`.
    * @param position.x The horizontal coordinate in pixels.
    * @param position.y The vertical coordinate in pixels.
-   * @returns A [[SolidColor]] instance of the sampled pixel
+   * @returns A SolidColor instance of the sampled pixel.
+   *
    * @async
    * @minVersion 24.0
    */
@@ -642,57 +857,73 @@ export class Document {
    * The Calculations command lets you blend two individual channels from one or more source images. You can then
    * apply the results to a new image or to a new channel or selection in the active image.
    *
-   * Performs Image > Calculations on the document. See the [[CalculationsOptions]]
+   * Performs Image > Calculations on the document. See the CalculationsOptions
    * object for more info and examples.
-   *
-   * ```javascript
-   * const doc = app.activeDocument;
-   * const options = {
-   *     source1: {
-   *         document: doc,
-   *         layer: doc.layers[0],
-   *         channel: CalculationsChannel.GRAY
-   *         invert: true
-   *     },
-   *     source2: {
-   *         document: doc,
-   *         layer: CalculationsLayer.MERGED,
-   *         channel: doc.channels[2]
-   *     },
-   *     blending: CalculationsBlendMode.DARKEN,
-   *     opacity: 50,
-   *     result: CalculationsResult.NEWCHANNEL
-   * };
-   * doc.calculations(options);
-   *
-   * ```
    *
    * Known issue: currently calculations requires having exactly one unlocked pixel layer being selected otherwise
    * it won't work. In future there should not be any layer requirements since this cannot output into layer.
+   *
    * @param calculationsOptions Option object for the calculations.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#calculations}
+   *
+   * @example
+   * ```js
+   * const doc = app.activeDocument;
+   * const options = {
+   *   source1: {
+   *     document: doc,
+   *     layer: doc.layers[0],
+   *     channel: constants.CalculationsChannel.GRAY
+   *     invert: true
+   *   },
+   *   source2: {
+   *     document: doc,
+   *     layer: constants.CalculationsLayer.MERGED,
+   *     channel: doc.channels[2]
+   *   },
+   *   blending: constants.CalculationsBlendMode.DARKEN,
+   *   opacity: 50,
+   *   result: constants.CalculationsResult.NEWCHANNEL
+   * };
+   * doc.calculations(options);
+   * ```
+   *
    * @async
    * @minVersion 24.5
    */
   calculations(calculationsOptions: CalculationsOptions): Promise<Document | Channel | void>;
   /**
    * All channels in the document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#channels}
    * @minVersion 23.0
    */
   get channels(): Channels;
   /**
-   * Component channels in the document. [(24.6)](/ps_reference/changelog#246-bug-fixes)
+   * Component channels in the document.
+   *
+   * Updates: [(24.6)](https://developer.adobe.com/photoshop/uxp/2022/ps_reference/changelog/#246-bug-fixes)
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#componentchannels}
    * @minVersion 24.5
    */
   get componentChannels(): Channel[];
   /**
    * Deprecated since these channels are component not composite.
-   * Use `compositeChannels` above.
+   * Use `componentChannels` above.
+   *
    * @deprecated
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#compositechannels}
    * @minVersion 23.0
    */
   get compositeChannels(): Channel[];
   /**
-   * Currently active channels of the document. [(24.6)](/ps_reference/changelog#246-bug-fixes)
+   * Currently active channels of the document.
+   *
+   * Updates: [(24.6)](https://developer.adobe.com/photoshop/uxp/2022/ps_reference/changelog/#246-bug-fixes)
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#activechannels}
    * @minVersion 23.0
    */
   get activeChannels(): Channel[];

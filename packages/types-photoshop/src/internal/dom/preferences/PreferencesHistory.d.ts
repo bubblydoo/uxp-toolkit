@@ -3,6 +3,7 @@ import { PreferencesBase } from './PreferencesBase';
 /**
  * All preferences related to history logging
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/preferences/#history}
  * @targetfolder classes/preferences
  * @minVersion 24.0
  */

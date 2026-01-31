@@ -7,7 +7,7 @@ import type { SolidColor } from '../objects/SolidColor';
 export class CharacterStyle {
   /**
    * The text face of the character, using the PostScript name of the font.
-   * See [[TextFont]] and use the `postScriptName` property.
+   * See {@link TextFont} and use the `postScriptName` property.
    * @minVersion 24.1
    */
   get font(): string;
@@ -205,7 +205,7 @@ export class CharacterStyle {
   get noBreak(): boolean;
   set noBreak(noBreak: boolean);
   /**
-   * The text color as a [[SolidColor]] instance.
+   * The text color as a {@link SolidColor} instance.
    * @minVersion 24.1
    */
   get color(): SolidColor;

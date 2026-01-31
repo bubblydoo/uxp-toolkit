@@ -3,7 +3,7 @@ import type { ApplyImageBlendMode, ApplyImageChannel, ApplyImageLayer } from '..
 import type { Document } from '../Document';
 import type { Layer } from '../Layer';
 /**
- * Type for the Layer choice in [[ApplyImageSource]].
+ * Type for the Layer choice in {@link ApplyImageSource}.
  * Select [ApplyImageLayer.MERGED](../constants/#applyimagelayer) to use the pixels from a merged
  * or flattened version of the document.
  * @targetfolder objects/options
@@ -12,7 +12,7 @@ import type { Layer } from '../Layer';
  */
 export type ApplyImageLayerType = Layer | ApplyImageLayer.MERGED;
 /**
- * Type for the Channel choice in [[ApplyImageSource]]
+ * Type for the Channel choice in {@link ApplyImageSource}
  * @targetfolder objects/options
  * @optionobject
  * @minVersion 24.5

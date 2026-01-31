@@ -1,10 +1,11 @@
 /**
- * Defines a CMYK color, used in [[SolidColor]] object.
+ * Defines a CMYK color, used in {@link SolidColor} object.
  *
  *  ***Fixes in Photoshop 24.2:***
  * - *Getter now will return number instead of `undefined`*
  * - *Value used in setter is now respected when passed to Photoshop*
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/cmykcolor/}
  * @targetfolder colors
  * @minVersion 23.0
  */
@@ -49,7 +50,9 @@ export class CMYKColor {
   get typename(): 'CMYKColor';
 }
 /**
- * Defines a grayscale color, used in [[SolidColor]] object.
+ * Defines a grayscale color, used in {@link SolidColor} object.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/graycolor/}
  *
  * @targetfolder colors
  * @minVersion 23.0
@@ -71,8 +74,9 @@ export class GrayColor {
   get typename(): 'GrayColor';
 }
 /**
- * Defines an HSB color, used in [[SolidColor]] object.
+ * Defines an HSB color, used in {@link SolidColor} object.
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/hsbcolor/}
  * @targetfolder colors
  * @minVersion 23.0
  */
@@ -111,8 +115,9 @@ export class HSBColor {
   get typename(): 'HSBColor';
 }
 /**
- * Defines a L<sup>\*</sup>a<sup>\*</sup>b<sup>\*</sup> color, used in [[SolidColor]] object.
+ * Defines a L<sup>\*</sup>a<sup>\*</sup>b<sup>\*</sup> color, used in {@link SolidColor} object.
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/labcolor/}
  * @targetfolder colors
  * @minVersion 23.0
  */
@@ -151,11 +156,12 @@ export class LabColor {
   get typename(): 'LabColor';
 }
 /**
- * Defines an RGB color, used in [[SolidColor]] object.
+ * Defines an RGB color, used in {@link SolidColor} object.
  *
  * Please note: RGB with 32 bits per channels is not currently supported. Color values will be rounded to the nearest
  * range valid for RGB with 16 bits per channel.
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/rgbcolor/}
  * @targetfolder colors
  * @minVersion 23.0
  */
@@ -204,8 +210,9 @@ export class RGBColor {
   get typename(): 'RGBColor';
 }
 /**
- * Represents a missing color, used in [[SolidColor]] object.
+ * Represents a missing color, used in {@link SolidColor} object.
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/nocolor/}
  * @targetfolder colors
  * @minVersion 23.0
  */

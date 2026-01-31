@@ -1,5 +1,5 @@
 /**
- * An object literal can be constructed with any of the following properties and passed to [[LayerComps.add]].
+ * An object literal can be constructed with any of the following properties and passed to {@link LayerComps.add}.
  * As a type, `LayerCompCreateOptions` can be used in Typescript development.
  *
  * ```javascript
@@ -51,7 +51,7 @@ export interface LayerCompCreateOptions {
   childComp?: boolean;
 }
 /**
- * An object literal can be constructed with any of the following properties and passed to [[LayerComp.recapture]].
+ * An object literal can be constructed with any of the following properties and passed to {@link LayerComp.recapture}.
  * As a type, `LayerCompRecaptureOptions` can be used in Typescript development.
  *
  * ```javascript

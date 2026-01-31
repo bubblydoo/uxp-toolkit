@@ -2,7 +2,7 @@ import type * as Constants from '../Constants';
 import type { SolidColor } from '../objects/SolidColor';
 /**
  * An object literal can be constructed with any of the following properties
- * and passed to [[Photoshop.createDocument]].
+ * and passed to {@link Photoshop.createDocument}.
  * As a type, `DocumentCreateOptions` can be used in Typescript development.
  *
  * ```javascript

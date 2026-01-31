@@ -3,6 +3,8 @@ import type { Document } from '../Document';
 import type { SolidColor } from '../objects/SolidColor';
 /**
  * A collections class allowing access to the document's CountItem.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/countitems/}
  */
 export class CountItems extends Array<CountItem> {
   /**
@@ -34,17 +36,17 @@ export class CountItems extends Array<CountItem> {
    */
   get typename(): 'CountItems';
   /**
-   * Number of [[CountItem]] elements in this collection.
+   * Number of {@link CountItem} elements in this collection.
    * @minVersion 24.1
    */
   get length(): number;
   /**
-   * The owner [[Document]] of this CountItems collection.
+   * The owner {@link Document} of this CountItems collection.
    * @minVersion 24.1
    */
   get parent(): Document;
   /**
-   * Adds a new [[CountItem]] to the collection.
+   * Adds a new {@link CountItem} to the collection.
    *
    * ```javascript
    * app.activeDocument.countItems.add({x: 20, y: 20});
@@ -60,7 +62,7 @@ export class CountItems extends Array<CountItem> {
     y: number;
   }): CountItem;
   /**
-   * Clears all [[CountItem]] objects from this collection.
+   * Clears all {@link CountItem} objects from this collection.
    *
    * ```javascript
    * app.activeDocument.countItems.removeAllFromActiveGroup();
@@ -69,7 +71,7 @@ export class CountItems extends Array<CountItem> {
    */
   removeAllFromActiveGroup(): void;
   /**
-   * Retrieves all [[CountItem]] objects from this collection.
+   * Retrieves all {@link CountItem} objects from this collection.
    *
    * ```javascript
    * app.activeDocument.countItems.getAll();
@@ -121,7 +123,7 @@ export class CountItems extends Array<CountItem> {
   setActiveLabelSize(size: number): void;
   /**
    * Sets the Color of the Count Item marker and label.
-   * @param color: The color as a [[SolidColor]] object.
+   * @param color: The color as a {@link SolidColor} object.
    * @minVersion 24.1
    */
   setActiveColor(color: SolidColor): void;

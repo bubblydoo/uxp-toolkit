@@ -1,13 +1,13 @@
 import type * as Constants from '../Constants';
 /**
- * Used to create a [[PathPoint]], which represents the anchor and control-handle endpoints for a path segment.
+ * Used to create a {@link PathPoint}, which represents the anchor and control-handle endpoints for a path segment.
  * Each point (the anchor point, left-direction point, and right-direction point) is an array containing X and Y
  * position coordinates.
  *
- *  - Use the JavaScript `new` operator to create these objects, and store them in the [[SubPathInfo.entireSubPath]]
- * property before using that object to create a path item with [[PathItems.add]]()
+ *  - Use the JavaScript `new` operator to create these objects, and store them in the {@link SubPathInfo.entireSubPath}
+ * property before using that object to create a path item with {@link PathItems.add}()
  *
- *  - The resulting [[SubPathItem]] object contains the resulting [[PathPoint]] objects. Use the [[PathPoint]] object
+ *  - The resulting {@link SubPathItem} object contains the resulting {@link PathPoint} objects. Use the {@link PathPoint} object
  * to retrieve information about the points that describe existing path segments. The properties are read-only.
  *
  * For paths that are straight segments (not curved), the coordinates of all three points are the same. For curved

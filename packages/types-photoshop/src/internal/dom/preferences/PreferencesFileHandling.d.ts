@@ -3,6 +3,7 @@ import { PreferencesBase } from './PreferencesBase';
 /**
  * File handling preferences. Mostly about file saving options, file compatibility and recent files
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/preferences/#filehandling}
  * @targetfolder classes/preferences
  * @minVersion 24.0
  */

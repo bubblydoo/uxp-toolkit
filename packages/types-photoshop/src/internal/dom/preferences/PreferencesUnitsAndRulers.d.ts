@@ -3,6 +3,7 @@ import { PreferencesBase } from './PreferencesBase';
 /**
  * Preferences related to ruler units, type units and resolution
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/preferences/#unitsandrulers}
  * @targetfolder classes/preferences
  * @minVersion 24.0
  */

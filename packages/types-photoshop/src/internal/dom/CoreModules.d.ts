@@ -314,7 +314,7 @@ export interface Core {
    */
   apiVersion: number;
   /**
-   * Returns true if the plugin is currently in a modal state using [[executeAsModal]]
+   * Returns true if the plugin is currently in a modal state using {@link executeAsModal}
    * @minVersion 23.1
    */
   isModal: () => boolean;
@@ -480,7 +480,7 @@ export interface Core {
    * Converts the given color (in descriptor form) to RGB,
    * returning the color descriptor.
    *
-   * This is an internal API that is used for [[SolidColor]]
+   * This is an internal API that is used for {@link SolidColor}
    * and all the other color classes.
    *
    * Currently, this API uses the application color settings
@@ -567,7 +567,7 @@ export interface Core {
    *
    * group: '`UI`', event: '`userIdle`'
    *
-   * - Invoked after the Photoshop user idles for a specified number of seconds. See [[setUserIdleTime]].
+   * - Invoked after the Photoshop user idles for a specified number of seconds. See {@link setUserIdleTime}.
    * - Invoked a second time with the descriptor `{idleEnd: true}` if the user is no longer idle. This signal can
    * be used to finish up tasks being performed during the idle time.
    * ```javascript
@@ -579,7 +579,7 @@ export interface Core {
   addNotificationListener: (group: string, events: string[], notifier: NotificationListener) => Promise<void>;
   /**
    * Specifies the number of seconds a user must be idle on Photoshop before invoking the
-   * userIdle event handler defined with [[addNotificationListener]]. An idleTime of 0
+   * userIdle event handler defined with {@link addNotificationListener}. An idleTime of 0
    * turns off idle notifications.
    *
    * ```javascript
@@ -599,7 +599,7 @@ export interface Core {
   getDisplayConfiguration: (options: DisplayConfigurationOptions) => Promise<DisplayConfiguration[]>;
   /**
    * Gets the number of seconds a user must be idle on Photoshop before invoking the
-   * userIdle event handler defined with [[addNotificationListener]]. An idleTime of 0
+   * userIdle event handler defined with {@link addNotificationListener}. An idleTime of 0
    * means turned off idle notifications.
    */
   getUserIdleTime: () => Promise<number>;
@@ -790,7 +790,7 @@ export interface ExecuteAsModalOptions {
   timeOut?: number;
 }
 /**
- * Options for the history state that [[Document.suspendHistory]] will create.
+ * Options for the history state that {@link Document.suspendHistory} will create.
  * @optionobject
  * @targetfolder objects/options
  */

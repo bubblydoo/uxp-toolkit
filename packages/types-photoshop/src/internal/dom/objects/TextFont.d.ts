@@ -1,7 +1,10 @@
 import type { Photoshop } from '../Photoshop';
 /**
- * Describes a font that is available to the application. Access this object in the [[Photoshop.fonts]] collection.
+ * Describes a font that is available to the application. Access this object in the {@link Photoshop.fonts} collection.
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/textfont/}
+ *
+ * @example
  * ```javascript
  * const arialMTFont = require('photoshop').app.fonts.getByName("ArialMT");
  * ```

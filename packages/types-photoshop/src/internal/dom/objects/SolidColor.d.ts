@@ -4,6 +4,9 @@ import type * as Colors from './Colors';
  * Represents a color, and allows for mapping into all available Photoshop color models.
  * Import SolidColor from the Photoshop's app object:
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/objects/solidcolor/}
+ *
+ * @example
  * ```javascript
  * const SolidColor = require("photoshop").app.SolidColor;
  * ```
@@ -14,6 +17,7 @@ import type * as Colors from './Colors';
  *
  * For example, to set the foreground color to red:
  *
+ * @example
  * ```javascript
  * const SolidColor = require("photoshop").app.SolidColor;
  * const red = new SolidColor();

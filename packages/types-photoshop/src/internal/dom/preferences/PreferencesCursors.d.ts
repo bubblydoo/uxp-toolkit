@@ -3,6 +3,7 @@ import { PreferencesBase } from './PreferencesBase';
 /**
  * Options for size and style of tool cursors.
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/preferences/#cursors}
  * @targetfolder classes/preferences
  * @minVersion 24.0
  */

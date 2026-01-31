@@ -3,14 +3,14 @@ import type { CalculationsBlendMode, CalculationsChannel, CalculationsLayer, Cal
 import type { Document } from '../Document';
 import type { Layer } from '../Layer';
 /**
- * Type for the Layer choice in [[CalculationsSource]]
+ * Type for the Layer choice in {@link CalculationsSource}
  * @targetfolder objects/options
  * @optionobject
  * @minVersion 24.5
  */
 declare type CalculationsLayerType = Layer | CalculationsLayer.MERGED;
 /**
- * Type for the Channel choice in [[CalculationsSource]]
+ * Type for the Channel choice in {@link CalculationsSource}
  * @targetfolder objects/options
  * @optionobject
  * @minVersion 24.5
@@ -21,7 +21,7 @@ export type CalculationsChannelType
     | CalculationsChannel.TRANSPARENCY
     | CalculationsChannel.SELECTION;
 /**
- * Reference for sources (source1, source2, mask) to be used in [[CalculationsOptions]].
+ * Reference for sources (source1, source2, mask) to be used in {@link CalculationsOptions}.
  * @targetfolder objects/options
  * @optionobject
  * @minVersion 24.5
@@ -53,7 +53,7 @@ export interface CalculationsSource {
 }
 /**
  * An object literal can be constructed with the following properties
- * and passed to [[Document.calculations]].
+ * and passed to {@link Document.calculations}.
  * As a type, `CalculationsOptions` can be used in Typescript development.
  *
  * ```javascript

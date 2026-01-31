@@ -1,6 +1,28 @@
 import type * as Constants from '../Constants';
 /**
- * Options for converting an image to bitmap mode, using [[Document.changeMode]] with `ChangeMode.BITMAP`.
+ * Options for converting an image to bitmap mode, using {@link Document.changeMode} with `ChangeMode.BITMAP`.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#changemode}
+ *
+ * @example
+ * ```javascript
+ * const doc = app.activeDocument;
+ * const options = new BitmapConversionOptions();
+ * options.method = constants.BitmapConversionType.DIFFUSIONDITHER;
+ * options.resolution = 72;
+ * await doc.changeMode(constants.ChangeMode.BITMAP, options);
+ * ```
+ *
+ * @example
+ * ```javascript
+ * // Convert with halftone screen
+ * const options = new BitmapConversionOptions();
+ * options.method = constants.BitmapConversionType.HALFTONESCREEN;
+ * options.frequency = 60;
+ * options.angle = 45;
+ * options.shape = constants.BitmapHalfToneType.ROUND;
+ * await doc.changeMode(constants.ChangeMode.BITMAP, options);
+ * ```
  *
  * @targetfolder objects/conversionoptions
  * @optionobject
@@ -79,7 +101,30 @@ export class BitmapConversionOptions {
   constructor();
 }
 /**
- * Options for converting an RGB image to an indexed color model using [[Document.changeMode]]
+ * Options for converting an RGB image to an indexed color model using {@link Document.changeMode}
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#changemode}
+ *
+ * @example
+ * ```javascript
+ * const doc = app.activeDocument;
+ * const options = new IndexedConversionOptions();
+ * options.palette = constants.Palette.LOCALPERCEPTUAL;
+ * options.colors = 256;
+ * options.dither = constants.Dither.DIFFUSION;
+ * options.transparency = true;
+ * await doc.changeMode(constants.ChangeMode.INDEXEDCOLOR, options);
+ * ```
+ *
+ * @example
+ * ```javascript
+ * // Convert with web palette
+ * const options = new IndexedConversionOptions();
+ * options.palette = constants.Palette.WEBPALETTE;
+ * options.colors = 216;
+ * options.preserveExactColors = true;
+ * await doc.changeMode(constants.ChangeMode.INDEXEDCOLOR, options);
+ * ```
  *
  * @targetfolder objects/conversionoptions
  * @optionobject

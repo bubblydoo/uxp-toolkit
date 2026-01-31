@@ -46,7 +46,7 @@ interface LayerCreateOptionsBase {
   blendMode?: Constants.BlendMode;
 }
 /**
- * An object literal can be constructed with any of the following properties and passed to [[Document.createLayer]].
+ * An object literal can be constructed with any of the following properties and passed to {@link Document.createLayer}.
  * As a type, `PixelLayerCreateOptions` can be used in Typescript development.
  *
  * ```javascript
@@ -69,7 +69,7 @@ export interface PixelLayerCreateOptions extends LayerCreateOptionsBase {
 }
 /**
  * An object literal can be constructed with any of the following properties
- * and passed to [[Document.createLayer]].
+ * and passed to {@link Document.createLayer}.
  * As a type, `TextLayerCreateOptions` can be used in Typescript development.
  *
  * ```javascript
@@ -118,7 +118,7 @@ export interface TextLayerCreateOptions extends LayerCreateOptionsBase {
 }
 /**
  * An object literal can be constructed with any of the following properties
- * and passed to [[Document.createLayerGroup]].
+ * and passed to {@link Document.createLayerGroup}.
  * As a type, `GroupLayerCreateOptions` can be used in Typescript development.
  *
  * ```javascript
@@ -144,7 +144,7 @@ export interface GroupLayerCreateOptions extends LayerCreateOptionsBase {
   fromLayers?: Layer | Layer[];
 }
 /**
- * The options passed to [[Document.createLayer]] may take any of the following forms:
+ * The options passed to {@link Document.createLayer} may take any of the following forms:
  * - PixelLayerCreateOptions
  * - GroupLayerCreateOptions
  * @minVersion 22.5

@@ -13,7 +13,19 @@ type TypeSymbol = symbol & { _brand: { typeSymbol: undefined } };
  * - date created
  * - date modified
  * - name
- * You'll not instantiate this directly; use Entry#getMetadata to do so.
+ *
+ * Instantiate `EntryMetadata` by using Entry's getMetadata().
+ * In order to instantiate `Entry`, you will need to first invoke the `localFileSystem` and then fetch an instance of a File or Folder.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/EntryMetadata/}
+ *
+ * @example
+ * ```js
+ * const fs = require('uxp').storage.localFileSystem;
+ * const folder = await fs.getPluginFolder(); // Gets an instance of Folder (or Entry)
+ * const entryMetaData = await folder.getMetadata();
+ * console.log(entryMetaData.name);
+ * ```
  */
 export interface EntryMetadata {
   /**
@@ -47,6 +59,20 @@ export interface EntryMetadata {
  * An Entry is the base class for File and Folder.
  * You'll typically never instantiate an Entry directly, but it provides the common fields and methods that both
  * File and Folder share.
+ *
+ * You can get an instance of Entry via the `localFileSystem` by fetching an instance of a File or Folder.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/Entry/}
+ *
+ * @example
+ * ```js
+ * // Since Entry cannot be called directly we can use a File or Folder object to invoke Entry as shown below
+ * const fs = require('uxp').storage.localFileSystem;
+ * const folder = await fs.getPluginFolder(); // returns a Folder instance
+ * const folderEntry = await folder.getEntry("entryName.txt");
+ * // Now we can use folderEntry to invoke the APIs provided by Entry
+ * console.log(folderEntry.isEntry); // isEntry is an API of Entry, in this example it will return true
+ * ```
  */
 export class Entry {
   /**
@@ -64,16 +90,33 @@ export class Entry {
 
   /**
    * Copies this entry to the specified folder.
+   *
    * @param folder The folder to which to copy this entry.
-   * @param options
+   * @param options Options for the copy operation (all properties are optional)
    * @throws EntryExists If the attempt would overwrite an entry and overwrite is false.
    * @throws PermissionDenied If the underlying file system rejects the attempt.
    * @throws OutOfSpace If the file system is out of storage space.
-   * @return File or Folder.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/Entry/#copytofolder-options}
+   *
+   * @example
+   * ```js
+   * await someFile.copyTo(someFolder);
+   * ```
+   *
+   * @example
+   * ```js
+   * await someFile.copyTo(someFolder, {overwrite: true});
+   * ```
+   *
+   * @example
+   * ```js
+   * await someFolder.copyTo(anotherFolder, {overwrite: true, allowFolderCopy: true});
+   * ```
    */
   copyTo(
     folder: Folder,
-    options: {
+    options?: {
       /**
        * If true, allows overwriting existing entries.
        */
@@ -87,12 +130,40 @@ export class Entry {
 
   /**
    * Moves this entry to the target folder, optionally specifying a new name.
+   *
    * @param folder The folder to which to move this entry.
-   * @param options
+   * @param options Options for the move operation (all properties are optional)
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/Entry/#movetofolder-options}
+   *
+   * @example
+   * ```js
+   * await someFile.moveTo(someFolder);
+   * ```
+   *
+   * @example
+   * ```js
+   * await someFile.moveTo(someFolder, {overwrite: true});
+   * ```
+   *
+   * @example
+   * ```js
+   * await someFolder.moveTo(anotherFolder, {overwrite: true});
+   * ```
+   *
+   * @example
+   * ```js
+   * await someFile.moveTo(someFolder, {newName: 'masterpiece.txt'})
+   * ```
+   *
+   * @example
+   * ```js
+   * await someFile.moveTo(someFolder, {newName: 'novel.txt', {overwrite: true})
+   * ```
    */
   moveTo(
     folder: Folder,
-    options: {
+    options?: {
       /**
        * If true allows the move to overwrite existing files.
        */
@@ -107,43 +178,93 @@ export class Entry {
   /**
    * Removes this entry from the file system.
    * If the entry is a folder, all the contents will also be removed.
-   * @return The number is 0 if succeeded, otherwise throws an Error.
+   *
+   * Note: Currently when using this method, a permission denied error will occur if attempting to delete
+   * a folder that was selected from a storage picker or added via drag-and-drop.
+   *
+   * @returns The number is 0 if succeeded, otherwise throws an Error.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/Entry/#delete}
+   *
+   * @example
+   * ```js
+   * await aFile.delete();
+   * ```
    */
   delete(): Promise<number>;
 
   /**
    * Returns this entry's metadata.
-   * @return This entry's metadata.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/Entry/#getmetadata}
+   *
+   * @example
+   * ```js
+   * const metadata = aFile.getMetadata();
+   * ```
    */
   getMetadata(): Promise<EntryMetadata>;
 
   /**
    * Indicates that this instance is an Entry.
    * Useful for type-checking.
+   *
+   * @example
+   * ```js
+   * if (something.isEntry) {
+   *   return something.getMetadata();
+   * }
+   * ```
    */
   readonly isEntry: boolean;
 
   /**
    * Indicates that this instance is not a File.
    * Useful for type-checking.
+   *
+   * @example
+   * ```js
+   * if (!anEntry.isFile) {
+   *   return "This entry is not a file.";
+   * }
+   * ```
    */
   readonly isFile: boolean;
 
   /**
    * Indicates that this instance is not a folder.
    * Useful for type-checking.
+   *
+   * @example
+   * ```js
+   * if (!anEntry.isFolder) {
+   *   return "This entry is not a folder.";
+   * }
+   * ```
    */
   readonly isFolder: boolean;
 
   /**
    * The name of this entry.
    * Read-only.
+   *
+   * @example
+   * ```js
+   * console.log(anEntry.name);
+   * ```
    */
   readonly name: string;
 
   /**
    * The associated provider that services this entry.
    * Read-only.
+   *
+   * @example
+   * ```js
+   * if (entryOne.provider !== entryTwo.provider) {
+   *   throw new Error("Providers are not the same");
+   * }
+   * ```
    */
   readonly provider: FileSystemProvider;
 
@@ -152,12 +273,22 @@ export class Entry {
    * You can use this url as input to other entities of the extension system like for eg: set as src attribute of a
    * Image widget in UI.
    * Read-only.
+   *
+   * @example
+   * ```js
+   * console.log(anEntry.url);
+   * ```
    */
   readonly url: string;
 
   /**
    * The platform native file-system path of this entry.
    * Read-only
+   *
+   * @example
+   * ```js
+   * console.log(anEntry.nativePath);
+   * ```
    */
   readonly nativePath: string;
 }
@@ -166,24 +297,51 @@ export class Entry {
  * Represents a file on a file system.
  * Provides methods for reading from and writing to the file.
  * You'll never instantiate a File directly; instead you'll get access via a storage.FileSystemProvider.
+ *
+ * Keep in mind that `File` as such doesn't need a `require()` statement, however a `localFileSystem` will need it.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/File/}
+ *
+ * @example
+ * ```js
+ * // Get the object of a File instance
+ * const fs = require('uxp').storage.localFileSystem;
+ * const file = await fs.createEntryWithUrl("file:/Users/user/Documents/tmp"); // Gets a File instance
+ * console.log(file.isFile); // returns true
+ * ```
  */
 export class File extends Entry {
   /**
    * Determines if the entry is a file or not.
    * This is safe to use even if the entry is null or undefined.
+   *
    * @param entry The entry to check.
-   * @return If true, the entry is a file.
+   * @returns If true, the entry is a file.
    */
   static isFile(entry: Entry): boolean;
 
   /**
    * Indicates that this instance is a file.
+   *
+   * @example
+   * ```js
+   * if (anEntry.isFile) {
+   *   await anEntry.read();
+   * }
+   * ```
    */
   readonly isFile: true;
 
   /**
    * Indicates whether this file is read-only or read-write.
    * See readOnly and readWrite.
+   *
+   * @example
+   * ```js
+   * if (aFile.mode === modes.readOnly) {
+   *   throw new Error("Can't write to a file opened as read-only.");
+   * }
+   * ```
    */
   mode: ModeSymbol;
 
@@ -191,10 +349,23 @@ export class File extends Entry {
    * Reads data from the file and returns it.
    * The file format can be specified with the format option.
    * If a format is not supplied, the file is assumed to be a text file using UTF8 encoding.
-   * @param options
-   * @return The contents of the file.
+   *
+   * @param options Options for the read operation (all properties are optional)
+   * @returns The contents of the file.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/File/#readoptions}
+   *
+   * @example
+   * ```js
+   * const text = await myNovel.read();
+   * ```
+   *
+   * @example
+   * ```js
+   * const data = await myNovel.read({format: formats.binary});
+   * ```
    */
-  read(options: {
+  read(options?: {
     /**
      * The format of the file; see utf8 and binary.
      */
@@ -204,15 +375,30 @@ export class File extends Entry {
   /**
    * Writes data to a file, appending if desired.
    * The format of the file is controlled via the format option, and defaults to UTF8.
+   *
    * @param data The data to write to the file.
-   * @param options
-   * @return The length of the contents written to the file.
+   * @param options Options for the write operation (all properties are optional)
+   * @returns The length of the contents written to the file.
    * @throws FileIsReadOnly If writing to a read-only file.
    * @throws OutOfSpace If writing to the file causes the file system to exceed the available space (or quota).
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/File/#writedata-options}
+   *
+   * @example
+   * ```js
+   * await myNovel.write("It was a dark and stormy night.\n");
+   * await myNovel.write("Cliches and tropes aside, it really was.", {append: true});
+   * ```
+   *
+   * @example
+   * ```js
+   * const data = new ArrayBuffer();
+   * await aDataFile.write(data, {format: formats.binary});
+   * ```
    */
   write(
     data: string | ArrayBuffer,
-    options: {
+    options?: {
       /**
        * The format of the file; see utf8 and binary.
        */
@@ -229,6 +415,16 @@ export class File extends Entry {
  * Represents a folder on a file system.
  * You'll never instantiate this directly, but will get it by calling FileSystemProvider.getTemporaryFolder,
  * FileSystemProvider.getFolder, or via Folder.getEntries.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/Folder/}
+ *
+ * @example
+ * ```js
+ * // Get the Folder instance via localFileSystem
+ * const fs = require('uxp').storage.localFileSystem;
+ * const folder = await fs.getTemporaryFolder(); // Gets the Folder instance
+ * console.log(folder.isFolder); // returns true
+ * ```
  */
 export class Folder extends Entry {
   static isFolder(entry: Entry): boolean;
@@ -241,19 +437,41 @@ export class Folder extends Entry {
 
   /**
    * Returns an array of entries contained within this folder.
-   * @return The entries within the folder.
+   *
+   * @returns The entries within the folder.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/Folder/#getentries}
+   *
+   * @example
+   * ```js
+   * const entries = await aFolder.getEntries();
+   * const allFiles = entries.filter(entry => entry.isFile);
+   * ```
    */
-  getEntries(): Entry[];
+  getEntries(): Promise<Entry[]>;
 
   /**
    * Creates an entry within this folder and returns the appropriate instance.
+   *
    * @param name The name of the entry to create.
-   * @param options
-   * @return The created entry.
+   * @param options Options for the create operation (all properties are optional)
+   * @returns The created entry.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/Folder/#createentryname-options}
+   *
+   * @example
+   * ```js
+   * const myNovel = await aFolder.createEntry("mynovel.txt");
+   * ```
+   *
+   * @example
+   * ```js
+   * const catImageCollection = await aFolder.createEntry("cats", {type: types.folder});
+   * ```
    */
   createEntry(
     name: string,
-    options: {
+    options?: {
       /**
        * Indicates which kind of entry to create.
        * Pass folder to create a new folder.
@@ -273,13 +491,21 @@ export class Folder extends Entry {
    * Creates a File Entry object within this folder and returns the appropriate instance.
    * Note that this method just create a file entry object and not the actual file on the disk.
    * The file actually gets created when you call for eg: write method on the file entry object.
+   *
    * @param name The name of the file to create.
-   * @param options
-   * @return The created file entry.
+   * @param options Options for the create operation (all properties are optional)
+   * @returns The created file entry.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/Folder/#createfilename-options}
+   *
+   * @example
+   * ```js
+   * const myNovelTxtFile = await aFolder.createFile("mynovel.txt");
+   * ```
    */
   createFile(
     name: string,
-    options: {
+    options?: {
       /**
        * If true, the create attempt can overwrite an existing file.
        */
@@ -289,48 +515,77 @@ export class Folder extends Entry {
 
   /**
    * Creates a Folder within this folder and returns the appropriate instance.
+   *
    * @param name The name of the folder to create.
-   * @return The created folder entry object.
+   * @returns The created folder entry object.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/Folder/#createfoldername}
+   *
+   * @example
+   * ```js
+   * const myCollectionsFolder = await aFolder.createFolder("collections");
+   * ```
    */
   createFolder(name: string): Promise<Folder>;
 
   /**
    * Gets an entry from within this folder and returns the appropriate instance.
+   *
    * @param filePath The name/path of the entry to fetch.
-   * @return The fetched entry.
+   * @returns The fetched entry.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/Folder/#getentryfilepath}
+   *
+   * @example
+   * ```js
+   * const myNovel = await aFolder.getEntry("mynovel.txt");
+   * ```
    */
   getEntry(filePath: string): Promise<File | Folder>;
 
   /**
    * Renames an entry to a new name.
+   *
    * @param entry The entry to rename.
    * @param newName The new name to assign.
-   * @param options
+   * @param options Options for the rename operation (all properties are optional)
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/Folder/#renameentryentry-newname-options}
+   *
+   * @example
+   * ```js
+   * await myNovels.renameEntry(myNovel, "myFantasticNovel.txt");
+   * ```
    */
   renameEntry(
     entry: Entry,
     newName: string,
-    options: {
+    options?: {
       /**
        * If true, renaming can overwrite an existing entry.
        */
       overwrite?: boolean;
     },
-  ): void;
+  ): Promise<void>;
 }
 
 /**
  * Provides access to files and folders on a file system.
  * You'll never instantiate this directly; instead you'll use an instance of
  * one that has already been created for you by UXP.
+ *
+ * These APIs work with UXP Manifest version v5 and above.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/}
  */
 export class FileSystemProvider {
   /**
    * Checks if the supplied object is a FileSystemProvider.
    * It's safe to use even if the object is null or undefined.
    * Useful for type checking.
+   *
    * @param fs The object to check.
-   * @return  If true, the object is a file system provider;
+   * @returns If true, the object is a file system provider.
    */
   static isFileSystemProvider(fs: FileSystemProvider): boolean;
 
@@ -344,16 +599,47 @@ export class FileSystemProvider {
    * An array of the domains this file system supports.
    * If the file system can open a file picker to the user's documents folder, for example, then userDocuments will
    * be in this list.
+   *
+   * @example
+   * ```js
+   * if (fs.supportedDomains.contains(domains.userDocuments)) {
+   *   console.log("We can open a picker to the user's documents.")
+   * }
+   * ```
    */
   supportedDomains: DomainSymbol[];
 
   /**
    * Gets a file (or files) from the file system provider for the purpose of opening them.
    * Files are read-only.
-   * @param options
-   * @return Based on allowMultiple is true or false, or empty if no file were selected.
+   *
+   * Multiple files can be returned if the `allowMultiple` option is `true`.
+   *
+   * @param options Options for the file picker (all properties are optional)
+   * @returns Based on allowMultiple is true or false, or empty if no file were selected.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#getfileforopeningoptions}
+   *
+   * @example
+   * ```js
+   * const folder = await fs.getFolder({initialDomain: domains.userDocuments});
+   * const file = await fs.getFileForOpening({initialLocation: folder});
+   * if (!file) {
+   *   // no file selected
+   *   return;
+   * }
+   * const text = await file.read();
+   * ```
+   *
+   * @example
+   * ```js
+   * const files = await fs.getFileForOpening({allowMultiple: true, types: fileTypes.images});
+   * if (files.length === 0) {
+   *   // no files selected
+   * }
+   * ```
    */
-  getFileForOpening(options: {
+  getFileForOpening(options?: {
     /**
      * The preferred initial location of the file picker.
      * If not defined, the most recently used domain from a file picker is used instead.
@@ -386,11 +672,24 @@ export class FileSystemProvider {
    * If the act of writing to the file would overwrite it, the file picker should prompt the user if they are OK
    * with that action.
    * If not, the file should not be returned.
+   *
    * @param suggestedName Required when options.types is not defined.
-   * @param options
-   * @return Returns the selected file, or null if no file were selected.
+   * @param options Options for the file picker (all properties are optional)
+   * @returns Returns the selected file, or null if no file were selected.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#getfileforsavingsuggestedname-options}
+   *
+   * @example
+   * ```js
+   * const file = await fs.getFileForSaving("output.txt", {types: ["txt"]});
+   * if (!file) {
+   *   // file picker was cancelled
+   *   return;
+   * }
+   * await file.write("It was a dark and stormy night");
+   * ```
    */
-  getFileForSaving(suggestedName: string, options: {
+  getFileForSaving(suggestedName: string, options?: {
     /**
      * The preferred initial location of the file picker.
      * If not defined, the most recently used domain from a file picker is used instead.
@@ -408,10 +707,20 @@ export class FileSystemProvider {
    * Any files within are read-write.
    *
    * If the user dismisses the picker, null is returned instead.
-   * @param options
-   * @return The selected folder or null if no folder is selected.
+   *
+   * @param options Options for the folder picker (all properties are optional)
+   * @returns The selected folder or null if no folder is selected.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#getfolderoptions}
+   *
+   * @example
+   * ```js
+   * const folder = await fs.getFolder();
+   * const myNovel = (await folder.getEntries()).filter(entry => entry.name.indexOf('novel') > 0);
+   * const text = await myNovel.read();
+   * ```
    */
-  getFolder(options: {
+  getFolder(options?: {
     /**
      * The preferred initial location of the file picker.
      * If not defined, the most recently used domain from a file picker is used instead.
@@ -422,37 +731,93 @@ export class FileSystemProvider {
   /**
    * Returns a temporary folder.
    * The contents of the folder will be removed when the extension is disposed.
-   * @return Folder.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#gettemporaryfolder}
+   *
+   * @example
+   * ```js
+   * const temp = await fs.getTemporaryFolder();
+   * ```
    */
   getTemporaryFolder(): Promise<Folder>;
 
   /**
    * Returns a folder that can be used for extension's data storage without user interaction.
    * It is persistent across host-app version upgrades.
-   * @return Folder
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#getdatafolder}
    */
   getDataFolder(): Promise<Folder>;
 
   /**
    * Returns an plugin's folder – this folder and everything within it are read only.
    * This contains all the Plugin related packaged assets.
-   * @return Folder.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#getpluginfolder}
    */
   getPluginFolder(): Promise<Folder>;
 
   /**
    * Returns the fs url of given entry.
+   *
    * @param entry
-   * @return The fs url of given entry.
+   * @returns The fs url of given entry.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#getfsurlentry}
    */
   getFsUrl(entry: Entry): string;
 
   /**
    * Returns the platform native file system path of given entry.
+   *
    * @param entry
-   * @return The platform native file system path of given entry.
+   * @returns The platform native file system path of given entry.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#getnativepathentry}
    */
   getNativePath(entry: Entry): string;
+
+  /**
+   * Creates an entry for the given url and returns the appropriate instance.
+   *
+   * @param url The url to create an Entry object. Note that file: scheme has limited support in UWP due to the strict File access permissions.
+   * @param options Options for the create operation (all properties are optional)
+   * @returns The File or Folder object which is created for the given url.
+   * @throws Error if invalid file url format or value is passed.
+   *         if the parent folder of the file/folder to be created does not exist.
+   *         if a folder already exists at the url.
+   *         if a file already exists at the url and it is requested to create a folder.
+   *         if a file already exists at the url and the overwrite option is not set to true to create a file.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#createentrywithurlurl-options}
+   *
+   * @example
+   * ```js
+   * const newImgFolder = await fs.createEntryWithUrl("plugin-temp:/img", {type: types.folder});
+   * const newTmpFolder = await fs.createEntryWithUrl("file:/Users/user/Documents/tmp", {type: types.folder});
+   * ```
+   *
+   * @example
+   * ```js
+   * const newDatFile = await fs.createEntryWithUrl("plugin-temp:/tmp/test.dat", {overwrite: true});
+   * const newTxtFile = await fs.createEntryWithUrl("file:/Users/user/Documents/test.txt", {overwrite: true});
+   * ```
+   */
+  createEntryWithUrl(
+    url: string,
+    options?: {
+      /**
+       * Indicates which kind of entry to create. Pass types.folder to create a new folder.
+       * Note that if the type is file then this method just creates a file entry object and not the actual file on the disk.
+       * File on the storage is created when data is written into the file. eg: call write method on the file entry object.
+       */
+      type?: TypeSymbol;
+      /**
+       * If true, the create attempt can overwrite an existing file.
+       */
+      overwrite?: boolean;
+    },
+  ): Promise<File | Folder>;
 
   /**
    * Returns a token suitable for use with certain host-specific APIs (such as Photoshop).
@@ -462,8 +827,25 @@ export class FileSystemProvider {
    *
    * Note: When using the Photoshop DOM API, pass the instance of the file instead of a session token -- Photoshop
    * will convert the entry into a session token automatically on your behalf.
+   *
    * @param entry
-   * @return The session token for the given entry.
+   * @returns The session token for the given entry.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#createsessiontokenentry}
+   *
+   * @example
+   * ```js
+   * const fs = require('uxp').storage.localFileSystem;
+   * let entry = await fs.getFileForOpening();
+   * let token = fs.createSessionToken(entry);
+   * let result = await require('photoshop').action.batchPlay([{
+   *   _obj: "open",
+   *   "target": {
+   *     _path: token, // Rather than a system path, this expects a session token
+   *     _kind: "local",
+   *   }
+   * }], {});
+   * ```
    */
   createSessionToken(entry: Entry): string;
 
@@ -471,8 +853,11 @@ export class FileSystemProvider {
    * Returns the file system Entry that corresponds to the session token obtained from createSessionToken.
    * If an entry cannot be found that matches the token, then a Reference Error: token is not defined error is
    * thrown.
+   *
    * @param token
-   * @return The corresponding entry for the session token.
+   * @returns The corresponding entry for the session token.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#getentryforsessiontokentoken}
    */
   getEntryForSessionToken(token: string): Entry;
 
@@ -482,8 +867,19 @@ export class FileSystemProvider {
    * A persistent token is not guaranteed to last forever -- certain scenarios can cause the token to longer work
    * (including moving files, changing permissions, or OS-specific limitations).
    * If a persistent token cannot be reused, you'll get an error at the time of use.
+   *
    * @param entry
-   * @return The persistent token for the given entry.
+   * @returns The persistent token for the given entry.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#createpersistenttokenentry}
+   *
+   * @example
+   * ```js
+   * const fs = require('uxp').storage.localFileSystem;
+   * let entry = await fs.getFileForOpening();
+   * let token = await fs.createPersistentToken(entry);
+   * localStorage.setItem("persistent-file", token);
+   * ```
    */
   createPersistentToken(entry: Entry): Promise<string>;
 
@@ -496,16 +892,43 @@ export class FileSystemProvider {
    * You'll need to properly handle the case where the entry no longer exists on the disk, or the permissions have
    * changed by catching the appropriate errors.
    * If that occurs, the suggested practice is to prompt the user for the entry again and store the new token.
+   *
    * @param token
-   * @return The corresponding entry for the persistent token.
+   * @returns The corresponding entry for the persistent token.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#getentryforpersistenttokentoken}
+   *
+   * @example
+   * ```js
+   * const fs = require('uxp').storage.localFileSystem;
+   * let entry, contents, tries = 3, success = false;
+   * while (tries > 0) {
+   *   try {
+   *     entry = await fs.getEntryForPersistentToken(localStorage.getItem("persistent-file"));
+   *     contents = await entry.read();
+   *     tries = 0;
+   *     success = true;
+   *   } catch(err) {
+   *     entry = await fs.getFileForOpening();
+   *     localStorage.setItem("persistent-token", await fs.createPersistentToken(entry));
+   *     tries--;
+   *   }
+   * }
+   * if (!success) {
+   *   // fail gracefully somehow
+   * }
+   * ```
    */
   getEntryForPersistentToken(token: string): Promise<Entry>;
 
   /**
    * Gets an entry of the given url and returns the appropriate instance.
+   *
    * @param url
-   * @return The corresponding entry for the given url.
+   * @returns The corresponding entry for the given url.
    * @throws Error if invalid file url format or value is passed. if the file/folder does not exist at the url.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Persistent%20File%20Storage/FileSystemProvider/#getentrywithurlurl}
    *
    * @example
    * ```js
@@ -721,18 +1144,33 @@ interface Storage {
    * After encryption, it stores the key and the encrypted value pair.
    * When the value is requested with an associated key, it's retrieved after being decrypted.
    * Please note that the key is not encrypted thus it's not protected by the cryptographic operation.
+   *
+   * Caveats for SecureStorage are as follows:
+   *
+   * 1. Data in SecureStorage can be lost for various reasons. For an example, the user could uninstall the host application
+   *    and delete the secure storage. Or, the cryptographic information used by the secure storage could be damaged by the
+   *    user accidentally, and it will result in loss of data without the secure storage being removed. SecureStorage should
+   *    be regarded as a cache rather than a persistent storage. Data in SecureStorage should be able to be regenerated from
+   *    plugins after the time of loss.
+   * 2. SecureStorage is not an appropriate storage for sensitive data which wants to keep secret from the current user.
+   *    SecureStorage is protected under the current user's account credential. It means the encrypted data can be at risk
+   *    of being decrypted with the current user's privilege.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/uxp-api/reference-js/Modules/uxp/Key-Value%20Storage/SecureStorage/}
    */
   secureStorage: {
     /**
      * Returns number of items stored in the secure storage.
-     * @return Returns the number of items.
      */
     length: number;
 
     /**
      * Store a key and value pair after the value is encrypted in a secure storage.
+     *
      * @param key A key to set value.
      * @param value A value for a key.
+     * @returns Promise that resolves when the value is stored, rejected when the value is empty or not stored.
+     * @throws If either key or value doesn't have one of acceptable types.
      */
     setItem: (
       key: string,
@@ -741,27 +1179,34 @@ interface Storage {
 
     /**
      * Retrieve a value associated with a provided key after the value is being decrypted from a secure storage.
+     *
      * @param key A key to get value.
-     * @return A value as buffer.
+     * @returns A value as buffer.
+     * @throws If a key doesn't have an acceptable type.
      */
     getItem: (key: string) => Promise<Uint8Array>;
 
     /**
      * Remove a value associated with a provided key.
+     *
      * @param key A key to remove value.
+     * @returns Promise that resolves when the value associated with the key is removed, rejected when the value is neither removed nor found.
+     * @throws If a key doesn't have an acceptable type.
      */
     removeItem: (key: string) => Promise<void>;
 
     /**
      * Returns a key which is stored at the given index.
-     * @param index
-     * @return Returns the key which is stored at the given index.
+     *
+     * @param index Integer representing the number of the key.
+     * @returns Returns the key which is stored at the given index.
      */
     key: (index: number) => string;
 
     /**
      * Clear all values in a secure storage.
-     * @return Resolved when all the items are cleared.
+     *
+     * @returns Resolved when all the items are cleared.
      * Rejected when there is no item to clear or clear failed.
      */
     clear: () => Promise<void>;

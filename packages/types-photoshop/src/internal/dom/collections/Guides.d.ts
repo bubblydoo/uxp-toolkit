@@ -4,9 +4,12 @@ import type { Guide } from '../Guide';
 /**
  * A collections class allowing for array access into a document's guides
  *
- * Access this collection through [[Document.guides]] property. For example,
+ * Access this collection through {@link Document.guides} property. For example,
  * following adds a new guide to the collection:
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/guides/}
+ *
+ * @example
  * ```javascript
  * app.activeDocument.guides.add(Constants.Direction.HORIZONTAL, 20);
  * ```
@@ -36,7 +39,7 @@ export class Guides extends Array<Guide> {
     get: (obj: any, key: any) => any;
   };
   /**
-   * Number of [[Guide]] elements in this collection.
+   * Number of {@link Guide} elements in this collection.
    * @minVersion 23.0
    */
   get length(): number;

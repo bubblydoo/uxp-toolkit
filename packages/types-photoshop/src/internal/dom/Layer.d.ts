@@ -25,10 +25,14 @@ export enum PSLayerKind {
 /**
  * An object within a document that contains visual elements of the image, equivalent to a layer in Photoshop.
  *
- * You can access layers in a document using [[Document.layers]] collection.
+ * You can access layers in a document using Document.layers collection.
  *
- * If the object is representing a group layer, you can access it's children layers using [[Layer.layers]] property.
- * ```javascript
+ * If the object is representing a group layer, you can access it's children layers using Layer.layers property.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/}
+ *
+ * @example
+ * ```js
  * group.layers.forEach((layer) => {
  *   layer.visible = true;
  * })
@@ -41,114 +45,154 @@ export class Layer {
   private setLocking;
   /**
    * The class name of the referenced object: *"Layer"*.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#typename}
    * @minVersion 23.0
    */
   get typename(): 'Layer';
   /**
    * True if any property of this layer is locked.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#locked}
    * @minVersion 22.5
    */
   get locked(): boolean;
   /**
    * When set to true, prevents edits to pixels and properties of this layer.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#alllocked}
    * @minVersion 22.5
    */
   get allLocked(): boolean;
   set allLocked(locking: boolean);
   /**
    * When set to true, prevents the pixels of this layer from being edited.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#pixelslocked}
    * @minVersion 22.5
    */
   get pixelsLocked(): boolean;
   set pixelsLocked(locking: boolean);
   /**
    * When set to true, prevents the layer from being moved.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#positionlocked}
    * @minVersion 22.5
    */
   get positionLocked(): boolean;
   set positionLocked(locking: boolean);
   /**
-   * When set to true, prevents the transparent pixels from being edited
+   * When set to true, prevents the transparent pixels from being edited.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#transparentpixelslocked}
    * @minVersion 22.5
    */
   get transparentPixelsLocked(): boolean;
   set transparentPixelsLocked(locking: boolean);
   /**
    * True when the layer is the special Background layer.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#isbackgroundlayer}
    * @minVersion 22.5
    */
   get isBackgroundLayer(): boolean;
   /**
    * True when the layer is visible.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#visible}
    * @minVersion 22.5
    */
   get visible(): boolean;
   set visible(visible: boolean);
   /**
    * The kind of the layer.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#kind}
    * @minVersion 22.5
    */
   get kind(): Constants.LayerKind;
   /**
    * Bounds of the layer, including the effects.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#bounds}
    * @minVersion 22.5
    */
   get bounds(): ImagingBounds;
   /**
    * Bounds of the layer excluding effects.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#boundsnoeffects}
    * @minVersion 22.5
    */
   get boundsNoEffects(): ImagingBounds;
   /**
    * The master opacity of the layer, in percent.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#opacity}
    * @minVersion 22.5
    */
   get opacity(): number;
   set opacity(opacity: number);
   /**
    * The fill opacity of the layer, in percentage.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#fillopacity}
    * @minVersion 23.0
    */
   get fillOpacity(): number;
   set fillOpacity(opacity: number);
   /**
    * The density of the filter mask, in percentage.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#filtermaskdensity}
    * @minVersion 23.0
    */
   get filterMaskDensity(): number;
   set filterMaskDensity(density: number);
   /**
    * The feather of the filter mask between 0.0 and 1000.0.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#filtermaskfeather}
    * @minVersion 23.0
    */
   get filterMaskFeather(): number;
   set filterMaskFeather(feather: number);
   /**
    * The density of the layer mask, in percentage.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#layermaskdensity}
    * @minVersion 23.0
    */
   get layerMaskDensity(): number;
   set layerMaskDensity(density: number);
   /**
    * The feather of the layer mask between 0.0 and 1000.0.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#layermaskfeather}
    * @minVersion 23.0
    */
   get layerMaskFeather(): number;
   set layerMaskFeather(feather: number);
   /**
    * The density of the vector mask, in percentage.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#vectormaskdensity}
    * @minVersion 23.0
    */
   get vectorMaskDensity(): number;
   set vectorMaskDensity(density: number);
   /**
    * The feather of the vector mask between 0.0 and 1000.0.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#vectormaskfeather}
    * @minVersion 23.0
    */
   get vectorMaskFeather(): number;
   set vectorMaskFeather(feather: number);
   /**
-   * Whether the layer is being used as a clipping mask.
+   * Whether the layer is being used as a clipping mask. Releasing a clipping mask will also release the layers above.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#isclippingmask}
    * @minVersion 23.0
    */
   get isClippingMask(): boolean;
@@ -163,17 +207,23 @@ export class Layer {
    * - *Prior this version it was possible to set blend mode for background layer which turned it into regular
    * layer as a side effect and also changed its ID. Not it will throw error instead since these side effects
    * are not expected to happen*
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#blendmode}
    * @minVersion 22.5
    */
   get blendMode(): Constants.BlendMode;
   set blendMode(blendMode: Constants.BlendMode);
   /**
-   * Layers linked to this layer. See [[Layer.link]]
+   * Layers linked to this layer. See Layer.link
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#linkedlayers}
    * @minVersion 22.5
    */
   get linkedLayers(): Layers;
   /**
    * Name of the layer.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#name}
    * @minVersion 22.5
    */
   get name(): string;
@@ -184,17 +234,23 @@ export class Layer {
   set name(name: string);
   /**
    * ID of the layer, can be used for making batchPlay calls.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#id}
    * @minVersion 22.5
    */
   get id(): number;
   /**
    * The document that contains this layer.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#document}
    * @minVersion 23.0
    */
   get document(): Document;
   /**
    * The group layer that contains this layer.
    * It will return null if the layer is a top layer in the document.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#parent}
    * @minVersion 22.5
    */
   get parent(): Layer | null;
@@ -718,11 +774,17 @@ export class Layer {
   applyImage(applyImageOptions: ApplyImageOptions): Promise<void>;
   /**
    * Deletes this layer from the document.
-   * ```javascript
+   *
+   * @returns Number of layer elements deleted.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#delete}
+   *
+   * @example
+   * ```js
    * const layers = document.layers
    * layers && layers[0] && layers[0].delete()
    * ```
-   * @returns number of layer elements deleted
+   *
    * @minVersion 23.0
    */
   delete(): void;
@@ -730,15 +792,24 @@ export class Layer {
    * Duplicates the layer, creating a copy above it in layer stack,
    * and returns the newly created layer.
    *
-   * ```javascript
+   * @param relativeObject If specified, duplicate to a different document or relative to another layer.
+   * @param insertionLocation Where to insert the duplicated layer.
+   * @param name Name for the duplicated layer.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#duplicate}
+   *
+   * @example
+   * ```js
    * // duplicate a layer
    * const copyLayer = await layer.duplicate()
+   * ```
    *
+   * @example
+   * ```js
    * // extract to a new document
    * const exportDoc = psApp.documents[1]
    * const exportedLayer = await layer.duplicate(exportDoc)
    * ```
-   * @param targetDocument if specified, duplicate to a different document target.
    *
    * @async
    * @minVersion 23.0
@@ -752,23 +823,33 @@ export class Layer {
    * Creates a link between this layer and the target layer if not already linked,
    * and returns a list of layers linked to this layer.
    *
-   * ```javascript
+   * @param targetLayer The layer to link to.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#link}
+   *
+   * @example
+   * ```js
    * // link two layers together
    * const linkedLayers = strokes.link(fillLayer)
    * linkedLayers.forEach((layer) => console.log(layer.name))
-   * > "strokes"
-   * > "fillLayer"
+   * // "strokes"
+   * // "fillLayer"
    * ```
+   *
    * @minVersion 23.0
    */
   link(targetLayer: Layer): Layer[];
   /**
    * Unlinks the layer from any existing links.
    *
-   * ```javascript
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#unlink}
+   *
+   * @example
+   * ```js
    * // detach layer from any existing links
    * await layer.unlink()
    * ```
+   *
    * @async
    * @minVersion 23.0
    */
@@ -779,11 +860,18 @@ export class Layer {
    * "placeBefore" places the layer above relativeObject.
    * "placeInside" places the layer inside relativeObject if relativeObject is a group layer.
    * `ElementPlacement.PLACEINSIDE` is only valid when `relativeObject.kind === LayerKind.group`
+   *
+   * @param relativeObject The layer to move relative to.
+   * @param insertLocation Where to place the layer.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#move}
    * @minVersion 23.0
    */
   move(relativeObject: Layer, insertLocation: Constants.ElementPlacement): void;
   /**
    * Moves the layer to a position above the topmost layer or group.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#bringtofront}
    * @minVersion 23.0
    */
   bringToFront(): void;
@@ -791,23 +879,32 @@ export class Layer {
    * Moves the layer to the bottom. If the bottom layer is the
    * background, it will move the layer to the position above the background.
    * If it is in a group, it will move to the bottom of the group.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#sendtoback}
    * @minVersion 23.0
    */
   sendToBack(): void;
   /**
    * Moves the layer (translation).
    *
-   * ```javascript
+   * @param horizontal Numeric value to offset layer by in pixels or percent.
+   * @param vertical Numeric value to offset layer by in pixels or percent.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#translate}
+   *
+   * @example
+   * ```js
    * // Translate the layer to the left by 200px
    * await layer.translate(-200, 0)
+   * ```
    *
+   * @example
+   * ```js
    * // move the layer one height down
    * let xOffsetPct = {_unit: "percentUnit", _value: 0};
    * let yOffsetPct = {_unit: "percentUnit", _value: 100};
    * await layer.translate(xOffsetPct, yOffsetPct);
    * ```
-   * @param horizontal Numeric value to offset layer by in pixels or percent
-   * @param vertical Numeric value to offset layer by in pixels or percent
    *
    * @async
    * @minVersion 23.0
@@ -819,14 +916,19 @@ export class Layer {
   /**
    * Flips the layer on one or both axis.
    *
-   * ```javascript
-   * // flip horizontally
-   * await layer.flip.horizontal()
-   * ```
    * @param axis Which axis (or both) to flip the layer on.
    *             - "horizontal": flip layer on horizontal axis
    *             - "vertical": flip layer on vertical axis
    *             - "both": flip layer on both axes
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#flip}
+   *
+   * @example
+   * ```js
+   * // flip horizontally
+   * await layer.flip('horizontal');
+   * ```
+   *
    * @async
    * @minVersion 23.0
    */
@@ -836,17 +938,20 @@ export class Layer {
    *
    * Renamed from `resize` in ExtendScript.
    *
-   * ```javascript
-   * await layer.scale(80, 80)
+   * @param width Numeric percentage to scale layer horizontally.
+   * @param height Numeric percentage to scale layer vertically.
+   * @param anchor Anchor position to rotate around.
+   * @param options.interpolation Interpolation method to use when resampling the image.
    *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#scale}
+   *
+   * @example
+   * ```js
+   * await layer.scale(80, 80)
    * // Scale the layer to be a quarter of the size relative to bottom left corner
    * let anchorPos = require('photoshop').constants.AnchorPosition
    * await layer.scale(50, 50, anchorPos.BOTTOMLEFT)
    * ```
-   * @param width Numeric percentage to scale layer horizontally
-   * @param height Numeric percentage to scale layer vertically
-   * @param anchor Anchor position to rotate around
-   * @param options.interpolation Interpolation method to use when resampling the image
    *
    * @async
    * @minVersion 23.0
@@ -862,17 +967,20 @@ export class Layer {
   /**
    * Rotates the layer.
    *
-   * ```javascript
+   * @param angle Angle to rotate the layer by in degrees.
+   * @param anchor Anchor position to rotate around.
+   * @param options.interpolation Interpolation method to use when resampling the image.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#rotate}
+   *
+   * @example
+   * ```js
    * // rotate 90 deg counter clockwise
    * await layer.rotate(-90)
-   *
    * // rotate 90 deg clockwise relative to top left corner
    * let anchorPos = require('photoshop').constants.AnchorPosition
    * await layer.rotate(90, anchorPos.TOPLEFT)
    * ```
-   * @param angle Angle to rotate the layer by in degrees
-   * @param anchor Anchor position to rotate around
-   * @param options.interpolation Interpolation method to use when resampling the image
    *
    * @async
    * @minVersion 23.0
@@ -883,13 +991,17 @@ export class Layer {
   /**
    * Applies a skew to the layer.
    *
-   * ```javascript
-   * // parellelogram shape
+   * @param angleH Horizontal angle to skew by.
+   * @param angleV Vertical angle to skew by.
+   * @param options.interpolation Interpolation method to use when resampling the image.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#skew}
+   *
+   * @example
+   * ```js
+   * // parallelogram shape
    * await layer.skew(-15, 0)
    * ```
-   * @param angleH Horizontal angle to skew by
-   * @param angleV Vertical angle to skew by
-   * @param option.interpolation Interpolation method to use when resampling the image
    *
    * @async
    * @minVersion 23.0
@@ -901,6 +1013,8 @@ export class Layer {
    * Clears the layer pixels and does not copy to the clipboard.
    * If no pixel selection is found, select all pixels and clear.
    *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#clear}
+   *
    * @async
    * @minVersion 23.0
    */
@@ -909,16 +1023,24 @@ export class Layer {
    * Copies the layer to the clipboard. When the optional argument is set to true, a
    * merged copy is performed (that is, all visible layers are copied to the clipboard).
    *
-   * ```javascript
+   * @param merge Whether to perform a merged copy.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#copy}
+   *
+   * @example
+   * ```js
    * await layer.copy(true)
    * await layer.copy()
    * ```
+   *
    * @async
    * @minVersion 23.0
    */
   copy(merge?: boolean): Promise<void>;
   /**
    * Cuts the layer contents to the clipboard. If no selection is found then select all the pixels and then cut.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#cut}
    *
    * @async
    * @minVersion 23.0
@@ -929,6 +1051,8 @@ export class Layer {
    * layers are selected, they will be merged together. If one layer is selected,
    * it is merged down with the layer beneath. In this case, the layer below must
    * be a pixel layer. The merged layer will now be the active layer.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layer/#merge}
    *
    * @async
    * @minVersion 23.0

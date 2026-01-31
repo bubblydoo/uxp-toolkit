@@ -12,6 +12,32 @@ import type { PreferencesUnitsAndRulers } from './PreferencesUnitsAndRulers';
 /**
  * Contains Photoshop preferences grouped into several categories similar to preferences in user interface.
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/preferences/}
+ *
+ * @example
+ * ```javascript
+ * // Access general preferences
+ * const prefs = app.preferences;
+ * console.log(`Auto-update documents: ${prefs.general.autoUpdateOpenDocuments}`);
+ * prefs.general.exportClipboard = true;
+ * ```
+ *
+ * @example
+ * ```javascript
+ * // Configure interface preferences
+ * const prefs = app.preferences;
+ * prefs.interface.showTransformControls = true;
+ * prefs.interface.enableNarrowOptionBar = false;
+ * ```
+ *
+ * @example
+ * ```javascript
+ * // Set units and rulers
+ * const prefs = app.preferences;
+ * prefs.unitsAndRulers.rulerUnits = constants.Units.PIXELS;
+ * prefs.unitsAndRulers.typeUnits = constants.TypeUnits.POINTS;
+ * ```
+ *
  * @minVersion 24.0
  */
 export class Preferences {

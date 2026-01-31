@@ -2,9 +2,12 @@ import type { ColorSampler } from '../ColorSampler';
 /**
  * A collections class allowing for array access into a document's ColorSamplers
  *
- * Access this collection through the [[Document.colorSamplers]] property. For instance,
+ * Access this collection through the {@link Document.colorSamplers} property. For instance,
  * the following adds a new colorSampler to the collection:
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/colorsamplers/}
+ *
+ * @example
  * ```javascript
  * const app = require("photoshop").app;
  * app.activeDocument.colorSamplers.add({x: 20, y: 20});
@@ -14,8 +17,9 @@ import type { ColorSampler } from '../ColorSampler';
  * and then queried for its properties.
  * For example, the following gets the first colorSampler in the collection, and then
  * unpacks its `color` and `position` properties via a destructuring assignment to get
- * the sampled color as a [[SolidColor]] object and its current position as an `{x, y}` object:
+ * the sampled color as a {@link SolidColor} object and its current position as an `{x, y}` object:
  *
+ * @example
  * ```javascript
  * const cs = app.activeDocument.colorSamplers[0];
  * const { color, position } = cs; // destructuring assignment
@@ -54,7 +58,7 @@ export class ColorSamplers extends Array<ColorSampler> {
     get: (obj: any, key: any) => any;
   };
   /**
-   * Number of [[ColorSampler]] elements in this collection.
+   * Number of {@link ColorSampler} elements in this collection.
    * ```javascript
    * // A new document starts with no colorSamplers
    * app.activeDocument.colorSamplers.length; // returns 0
@@ -63,12 +67,12 @@ export class ColorSamplers extends Array<ColorSampler> {
    */
   get length(): number;
   /**
-   * The owner [[Document]] of this ColorSamplers collection.
+   * The owner {@link Document} of this ColorSamplers collection.
    * @minVersion 24.0
    */
   get parent(): Document;
   /**
-   * Adds a [[ColorSampler]] to the collection at the given `{x, y}` coordinates in pixels.
+   * Adds a {@link ColorSampler} to the collection at the given `{x, y}` coordinates in pixels.
    *
    * ```javascript
    * app.activeDocument.colorSamplers.add({x: 20, y: 20});

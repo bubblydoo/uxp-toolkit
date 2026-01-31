@@ -3,6 +3,7 @@ import { PreferencesBase } from './PreferencesBase';
 /**
  * Preferences related to the text and mostly text layers
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/preferences/#type}
  * @targetfolder classes/preferences
  * @minVersion 24.0
  */

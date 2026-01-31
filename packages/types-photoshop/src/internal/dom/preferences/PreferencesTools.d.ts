@@ -2,6 +2,7 @@ import { PreferencesBase } from './PreferencesBase';
 /**
  * Tools preferences
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/preferences/#tools}
  * @targetfolder classes/preferences
  * @minVersion 24.0
  */

@@ -1,7 +1,19 @@
 import type * as Constants from '../Constants';
 import type { SolidColor } from './SolidColor';
 /**
- * Options for saving a document in BMP format using the [[Document.saveAs]] method
+ * Options for saving a document in BMP format using the {@link Document.saveAs} method
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#saveas}
+ *
+ * @example
+ * ```javascript
+ * const doc = app.activeDocument;
+ * const saveFile = await require('uxp').storage.localFileSystem.getFileForSaving("image.bmp");
+ * const saveOptions = new BMPSaveOptions();
+ * saveOptions.depth = constants.BMPDepthType.BMP_24BITS;
+ * saveOptions.osType = constants.OperatingSystem.WINDOWS;
+ * await doc.saveAs.bmp(saveFile, saveOptions);
+ * ```
  *
  * @targetfolder objects/saveoptions
  * @minVersion 22.5
@@ -52,6 +64,20 @@ export class BMPSaveOptions {
   constructor();
 }
 /**
+ * Options for saving a document in JPEG format using the {@link Document.saveAs} method
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#saveas}
+ *
+ * @example
+ * ```javascript
+ * const doc = app.activeDocument;
+ * const saveFile = await require('uxp').storage.localFileSystem.getFileForSaving("image.jpg");
+ * const saveOptions = new JPEGSaveOptions();
+ * saveOptions.quality = 10;
+ * saveOptions.embedColorProfile = true;
+ * await doc.saveAs.jpg(saveFile, saveOptions);
+ * ```
+ *
  * @targetfolder objects/saveoptions
  * @optionobject
  * @minVersion 22.5
@@ -124,6 +150,21 @@ export class JPEGSaveOptions {
   constructor();
 }
 /**
+ * Options for saving a document in GIF format using the {@link Document.saveAs} method
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#saveas}
+ *
+ * @example
+ * ```javascript
+ * const doc = app.activeDocument;
+ * const saveFile = await require('uxp').storage.localFileSystem.getFileForSaving("image.gif");
+ * const saveOptions = new GIFSaveOptions();
+ * saveOptions.colors = 256;
+ * saveOptions.transparency = true;
+ * saveOptions.interlaced = false;
+ * await doc.saveAs.gif(saveFile, saveOptions);
+ * ```
+ *
  * @targetfolder objects/saveoptions
  * @optionobject
  * @minVersion 22.5
@@ -209,6 +250,20 @@ export class GIFSaveOptions {
   constructor();
 }
 /**
+ * Options for saving a document in PNG format using the {@link Document.saveAs} method
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#saveas}
+ *
+ * @example
+ * ```javascript
+ * const doc = app.activeDocument;
+ * const saveFile = await require('uxp').storage.localFileSystem.getFileForSaving("image.png");
+ * const saveOptions = new PNGSaveOptions();
+ * saveOptions.compression = 6;
+ * saveOptions.interlaced = false;
+ * await doc.saveAs.png(saveFile, saveOptions);
+ * ```
+ *
  * @targetfolder objects/saveoptions
  * @optionobject
  * @minVersion 22.5
@@ -249,6 +304,21 @@ export class PNGSaveOptions {
   get typename(): 'PNGSaveOptions';
 }
 /**
+ * Options for saving a document in Photoshop (PSD) format using the {@link Document.saveAs} method
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/document/#saveas}
+ *
+ * @example
+ * ```javascript
+ * const doc = app.activeDocument;
+ * const saveFile = await require('uxp').storage.localFileSystem.getFileForSaving("document.psd");
+ * const saveOptions = new PhotoshopSaveOptions();
+ * saveOptions.layers = true;
+ * saveOptions.embedColorProfile = true;
+ * saveOptions.maximizeCompatibility = true;
+ * await doc.saveAs.psd(saveFile, saveOptions);
+ * ```
+ *
  * @targetfolder objects/saveoptions
  * @optionobject
  * @minVersion 22.5

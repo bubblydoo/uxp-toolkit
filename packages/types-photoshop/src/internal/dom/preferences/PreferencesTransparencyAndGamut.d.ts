@@ -3,6 +3,7 @@ import { PreferencesBase } from './PreferencesBase';
 /**
  * Preferences how transparency will be shown and what color to use for out of gamut warning
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/preferences/#transparencyandgamut}
  * @targetfolder classes/preferences
  * @minVersion 24.0
  */

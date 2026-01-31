@@ -3,6 +3,7 @@ import { PreferencesBase } from './PreferencesBase';
 /**
  * Preferences how guides, grids and slices will be shown
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/preferences/#guidesgridsandslices}
  * @targetfolder classes/preferences
  * @minVersion 24.0
  */

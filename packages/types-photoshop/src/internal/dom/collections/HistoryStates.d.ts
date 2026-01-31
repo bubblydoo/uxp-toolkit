@@ -3,6 +3,9 @@ import type { HistoryState } from '../HistoryState';
  * A collections class allowing for array access into a document's history states,
  * while also providing familiar methods from ExtendScript, like `getByName`
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/historystates/}
+ *
+ * @example
  * ```javascript
  * // Iterate through all history states
  * app.activeDocument.historyStates.forEach(h => console.log(h.name));
@@ -41,7 +44,7 @@ export class HistoryStates extends Array<HistoryState> {
    */
   getByName(name: string): HistoryState;
   /**
-   * Number of [[HistoryState]] elements in this collection.
+   * Number of {@link HistoryState} elements in this collection.
    * @minVersion 22.5
    */
   get length(): number;

@@ -3,6 +3,7 @@ import { PreferencesBase } from './PreferencesBase';
 /**
  * User interface preferences
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/preferences/#interface}
  * @targetfolder classes/preferences
  * @minVersion 24.0
  */

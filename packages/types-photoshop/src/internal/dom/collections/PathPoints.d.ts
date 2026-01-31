@@ -1,7 +1,9 @@
 import type { PathPoint } from '../PathPoint';
 import type { SubPathItem } from '../SubPathItem';
 /**
- * A collection of [[PathPoint]] objects that define a subpath, kept in the [[SubPathItem.pathPoints]] property.
+ * A collection of {@link PathPoint} objects that define a subpath, kept in the {@link SubPathItem.pathPoints} property.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/pathpoints/}
  */
 export class PathPoints extends Array<PathPoint> {
   /**

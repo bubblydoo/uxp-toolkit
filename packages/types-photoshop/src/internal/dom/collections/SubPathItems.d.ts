@@ -1,11 +1,13 @@
 import type { PathItem } from '../PathItem';
 import type { SubPathItem } from '../SubPathItem';
 /**
- * A collection of [[SubPathItem]] objects that make up a [[PathItem]]. Access this object in the
- * [[PathItem.subPathItems]] collection property.
+ * A collection of {@link SubPathItem} objects that make up a {@link PathItem}. Access this object in the
+ * {@link PathItem.subPathItems} collection property.
  *
- *  - Use [[SubPathInfo]] to create subpaths; the properties are writeable.
- *  - Use the [[SubPathItem]] object to retrieve information about existing subpaths. The properties are read-only.
+ *  - Use {@link SubPathInfo} to create subpaths; the properties are writeable.
+ *  - Use the {@link SubPathItem} object to retrieve information about existing subpaths. The properties are read-only.
+ *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/subpathitems/}
  */
 export class SubPathItems extends Array<SubPathItem> {
   /**

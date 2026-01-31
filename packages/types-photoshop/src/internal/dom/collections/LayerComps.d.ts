@@ -4,9 +4,12 @@ import type { LayerCompCreateOptions } from '../types/LayerCompTypes';
 /**
  * A collections class allowing for array access into a document's Layer Comps
  *
- * Access this collection through [[Document.layerComps]] property. For example,
+ * Access this collection through {@link Document.layerComps} property. For example,
  * following adds a new Layer Comp to the collection:
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/layercomps/}
+ *
+ * @example
  * ```javascript
  * const comp = await app.activeDocument.layerComps.add();
  * ```
@@ -43,7 +46,7 @@ export class LayerComps extends Array<LayerComp> {
    */
   get typename(): 'LayerComps';
   /**
-   * Number of [[LayerComp]] elements in this collection
+   * Number of {@link LayerComp} elements in this collection
    *
    * @minVersion 24.0
    */
@@ -59,7 +62,7 @@ export class LayerComps extends Array<LayerComp> {
    *
    * Note: This command will fail if the document is flat, that is, only a Background and no other layers.
    *
-   * @param options An optional object literal containing key/value pairs as described by [[LayerCompCreateOptions]]
+   * @param options An optional object literal containing key/value pairs as described by {@link LayerCompCreateOptions}
    * ```javascript
    * const options = {
    *   name: "mockup",

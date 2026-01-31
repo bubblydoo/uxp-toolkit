@@ -6,6 +6,9 @@ import type { DocumentCreateOptions } from '../types/DocumentTypes';
  * list of documents that are currently open,
  * while also providing familiar methods from ExtendScript, like `getByName`.
  *
+ * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/documents/}
+ *
+ * @example
  * ```javascript
  * // Iterate through all the documents
  * app.documents.forEach(h => console.log(h.title));
@@ -27,21 +30,29 @@ export class Documents extends Array<Document> {
   };
   /**
    * Find the first document with the matching name.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/documents/#getbyname}
    * @minVersion 22.5
    */
   getByName(name: string): Document;
   /**
-   * Number of [[Document]] elements in this collection.
+   * Number of {@link Document} elements in this collection.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/documents/#length}
    * @minVersion 22.5
    */
   get length(): number;
   /**
    * The owner application of this Documents collection.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/documents/#parent}
    * @minVersion 22.5
    */
   get parent(): Photoshop;
   /**
    * The name for this object collection: Documents.
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/documents/#typename}
    * @minVersion 22.5
    */
   get typename(): 'Documents';
@@ -59,6 +70,11 @@ export class Documents extends Array<Document> {
    * resolution 300 pixels per inch, mode: @RGBColorMode and a fill of white with
    * no transparency.
    *
+   * @param options @DocumentCreateOptions
+   *
+   * @see {@link https://developer.adobe.com/photoshop/uxp/2022/ps_reference/classes/documents/#add}
+   *
+   * @example
    * ```javascript
    * // "Default Photoshop Size" 7x5 inches at 300ppi
    * let newDoc1 = await app.documents.add();
@@ -71,8 +87,8 @@ export class Documents extends Array<Document> {
    * });
    * let newDoc3 = await app.documents.add({preset: "My Default Size 1"});
    * ```
+   *
    * @async
-   * @param options @DocumentCreateOptions
    * @minVersion 22.5
    */
   add(options?: DocumentCreateOptions): Promise<Document | null>;
