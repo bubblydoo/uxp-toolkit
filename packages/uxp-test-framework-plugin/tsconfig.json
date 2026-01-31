@@ -4,7 +4,8 @@
     "target": "ESNext",
     "jsx": "react-jsx",
     "module": "ESNext",
-    "types": ["@adobe/cc-ext-uxp-types", "photoshop", "node", "react", "react-dom"],
+    "typeRoots": ["./node_modules/@adobe-uxp-types", "./node_modules/@types"],
+    "types": ["photoshop", "uxp", "node", "react", "react-dom"],
     "allowJs": true,
     "checkJs": true
   },

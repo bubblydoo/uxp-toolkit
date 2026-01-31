@@ -37,4 +37,14 @@ export default antfu(
       uxp: uxpPlugin,
     },
   },
+  {
+    files: [
+      'packages/types-photoshop/**/*.d.ts',
+      'packages/types-uxp/**/*.d.ts',
+    ],
+    rules: {
+      'ts/method-signature-style': 'warn',
+      'accessor-pairs': 'warn',
+    },
+  },
 );

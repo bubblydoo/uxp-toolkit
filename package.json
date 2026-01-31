@@ -8,7 +8,8 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^7.2.0",

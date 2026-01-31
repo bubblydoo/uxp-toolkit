@@ -1,4 +1,4 @@
-import type { Document } from 'photoshop/dom/Document';
+import type { Document } from 'photoshop';
 import { action, app } from 'photoshop';
 import { useSyncExternalStore } from 'react';
 

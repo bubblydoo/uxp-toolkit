@@ -7,7 +7,8 @@
     "dev": "cross-env MODE=dev vite build --watch",
     "build": "cross-env MODE=build vite build",
     "ccx": "cross-env MODE=package vite build",
-    "zip": "cross-env MODE=zip vite build"
+    "zip": "cross-env MODE=zip vite build",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@bubblydoo/uxp-polyfills": "workspace:^",
@@ -21,10 +22,10 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@adobe/cc-ext-uxp-types": "https://github.com/justintaylor-dev/cc-ext-uxp-types.git",
+    "@adobe-uxp-types/photoshop": "workspace:*",
+    "@adobe-uxp-types/uxp": "workspace:*",
     "@bubblydoo/tsconfig": "workspace:*",
     "@types/node": "^20.8.7",
-    "@types/photoshop": "^25.0.2",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
     "@types/ws": "^8.5.8",

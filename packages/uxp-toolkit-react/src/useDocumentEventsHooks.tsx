@@ -1,4 +1,4 @@
-import type { Document } from 'photoshop/dom/Document';
+import type { Document } from 'photoshop';
 import {
   DOCUMENT_EDITED_EVENTS,
   DOCUMENT_LAYERS_EDITED_EVENTS,

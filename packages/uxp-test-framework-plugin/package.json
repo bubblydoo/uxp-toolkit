@@ -25,7 +25,8 @@
     "src-plugin"
   ],
   "scripts": {
-    "build": "rm -rf dist-vite && pnpm exec rollup -c && cp cli.d.ts dist-vite/cli.d.ts"
+    "build": "rm -rf dist-vite && pnpm exec rollup -c && cp cli.d.ts dist-vite/cli.d.ts",
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "@bubblydoo/uxp-toolkit": "workspace:*"
@@ -37,7 +38,8 @@
     "vite": "^6.4.1"
   },
   "devDependencies": {
-    "@adobe/cc-ext-uxp-types": "https://github.com/justintaylor-dev/cc-ext-uxp-types.git",
+    "@adobe-uxp-types/photoshop": "workspace:*",
+    "@adobe-uxp-types/uxp": "workspace:*",
     "@babel/preset-typescript": "^7.28.5",
     "@bubblydoo/tsconfig": "workspace:*",
     "@bubblydoo/uxp-polyfills": "workspace:*",
@@ -48,7 +50,6 @@
     "@rollup/plugin-typescript": "^12.1.2",
     "@tanstack/react-query": "^5.90.20",
     "@types/node": "^20.8.7",
-    "@types/photoshop": "^25.0.2",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
     "@types/ws": "^8.5.8",

@@ -9,6 +9,9 @@
       "dependsOn": ["^test"],
       "outputs": ["test-results/**"],
       "env": ["CI"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
     }
   }
 }

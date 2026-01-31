@@ -24,7 +24,8 @@
     "build": "tsup",
     "test": "vitest run",
     "uxp-test:build": "uxp-test build",
-    "uxp-test:dev": "uxp-test dev"
+    "uxp-test:dev": "uxp-test dev",
+    "typecheck": "tsc --noEmit"
   },
   "publishConfig": {
     "access": "public",
@@ -49,12 +50,12 @@
     "xmlbuilder2": "^4.0.3"
   },
   "devDependencies": {
-    "@adobe-uxp-types/uxp": "^0.0.9",
+    "@adobe-uxp-types/photoshop": "workspace:*",
+    "@adobe-uxp-types/uxp": "workspace:*",
     "@bubblydoo/tsconfig": "workspace:*",
     "@bubblydoo/uxp-test-framework": "workspace:*",
     "@types/chai": "^5.2.3",
     "@types/node": "^20.8.7",
-    "@types/photoshop": "^25.0.2",
     "chai": "^6.2.2",
     "dedent": "^1.7.1",
     "rollup": "^4.57.0",
