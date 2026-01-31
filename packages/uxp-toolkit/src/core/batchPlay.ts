@@ -1,12 +1,7 @@
 import { action } from 'photoshop';
 
 type P = Parameters<typeof action.batchPlay>;
-
-export type CorrectBatchPlayOptions = P[1] & {
-  immediateRedraw?: boolean;
-};
-
-export async function batchPlay(actions: P[0], options?: CorrectBatchPlayOptions) {
+export async function batchPlay(actions: P[0], options?: P[1]) {
   return action.batchPlay(actions, {
     ...options,
     modalBehavior: 'execute',

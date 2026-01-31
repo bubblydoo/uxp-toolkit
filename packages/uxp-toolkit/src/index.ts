@@ -4,7 +4,7 @@ export { createMultiGetDocumentCommand } from './commands-library/multiGetDocume
 export { executeAsModalAndSuspendHistory } from './core-wrappers/executeAsModalAndSuspendHistory';
 
 // Core – batchPlay & command building
-export { batchPlay, type CorrectBatchPlayOptions } from './core/batchPlay';
+export { batchPlay } from './core/batchPlay';
 export {
   batchPlayCommand,
   batchPlayCommands,

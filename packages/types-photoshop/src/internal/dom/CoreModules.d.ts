@@ -67,6 +67,10 @@ export interface BatchPlayCommandOptions {
    * @minVersion 24.5
    */
   continueOnError?: boolean;
+  /**
+   * When true, then Photoshop will update its UI after all the descriptors have been executed.
+   */
+  immediateRedraw?: boolean;
 }
 export type CPUVendorKind = 'Intel' | 'AMD' | 'ARM' | 'Unknown';
 /**
