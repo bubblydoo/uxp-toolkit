@@ -156,9 +156,38 @@ importers:
 
   packages/tsconfig: {}
 
-  packages/types-photoshop: {}
+  packages/types-photoshop:
+    devDependencies:
+      '@adobe-uxp-types/uxp':
+        specifier: workspace:*
+        version: link:../types-uxp
+      '@bubblydoo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: ^20.8.7
+        version: 20.19.30
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.18
+        version: 4.0.18(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3)(yaml@2.8.2)
 
-  packages/types-uxp: {}
+  packages/types-uxp:
+    devDependencies:
+      '@bubblydoo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: ^20.8.7
+        version: 20.19.30
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.18
+        version: 4.0.18(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3)(yaml@2.8.2)
 
   packages/uxp-polyfills:
     devDependencies:

@@ -20,6 +20,17 @@
   },
   "types": "./src/index.d.ts",
   "files": [
-    "src"
-  ]
+    "src/**/*.d.ts"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@adobe-uxp-types/uxp": "workspace:*",
+    "@bubblydoo/tsconfig": "workspace:*",
+    "@types/node": "^20.8.7",
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.18"
+  }
 }

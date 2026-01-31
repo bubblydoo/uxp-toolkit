@@ -138,6 +138,14 @@ const layers = photoshopLayerDescriptorsToUTLayers(descriptors);
 ```
 
 
+### Types packages
+
+We publish our own types for the `uxp` and `photoshop` modules, which are based on other community efforts but adapted to be more accurate:
+
+```bash
+pnpm add @adobe-uxp-types/uxp @adobe-uxp-types/photoshop
+```
+
 ### Commands library
 
 We have a library of commands for common actions in Photoshop, which you can import from `@bubblydoo/uxp-toolkit/commands`.

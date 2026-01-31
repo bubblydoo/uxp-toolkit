@@ -44,7 +44,18 @@ export default antfu(
     ],
     rules: {
       'ts/method-signature-style': 'warn',
-      'accessor-pairs': 'warn',
+      'accessor-pairs': 'off',
+    },
+  },
+  {
+    files: [
+      'packages/types-photoshop/**/*.test-d.ts',
+      'packages/types-uxp/**/*.test-d.ts',
+    ],
+    rules: {
+      'ts/no-unused-expressions': 'off',
+      'unused-imports/no-unused-imports': 'off',
+      'unused-imports/no-unused-vars': 'off',
     },
   },
 );

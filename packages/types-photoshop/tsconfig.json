@@ -1,0 +1,9 @@
+{
+  "extends": "@bubblydoo/tsconfig/tsconfig.base.json",
+  "compilerOptions": {
+    "moduleDetection": "force",
+    "rootDir": ".",
+    "typeRoots": ["./node_modules/@adobe-uxp-types", "./node_modules/@types"]
+  },
+  "include": ["src"]
+}
