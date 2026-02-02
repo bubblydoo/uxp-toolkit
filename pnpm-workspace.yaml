@@ -1,6 +1,6 @@
 shellEmulator: true
 
-trustPolicy: no-downgrade
+trustPolicy: trust
 trustPolicyIgnoreAfter: 4320
 
 packages:

@@ -1,0 +1,45 @@
+{
+  "name": "@bubblydoo/uxp-cli",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "bin": {
+    "uxp-cli": "./dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "@bubblydoo/uxp-cli-common": "workspace:*",
+    "arg": "^5.0.2",
+    "chrome-remote-interface": "^0.33.3"
+  },
+  "devDependencies": {
+    "@bubblydoo/tsconfig": "workspace:*",
+    "@types/chrome-remote-interface": "^0.33.0",
+    "@types/node": "^20.8.7",
+    "tsup": "^8.3.5",
+    "typescript": "^5.8.3"
+  }
+}
