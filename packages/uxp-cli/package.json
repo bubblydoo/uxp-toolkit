@@ -2,7 +2,6 @@
   "name": "@bubblydoo/uxp-cli",
   "type": "module",
   "version": "0.0.2",
-  "private": true,
   "exports": {
     ".": {
       "types": "./src/index.ts",
