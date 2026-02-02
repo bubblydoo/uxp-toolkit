@@ -1,0 +1,58 @@
+{
+  "name": "@bubblydoo/photoshop-mcp",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "MCP server for Photoshop automation via Chrome DevTools Protocol",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "bin": {
+    "photoshop-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "dist-readmes",
+    "dist-runtime",
+    "dist-schemas"
+  ],
+  "scripts": {
+    "build": "tsup && tsup --config tsup-runtime.config.ts && tsx collect-schemas.ts && tsx collect-readmes.ts",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@bubblydoo/uxp-cli-common": "workspace:*",
+    "@hono/mcp": "^0.2.3",
+    "@hono/node-server": "^1.19.9",
+    "@modelcontextprotocol/sdk": "^1.25.3",
+    "chrome-remote-interface": "^0.33.3",
+    "esbuild": "^0.27.0",
+    "hono": "^4.11.7",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@adobe-uxp-types/photoshop": "workspace:*",
+    "@adobe-uxp-types/uxp": "workspace:*",
+    "@bubblydoo/tsconfig": "workspace:*",
+    "@bubblydoo/uxp-toolkit": "workspace:*",
+    "@types/chrome-remote-interface": "^0.33.0",
+    "@types/node": "^20.8.7",
+    "glob": "^13.0.0",
+    "tsup": "^8.3.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.8.3"
+  }
+}

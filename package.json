@@ -2,7 +2,7 @@
   "name": "@bubblydoo/uxp-toolkit-repo",
   "version": "0.0.0",
   "private": true,
-  "packageManager": "pnpm@10.21.0",
+  "packageManager": "pnpm@10.28.2",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
   "scripts": {
     "build": "turbo run build",

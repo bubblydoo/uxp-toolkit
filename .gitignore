@@ -15,3 +15,6 @@ docs.json
 
 # for eslint ignore
 dist-vite
+dist-runtime
+dist-schemas
+dist-readmes

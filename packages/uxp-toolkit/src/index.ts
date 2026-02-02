@@ -61,7 +61,7 @@ export {
 export { type PsLayerRef } from './ut-tree/psLayerRef';
 
 // UT tree – text
-export { utLayersToText as utTreeToText } from './ut-tree/utLayersToText';
+export { utLayersToText } from './ut-tree/utLayersToText';
 
 export {
   utLayersToTree,

@@ -11,10 +11,12 @@
   },
   "exports": {
     ".": {
+      "@bubblydoo/uxp-toolkit-repo-compiled": "./dist/index.js",
       "types": "./src/index.ts",
       "import": "./src/index.ts"
     },
     "./commands": {
+      "@bubblydoo/uxp-toolkit-repo-compiled": "./dist/commands-library/index.js",
       "types": "./src/commands-library/index.ts",
       "import": "./src/commands-library/index.ts"
     },

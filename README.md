@@ -139,6 +139,34 @@ const descriptors = await getDocumentLayerDescriptors(document.id);
 const layers = photoshopLayerDescriptorsToUTLayers(descriptors);
 ```
 
+### `utLayersToText`
+
+Convert a `UTLayer` tree to a human-readable text representation. This is useful for debugging, logging, and AI/LLM use cases where you need to represent the layer structure as text.
+
+```ts
+import { utLayersToText } from '@bubblydoo/uxp-toolkit';
+
+const text = utLayersToText(layers);
+console.log(text);
+```
+
+Output:
+```
+◯ Background
+◯ ▾ Header Group
+◯   Logo ƒ
+◯   ⬐ Title
+⊘   Subtitle ⁕
+◯ ▾ Content
+◯   Image
+```
+
+Icons:
+- `◯` visible / `⊘` hidden
+- `▾` group
+- `⬐` clipping mask
+- `ƒ` has layer effects
+- `⁕` non-default blend mode
 
 ### Types packages
 
@@ -327,19 +355,29 @@ Based on this, we created our own CLI. You can run this without installing anyth
 This can replace UXP Developer Tools.
 
 Open devtools with a "fake" plugin (doesn't have any functionality)
-```
+
+```bash
 pnpm --allow-build=@adobe-fixed-uxp/uxp-devtools-helper dlx @bubblydoo/uxp-cli open-devtools
 ```
 
 Open devtools with a custom plugin
-```
+
+```bash
 pnpm --allow-build=@adobe-fixed-uxp/uxp-devtools-helper dlx @bubblydoo/uxp-cli open-devtools --plugin-path ./my-plugin
 ```
 
 You can also just install it:
 
-```
+```bash
 pnpm add -D @bubblydoo/uxp-cli
 ```
 
 If you're using approved builds in pnpm, make sure to add `@adobe-fixed-uxp/uxp-devtools-helper` to the `onlyBuiltDependencies` in your `pnpm-workspace.yaml`. The postinstall script just unzips some binary proprietary Adobe files.
+
+### Photoshop MCP
+
+We have a MCP server for Photoshop automation via Chrome DevTools Protocol. It allows AI assistants to execute JavaScript code directly in Adobe Photoshop's UXP environment, but it also has access to UXP Toolkit and its commands, to the TypeScript schemas and these readmes.
+
+```bash
+pnpm --allow-build=@adobe-fixed-uxp/uxp-devtools-helper dlx @bubblydoo/photoshop-mcp
+```
