@@ -139,6 +139,34 @@ const descriptors = await getDocumentLayerDescriptors(document.id);
 const layers = photoshopLayerDescriptorsToUTLayers(descriptors);
 ```
 
+### `utLayersToText`
+
+Convert a `UTLayer` tree to a human-readable text representation. This is useful for debugging, logging, and AI/LLM use cases where you need to represent the layer structure as text.
+
+```ts
+import { utLayersToText } from '@bubblydoo/uxp-toolkit';
+
+const text = utLayersToText(layers);
+console.log(text);
+```
+
+Output:
+```
+◯ Background
+◯ ▾ Header Group
+◯   Logo ƒ
+◯   ⬐ Title
+⊘   Subtitle ⁕
+◯ ▾ Content
+◯   Image
+```
+
+Icons:
+- `◯` visible / `⊘` hidden
+- `▾` group
+- `⬐` clipping mask
+- `ƒ` has layer effects
+- `⁕` non-default blend mode
 
 ### Types packages
 

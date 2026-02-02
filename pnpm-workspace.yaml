@@ -2,8 +2,9 @@ shellEmulator: true
 
 trustPolicy: no-downgrade
 trustPolicyIgnoreAfter: 4320 # 3 days
-trustPolicyIgnore:
+trustPolicyExclude:
   - chokidar@4.0.3
+  - sass@1.97.3
 
 packages:
   - packages/*

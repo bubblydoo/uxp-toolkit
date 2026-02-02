@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@bubblydoo/tsconfig/tsconfig.base.json",
+  "compilerOptions": {
+    "customConditions": ["@bubblydoo/uxp-toolkit-repo-compiled"],
+    "typeRoots": ["./node_modules/@adobe-uxp-types", "./node_modules/@types"],
+    "types": ["uxp", "photoshop", "node"],
+    "noImplicitAny": false,
+    "noEmit": true
+  },
+  "include": ["runtime-src"]
+}
