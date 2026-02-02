@@ -1,7 +1,9 @@
 shellEmulator: true
 
-trustPolicy: trust
-trustPolicyIgnoreAfter: 4320
+trustPolicy: no-downgrade
+trustPolicyIgnoreAfter: 4320 # 3 days
+trustPolicyIgnore:
+  - chokidar@4.0.3
 
 packages:
   - packages/*
