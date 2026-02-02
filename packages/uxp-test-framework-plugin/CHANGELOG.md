@@ -1,5 +1,12 @@
 # @bubblydoo/uxp-test-framework-plugin
 
+## 0.0.11
+
+### Patch Changes
+
+- Updated dependencies [8e43414]
+  - @bubblydoo/uxp-toolkit@0.0.11
+
 ## 0.0.10
 
 ### Patch Changes

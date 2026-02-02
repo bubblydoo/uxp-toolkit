@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.11
+
+### Patch Changes
+
+- 8e43414: Add Photoshop mcp server
+
 ## 0.0.10
 
 ### Patch Changes
