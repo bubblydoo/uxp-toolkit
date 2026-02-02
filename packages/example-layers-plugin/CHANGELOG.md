@@ -1,5 +1,13 @@
 # @bubblydoo/example-layers-plugin
 
+## 0.0.11
+
+### Patch Changes
+
+- Updated dependencies [8e43414]
+  - @bubblydoo/uxp-toolkit@0.0.11
+  - @bubblydoo/uxp-toolkit-react@0.0.11
+
 ## 0.0.10
 
 ### Patch Changes
