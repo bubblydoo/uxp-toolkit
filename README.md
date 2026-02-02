@@ -11,6 +11,7 @@ With the code in this repo, we fix a few things:
 - A testing framework for UXP, which you can also use for your own tests.
 - Vitest integration for running unit tests without Photoshop, with CI/CD support.
 - Typescript types for the `uxp` and `photoshop` modules.
+- A fixed CLI for UXP.
 
 ```bash
 pnpm add @bubblydoo/uxp-toolkit
@@ -316,3 +317,29 @@ This package provides the following hooks:
 - `useIsPluginPanelVisible` and `useIsAnyPluginPanelVisible` – Whether a plugin panel is visible
 - `useApplicationInfoQuery` – React Query for Photoshop application info (e.g. panel list)
 - `useEventListenerSkippable` - Generic hook to subscribe to events with optional skip/filter so triggers can be queued or ignored
+
+### CLI
+
+We fixed the [official devtools package](https://github.com/adobe-uxp/devtools-cli), which had a lot of issues. You can find the fixed repo [here](https://github.com/bubblydoo/adobe-fixed-uxp-devtools).
+
+Based on this, we created our own CLI. You can run this without installing anything, just `pnpm`.
+
+This can replace UXP Developer Tools.
+
+Open devtools with a "fake" plugin (doesn't have any functionality)
+```
+pnpm --allow-build=@adobe-fixed-uxp/uxp-devtools-helper dlx @bubblydoo/uxp-cli open-devtools
+```
+
+Open devtools with a custom plugin
+```
+pnpm --allow-build=@adobe-fixed-uxp/uxp-devtools-helper dlx @bubblydoo/uxp-cli open-devtools --plugin-path ./my-plugin
+```
+
+You can also just install it:
+
+```
+pnpm add -D @bubblydoo/uxp-cli
+```
+
+If you're using approved builds in pnpm, make sure to add `@adobe-fixed-uxp/uxp-devtools-helper` to the `onlyBuiltDependencies` in your `pnpm-workspace.yaml`. The postinstall script just unzips some binary proprietary Adobe files.

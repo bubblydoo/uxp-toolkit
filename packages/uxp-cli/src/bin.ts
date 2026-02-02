@@ -22,7 +22,6 @@ Actions:
 
 Options:
   --plugin-path, -p <path>    Path to the UXP plugin directory
-  --plugin-id, -i <id>        Plugin ID
   --help, -h                  Show this help message
 
 Examples:
@@ -30,7 +29,7 @@ Examples:
   uxp-cli open-devtools
 
   # Open devtools with custom plugin
-  uxp-cli open-devtools --plugin-path ./my-plugin --plugin-id com.example.myplugin
+  uxp-cli open-devtools --plugin-path ./my-plugin
 
   # Dump object properties (always uses fake plugin)
   uxp-cli dump-object
@@ -61,10 +60,8 @@ if (!['open-devtools', 'dump-object'].includes(action)) {
 // Parse action-specific options
 const actionArgs = arg({
   '--plugin-path': String,
-  '--plugin-id': String,
   '--help': Boolean,
   '-p': '--plugin-path',
-  '-i': '--plugin-id',
   '-h': '--help',
 }, {
   argv: args._.slice(1),
@@ -77,26 +74,21 @@ if (actionArgs['--help']) {
 
 async function getPluginInfo(useFakePlugin: boolean) {
   const fakePluginPath = path.resolve(__dirname, '../../uxp-cli-common/fake-plugin');
-  const fakePluginId = 'co.bubblydoo.fake-plugin';
 
   if (useFakePlugin) {
     console.log('Using fake plugin:');
     console.log(`  Plugin Path: ${fakePluginPath}`);
-    console.log(`  Plugin ID: ${fakePluginId}`);
-    return { pluginPath: fakePluginPath, pluginId: fakePluginId };
+    return { pluginPath: fakePluginPath };
   }
 
   let pluginPath = actionArgs['--plugin-path'];
-  let pluginId = actionArgs['--plugin-id'];
 
   // Default to fake-plugin if not provided
-  if (!pluginPath || !pluginId) {
+  if (!pluginPath) {
     pluginPath = pluginPath || fakePluginPath;
-    pluginId = pluginId || fakePluginId;
 
     console.log('Using default fake plugin:');
     console.log(`  Plugin Path: ${pluginPath}`);
-    console.log(`  Plugin ID: ${pluginId}`);
   }
 
   // Ensure plugin path is absolute
@@ -113,7 +105,9 @@ async function getPluginInfo(useFakePlugin: boolean) {
     process.exit(1);
   }
 
-  return { pluginPath, pluginId };
+  const manifest = JSON.parse(await fs.readFile(path.resolve(pluginPath, 'manifest.json'), 'utf8'));
+
+  return { pluginPath, pluginId: manifest.id };
 }
 
 async function openDevtools() {
