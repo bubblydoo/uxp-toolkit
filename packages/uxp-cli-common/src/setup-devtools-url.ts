@@ -188,29 +188,68 @@ export async function setupDevtoolsUrl(pluginPath: string, ports: number[] = DEF
         console.error('Error unloading plugin:', error);
       }
 
-      // Stop the server (no public stop method, so we access private fields)
+      // Stop the server by accessing private fields (no public close method)
       try {
         const serverAny = server as unknown as {
-          _httpServer?: { close: (callback?: (err?: Error) => void) => void };
-          _io?: { close: () => void };
+          _httpServer?: {
+            close: (callback?: (err?: Error) => void) => void;
+            closeAllConnections?: () => void;
+          };
+          _io?: {
+            clients: Set<{ close: (code?: number, reason?: string) => void }>;
+            close: () => void;
+          };
         };
-        serverAny._io?.close();
-        await new Promise<void>((resolve, reject) => {
-          if (serverAny._httpServer) {
-            serverAny._httpServer.close((err) => {
-              if (err)
-                reject(err);
-              else resolve();
-            });
+
+        // Close all WebSocket clients (ws library uses .clients Set)
+        if (serverAny._io?.clients) {
+          for (const client of serverAny._io.clients) {
+            client.close(1000, 'Server shutting down');
           }
-          else {
+        }
+
+        // Close the WebSocket server
+        if (serverAny._io?.close) {
+          serverAny._io.close();
+        }
+
+        // Force close all HTTP keep-alive connections (Node.js 18.2+)
+        if (serverAny._httpServer?.closeAllConnections) {
+          serverAny._httpServer.closeAllConnections();
+        }
+
+        // Close the HTTP server with timeout
+        await Promise.race([
+          new Promise<void>((resolve, reject) => {
+            if (serverAny._httpServer) {
+              serverAny._httpServer.close((err) => {
+                if (err) reject(err);
+                else resolve();
+              });
+            }
+            else {
+              resolve();
+            }
+          }),
+          new Promise<void>(resolve => setTimeout(() => {
+            console.log('Server close timed out, continuing anyway');
             resolve();
-          }
-        });
+          }, 3000)),
+        ]);
         console.log('Server stopped');
       }
       catch (error) {
         console.error('Error stopping server:', error);
+      }
+
+      // Terminate the DevToolsHelper (Adobe Vulcan native library)
+      // This is crucial to prevent hanging handles
+      try {
+        devtoolsManager.terminate();
+        console.log('DevToolsHelper terminated');
+      }
+      catch (error) {
+        console.error('Error terminating DevToolsHelper:', error);
       }
     },
   };

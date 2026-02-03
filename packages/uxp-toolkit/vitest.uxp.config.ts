@@ -17,6 +17,7 @@ export default defineConfig({
     pool: cdpPool({
       debug: true,
       cdp: async () => {
+        // console.log('Setting up devtools URL');
         return await setupDevtoolsUrl(pluginPath);
       },
       executionContextOrSession: async (cdp) => {

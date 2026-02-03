@@ -54,12 +54,19 @@ export async function setupCdpConnection(
     disconnect: async () => {
       try {
         await cdp.close();
-        if (options.teardown) {
-          await options.teardown();
-        }
       }
       catch {
-        // Ignore close errors
+        // Ignore CDP close errors
+      }
+      if (options.teardown) {
+        try {
+          console.log('Tearing down devtools URL');
+          await options.teardown();
+          console.log('Teardown complete');
+        }
+        catch (error) {
+          console.error('Teardown error:', error);
+        }
       }
     },
   };
