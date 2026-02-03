@@ -26,23 +26,33 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:chrome": "node --import tsx ./node_modules/vitest/vitest.mjs run --config test/vitest-chrome.config.ts"
   },
   "peerDependencies": {
     "vitest": ">=4"
   },
   "dependencies": {
     "@bubblydoo/uxp-cli-common": "workspace:*",
+    "@vitest/expect": "^4.0.18",
+    "@vitest/runner": "^4.0.18",
+    "@vitest/utils": "^4.0.18",
     "birpc": "^4.0.0",
+    "chai": "^6.2.2",
     "chrome-remote-interface": "^0.33.3",
     "devalue": "^5.1.1",
-    "esbuild": "^0.24.0"
+    "esbuild": "^0.24.0",
+    "flatted": "^3.3.3",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@bubblydoo/tsconfig": "workspace:*",
+    "@types/chai": "^5.2.3",
     "@types/chrome-remote-interface": "^0.33.0",
     "@types/node": "^20.8.7",
+    "puppeteer": "^24.36.1",
     "tsup": "^8.3.5",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.3",
     "vitest": "^4.0.0"
   }

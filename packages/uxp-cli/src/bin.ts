@@ -4,7 +4,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { setupCdpSession, setupCdpSessionWithDefaults, setupDevtoolsUrl, waitForExecutionContextCreated } from '@bubblydoo/uxp-cli-common';
+import { setupCdpSession, setupCdpSessionWithUxpDefaults, setupDevtoolsUrl, waitForExecutionContextCreated } from '@bubblydoo/uxp-cli-common';
 import arg from 'arg';
 import { openDevtoolsSessionInChrome } from './open-devtools-session';
 
@@ -136,7 +136,7 @@ async function dumpObject() {
 
   const executionContextCreatedPromise = waitForExecutionContextCreated(cdp);
 
-  await setupCdpSessionWithDefaults(cdp);
+  await setupCdpSessionWithUxpDefaults(cdp);
 
   console.log('Waiting for execution context...');
   const executionContext = await executionContextCreatedPromise;

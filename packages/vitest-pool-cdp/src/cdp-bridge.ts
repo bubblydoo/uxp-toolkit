@@ -1,5 +1,6 @@
+import type CDP from 'chrome-remote-interface';
 import type { CdpConnection, CdpPoolOptions } from './types';
-import { setupCdpSession, setupCdpSessionWithDefaults, waitForExecutionContextCreated } from '@bubblydoo/uxp-cli-common';
+import { setupCdpSession, setupCdpSessionWithUxpDefaults, waitForExecutionContextCreated } from '@bubblydoo/uxp-cli-common';
 import { evaluateInCdp } from './cdp-util';
 
 /**
@@ -14,13 +15,28 @@ export async function setupCdpConnection(
 
   const cdp = await setupCdpSession(cdpUrl);
 
-  const executionContextCreatedPromise = waitForExecutionContextCreated(cdp);
+  const targetAttachedPromise = waitForAttachedToTarget(cdp);
 
-  await setupCdpSessionWithDefaults(cdp);
+  const executionContextPromise = waitForExecutionContextCreated(cdp).then(context => ({ uniqueId: context.uniqueId }));
+
+  executionContextPromise.then((context) => {
+    console.log('executionContextPromise', context);
+  });
+
+  await cdp.Target.setAutoAttach({ autoAttach: true, waitForDebuggerOnStart: true, flatten: true });
+  await cdp.Target.setDiscoverTargets({ discover: true });
+  await cdp.Target.setRemoteLocations({ locations: [{ host: 'localhost', port: 9293 }] });
+  await cdp.Runtime.runIfWaitingForDebugger();
+
+  const { sessionId } = await targetAttachedPromise;
+
+  await cdp.Network.enable({}, sessionId);
+  await cdp.Page.enable(sessionId);
+  await cdp.Runtime.enable(sessionId);
 
   return {
     cdp,
-    executionContextUniqueId: (await executionContextCreatedPromise).uniqueId!,
+    executionContext: { sessionId },
     disconnect: async () => {
       try {
         await cdp.close();
@@ -45,4 +61,12 @@ export async function injectWorkerRuntime(
   await evaluateInCdp(connection, workerCode, { awaitPromise: false, returnByValue: false });
 
   log('Worker runtime injected successfully');
+}
+
+export async function waitForAttachedToTarget(cdp: CDP.Client): Promise<{ sessionId: string; targetId: string }> {
+  return new Promise((resolve) => {
+    cdp.Target.on('attachedToTarget', (event) => {
+      resolve({ sessionId: event.sessionId, targetId: event.targetInfo.targetId });
+    });
+  });
 }

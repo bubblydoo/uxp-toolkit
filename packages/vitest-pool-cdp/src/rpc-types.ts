@@ -3,6 +3,8 @@
  * These types define the bidirectional function interfaces used by birpc.
  */
 
+import type { File } from '@vitest/runner';
+
 /**
  * Functions exposed by the worker (CDP context) that the pool can call.
  */
@@ -13,7 +15,25 @@ export interface WorkerFunctions {
   ping: () => 'pong';
 
   /**
-   * Evaluate arbitrary code in the CDP context.
+   * Store bundled test code for a file path.
+   * The code will be executed when the runner imports the file.
+   */
+  setBundledCode: (filepath: string, code: string) => void;
+
+  /**
+   * Run tests for the given file specs.
+   * Returns the File objects with test results.
+   */
+  runTests: (specs: string[]) => Promise<File[]>;
+
+  /**
+   * Collect tests without running them.
+   * Returns the File objects with collected test info.
+   */
+  collectTests: (specs: string[]) => Promise<File[]>;
+
+  /**
+   * Evaluate arbitrary code in the CDP context (for debugging).
    */
   eval: (code: string) => unknown;
 
@@ -28,10 +48,6 @@ export interface WorkerFunctions {
 
 /**
  * Functions exposed by the pool (Node.js) that the worker can call.
- * Currently empty but can be extended for features like:
- * - Reading files from the filesystem
- * - Logging to Node.js console
- * - Fetching resources
  */
 export interface PoolFunctions {
   /**
@@ -43,44 +59,10 @@ export interface PoolFunctions {
    * Read a file from the filesystem.
    */
   readFile: (path: string) => Promise<string>;
-}
 
-/**
- * Test result returned from CDP after running a test.
- */
-export interface TestResult {
-  name: string;
-  fullName: string;
-  status: 'pass' | 'fail' | 'skip';
-  duration: number;
-  error?: {
-    message: string;
-    stack?: string;
-    expected?: unknown;
-    actual?: unknown;
-  };
-}
-
-/**
- * Result of running all tests in a file.
- */
-export interface TestRunResult {
-  results: TestResult[];
-  passed: number;
-  failed: number;
-  skipped: number;
-  total: number;
-}
-
-/**
- * Collected test information (without running).
- */
-export interface CollectedTests {
-  tests: Array<{
-    name: string;
-    fullName: string;
-    skip: boolean;
-    only: boolean;
-  }>;
-  total: number;
+  /**
+   * Called when test tasks are updated (results, state changes).
+   * This allows the worker to report progress back to the pool.
+   */
+  onTaskUpdate: (packs: unknown[]) => Promise<void>;
 }

@@ -67,7 +67,13 @@ export const CDP_RECEIVE_FUNCTION = '__vitest_cdp_receive__';
  */
 export interface CdpConnection {
   cdp: CDP.Client;
-  executionContextUniqueId: string;
+  executionContext: {
+    uniqueId: string;
+  } | {
+    id: number;
+  } | {
+    sessionId: string;
+  };
   disconnect: () => Promise<void>;
 }
 

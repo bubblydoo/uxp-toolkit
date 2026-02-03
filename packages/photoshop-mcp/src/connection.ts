@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   setupCdpSession,
-  setupCdpSessionWithDefaults,
+  setupCdpSessionWithUxpDefaults,
   setupDevtoolsUrl,
   waitForExecutionContextCreated,
 } from '@bubblydoo/uxp-cli-common';
@@ -69,7 +69,7 @@ export async function getOrReusePhotoshopConnection(): Promise<PhotoshopConnecti
 
   const executionContextCreatedPromise = waitForExecutionContextCreated(cdp);
 
-  await setupCdpSessionWithDefaults(cdp);
+  await setupCdpSessionWithUxpDefaults(cdp);
 
   console.error('[photoshop-mcp] Waiting for execution context...');
   const executionContext = await executionContextCreatedPromise;

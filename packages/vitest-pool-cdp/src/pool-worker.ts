@@ -1,6 +1,8 @@
+import type { File, TaskEventPack, TaskResultPack } from '@vitest/runner';
 import type { BirpcReturn } from 'birpc';
+import type { RuntimeRPC } from 'vitest';
 import type { PoolOptions, PoolWorker, WorkerRequest } from 'vitest/node';
-import type { CollectedTests, PoolFunctions, TestResult, TestRunResult, WorkerFunctions } from './rpc-types';
+import type { PoolFunctions, WorkerFunctions } from './rpc-types';
 import type { CdpConnection, CdpPoolOptions, EventCallback } from './types';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
@@ -9,20 +11,19 @@ import { fileURLToPath } from 'node:url';
 import { createBirpc } from 'birpc';
 import * as devalue from 'devalue';
 import * as esbuild from 'esbuild';
+import * as flatted from 'flatted';
 import {
   injectWorkerRuntime,
   setupCdpConnection,
 } from './cdp-bridge';
 import { evaluateInCdp } from './cdp-util';
-import { TEST_RUNTIME_CODE } from './test-runtime';
 import { CDP_MESSAGE_PREFIX, CDP_RECEIVE_FUNCTION } from './types';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * Custom Vitest pool worker that communicates over CDP using birpc.
- * Uses a hybrid approach where test transformation happens in Node.js
- * and execution happens in the CDP context.
+ * Uses @vitest/runner in the CDP context for full Vitest compatibility.
  */
 export class CdpPoolWorker implements PoolWorker {
   name = 'cdp-pool';
@@ -35,7 +36,7 @@ export class CdpPoolWorker implements PoolWorker {
   private log: (...args: unknown[]) => void;
 
   /**
-   * birpc instance for communication with the worker.
+   * birpc instance for communication with the CDP worker.
    */
   private rpc: BirpcReturn<WorkerFunctions, PoolFunctions> | null = null;
 
@@ -44,6 +45,18 @@ export class CdpPoolWorker implements PoolWorker {
    * Receives serialized strings that birpc will deserialize.
    */
   private rpcMessageHandler: ((data: string) => void) | null = null;
+
+  /**
+   * birpc instance for communication with Vitest's pool runner.
+   * This is used to call onCollected, onTaskUpdate, etc.
+   */
+  private vitestRpc: BirpcReturn<RuntimeRPC, object> | null = null;
+
+  /**
+   * Message handler callback for Vitest birpc's `on` option.
+   * Receives messages from Vitest's pool runner.
+   */
+  private vitestRpcMessageHandler: ((data: unknown) => void) | null = null;
 
   constructor(poolOptions: PoolOptions, cdpOptions: CdpPoolOptions) {
     this.poolOptions = poolOptions;
@@ -95,13 +108,13 @@ export class CdpPoolWorker implements PoolWorker {
       const workerCode = await this.loadWorkerRuntime();
       await injectWorkerRuntime(this.connection, workerCode, this.log);
       this.workerInjected = true;
-
-      // Inject the test runtime (describe/it/expect/etc.)
-      await this.injectTestRuntime();
     }
 
-    // Create the birpc instance
+    // Create the birpc instance for CDP worker communication
     this.rpc = this.createRpc();
+
+    // Create the birpc instance for Vitest RPC communication
+    this.vitestRpc = this.createVitestRpc();
 
     // Verify the worker is ready
     const pingResult = await this.rpc.ping();
@@ -113,7 +126,7 @@ export class CdpPoolWorker implements PoolWorker {
   }
 
   /**
-   * Create the birpc instance for communication with the worker.
+   * Create the birpc instance for communication with the CDP worker.
    * Uses devalue for serialization to handle complex objects, dates, etc.
    */
   private createRpc(): BirpcReturn<WorkerFunctions, PoolFunctions> {
@@ -124,6 +137,12 @@ export class CdpPoolWorker implements PoolWorker {
 
       readFile: async (filePath: string) => {
         return fsp.readFile(filePath, 'utf-8');
+      },
+
+      onTaskUpdate: async (packs: unknown[]) => {
+        this.log('Task update received:', packs);
+        // Forward task updates to Vitest via the Vitest RPC channel
+        await this.forwardTaskUpdates(packs as TaskResultPack[]);
       },
     };
 
@@ -143,6 +162,109 @@ export class CdpPoolWorker implements PoolWorker {
         timeout: this.cdpOptions.rpcTimeout ?? 30000,
       },
     );
+  }
+
+  /**
+   * Incrementing message ID for Vitest RPC calls.
+   */
+  private vitestRpcMessageId = 0;
+
+  /**
+   * Create the birpc instance for communication with Vitest's pool runner.
+   * This is used to call onCollected, onTaskUpdate, etc.
+   *
+   * Note: We use flatted for serialization because File objects have circular
+   * references that Vitest expects to be preserved.
+   */
+  private createVitestRpc(): BirpcReturn<RuntimeRPC, object> {
+    return createBirpc<RuntimeRPC, object>(
+      {}, // We don't expose any functions to Vitest
+      {
+        post: (data: unknown) => {
+          // Send to Vitest via the message event
+          // Messages WITHOUT __vitest_worker_response__ are routed to the "rpc" event
+          this.log('Sending to Vitest RPC (pre-flatted):', JSON.stringify(data, this.circularReplacer()).slice(0, 200));
+          // Emit the data as-is - birpc on pool runner side will handle it
+          this.emit('message', data);
+        },
+        on: (fn) => {
+          this.vitestRpcMessageHandler = fn;
+        },
+        timeout: -1, // No timeout for Vitest RPC
+      },
+    );
+  }
+
+  /**
+   * Helper to create a JSON replacer that handles circular references for logging.
+   */
+  private circularReplacer() {
+    const seen = new WeakSet();
+    return (_key: string, value: unknown) => {
+      if (typeof value === 'object' && value !== null) {
+        if (seen.has(value)) {
+          return '[Circular]';
+        }
+        seen.add(value);
+      }
+      return value;
+    };
+  }
+
+  /**
+   * Restore circular references in File objects.
+   * Vitest expects file.tasks[].file to point back to file,
+   * and tasks to have suite references to their parent suite.
+   */
+  private restoreFileReferences(files: File[]): File[] {
+    const restoreTask = (task: File['tasks'][0], file: File, parentSuite?: File['tasks'][0]): void => {
+      // Restore file reference
+      (task as unknown as { file: File }).file = file;
+
+      // Restore suite reference for tests/suites
+      if (parentSuite && 'suite' in task) {
+        (task as unknown as { suite: File['tasks'][0] }).suite = parentSuite;
+      }
+
+      // Process nested tasks
+      if ('tasks' in task && task.tasks) {
+        for (const subtask of task.tasks) {
+          restoreTask(subtask, file, task);
+        }
+      }
+    };
+
+    for (const file of files) {
+      // File.file should point to itself
+      file.file = file;
+
+      // Restore references in all tasks
+      for (const task of file.tasks) {
+        restoreTask(task, file);
+      }
+    }
+
+    return files;
+  }
+
+  /**
+   * Forward task updates from the CDP worker to Vitest via the RPC channel.
+   */
+  private async forwardTaskUpdates(packs: TaskResultPack[]): Promise<void> {
+    if (!this.vitestRpc) {
+      this.log('Warning: vitestRpc not initialized, cannot forward task updates');
+      return;
+    }
+
+    for (const [taskId, result, meta] of packs) {
+      this.log(`Task ${taskId} updated:`, result, meta);
+    }
+
+    // Convert packs to events - each pack gets a corresponding event
+    const events: TaskEventPack[] = [];
+
+    // Call Vitest's onTaskUpdate RPC method
+    await this.vitestRpc.onTaskUpdate(packs, events);
   }
 
   /**
@@ -194,23 +316,6 @@ export class CdpPoolWorker implements PoolWorker {
   }
 
   /**
-   * Inject the test runtime (vitest-compatible describe/it/expect) into CDP.
-   */
-  private async injectTestRuntime(): Promise<void> {
-    if (!this.connection) {
-      throw new Error('CDP connection not established');
-    }
-
-    this.log('Injecting test runtime...');
-
-    this.log(TEST_RUNTIME_CODE);
-
-    await evaluateInCdp(this.connection, TEST_RUNTIME_CODE, { awaitPromise: true, returnByValue: true });
-
-    this.log('Test runtime injected successfully');
-  }
-
-  /**
    * Stop the worker by closing the CDP connection.
    */
   async stop(): Promise<void> {
@@ -218,6 +323,8 @@ export class CdpPoolWorker implements PoolWorker {
 
     this.rpc = null;
     this.rpcMessageHandler = null;
+    this.vitestRpc = null;
+    this.vitestRpcMessageHandler = null;
 
     if (this.connection) {
       await this.connection.disconnect();
@@ -232,18 +339,33 @@ export class CdpPoolWorker implements PoolWorker {
 
   /**
    * Send a message to the worker in the CDP context.
-   * This is called by Vitest with WorkerRequest messages.
+   * This is called by Vitest with WorkerRequest messages or birpc RPC messages.
    * We intercept these and handle them with our hybrid approach.
    */
   send(message: WorkerRequest): void {
     this.log('Received message from Vitest:', JSON.stringify(message).slice(0, 200));
 
-    // Handle Vitest worker requests
+    // Handle Vitest worker requests (control messages)
     if (this.isVitestWorkerRequest(message)) {
       this.handleVitestRequest(message).catch((error) => {
         console.error('[vitest-pool-cdp] Error handling Vitest request:', error);
         this.emit('error', error);
       });
+      return;
+    }
+
+    // Handle birpc RPC messages from Vitest (e.g., onCancel, or responses to our calls)
+    // These don't have __vitest_worker_request__ and are meant for the RPC channel
+    if (this.vitestRpcMessageHandler) {
+      this.log('Routing to Vitest RPC handler, message:', JSON.stringify(message).slice(0, 200));
+      try {
+        this.vitestRpcMessageHandler(message);
+        this.log('Vitest RPC handler completed');
+      }
+      catch (error) {
+        this.log('Vitest RPC handler threw error:', error);
+        throw error;
+      }
       return;
     }
 
@@ -285,31 +407,21 @@ export class CdpPoolWorker implements PoolWorker {
 
       this.log(`${method === 'run' ? 'Running' : 'Collecting'} tests for files:`, files);
 
-      for (const file of files) {
-        try {
-          await this.processTestFile(file, method);
-        }
-        catch (error) {
-          this.log(`Error processing ${file}:`, error);
-          // Report the error as a failed test
-          this.emitTestResult(file, {
-            name: path.basename(file),
-            fullName: file,
-            status: 'fail',
-            duration: 0,
-            error: {
-              message: error instanceof Error ? error.message : String(error),
-              stack: error instanceof Error ? error.stack : undefined,
-            },
-          });
-        }
+      try {
+        await this.processTestFiles(files, method);
+      }
+      catch (error) {
+        this.log('Error processing test files:', error);
+        this.emit('error', error);
       }
 
       // Signal that we're done with all files
+      this.log('Emitting done message');
       this.emit('message', {
         type: 'done',
-        __vitest_worker_request__: true,
+        __vitest_worker_response__: true,
       });
+      this.log('Done message emitted');
       return;
     }
 
@@ -317,53 +429,56 @@ export class CdpPoolWorker implements PoolWorker {
   }
 
   /**
-   * Process a single test file: bundle, send to CDP, execute, report results.
+   * Process test files: bundle, send to CDP, and run/collect via @vitest/runner.
    */
-  private async processTestFile(filePath: string, method: 'run' | 'collect'): Promise<void> {
+  private async processTestFiles(filePaths: string[], method: 'run' | 'collect'): Promise<void> {
     if (!this.rpc) {
       throw new Error('RPC not initialized');
     }
+    if (!this.vitestRpc) {
+      throw new Error('Vitest RPC not initialized');
+    }
 
-    this.log(`Processing test file: ${filePath}`);
+    // Bundle and send each test file to the worker
+    for (const filePath of filePaths) {
+      this.log(`Processing test file: ${filePath}`);
 
-    // Bundle the test file
-    const bundledCode = await this.bundleTestFile(filePath);
+      // Bundle the test file
+      const bundledCode = await this.bundleTestFile(filePath);
 
-    // Reset test state in CDP
-    await this.rpc.eval('__vitest_reset__()');
+      // Send the bundled code to the worker
+      await this.rpc.setBundledCode(filePath, bundledCode);
+    }
 
-    // Execute the bundled test code (this registers describe/it)
-    this.log('Executing test code in CDP...');
-    await this.rpc.eval(bundledCode);
-
-    if (method === 'collect') {
-      // Just collect test info without running
-      const collected = await this.rpc.eval('__vitest_collect_tests__()') as CollectedTests;
-
-      this.log('Collected tests:', collected);
-
-      // Report collected tests
-      for (const test of collected.tests) {
-        this.emitTestResult(filePath, {
-          name: test.name,
-          fullName: test.fullName,
-          status: test.skip ? 'skip' : 'pass',
-          duration: 0,
-        });
-      }
+    // Now run or collect all files
+    let results: File[];
+    if (method === 'run') {
+      this.log('Running tests in CDP via @vitest/runner...');
+      results = await this.rpc.runTests(filePaths);
     }
     else {
-      // Run the tests
-      this.log('Running tests in CDP...');
-      const runResult = await this.rpc.eval('__vitest_run_tests__()') as TestRunResult;
-
-      this.log('Test results:', runResult);
-
-      // Report each test result
-      for (const result of runResult.results) {
-        this.emitTestResult(filePath, result);
-      }
+      this.log('Collecting tests in CDP via @vitest/runner...');
+      results = await this.rpc.collectTests(filePaths);
     }
+
+    this.log('Test results:', results);
+
+    // Restore circular references in the results
+    // The CDP worker returns JSON-serialized data which loses circular refs
+    const restoredFiles = this.restoreFileReferences(results);
+
+    // Report collected files to Vitest via RPC
+    // This is crucial - Vitest needs onCollected to be called
+    this.log('Calling onCollected with', restoredFiles.length, 'files');
+    try {
+      const result = await this.vitestRpc.onCollected(restoredFiles);
+      this.log('onCollected completed successfully, result:', result);
+    }
+    catch (error) {
+      this.log('onCollected threw error:', error);
+      throw error;
+    }
+    this.log('processTestFiles completed');
   }
 
   /**
@@ -387,10 +502,13 @@ export class CdpPoolWorker implements PoolWorker {
       mainFields: ['module', 'main'],
       target: 'es2022',
       sourcemap: 'inline',
-      // Mark vitest and UXP/Node built-in modules as external
-      // This preserves native require() calls for these modules
+      // Mark vitest, runner packages, and UXP/Node built-in modules as external
+      // These are provided by the worker runtime
       external: [
         'vitest',
+        '@vitest/runner',
+        '@vitest/expect',
+        '@vitest/utils',
         'photoshop',
         'uxp',
         'fs',
@@ -406,11 +524,11 @@ export class CdpPoolWorker implements PoolWorker {
         'stream',
         'zlib',
       ],
-      // Define globals for vitest imports
+      // Define globals for vitest imports - they're already on globalThis
       banner: {
         js: `
-// Vitest globals provided by test runtime
-const { describe, it, test, expect, beforeAll, afterAll, beforeEach, afterEach } = globalThis;
+// Test globals are provided by the worker runtime on globalThis
+const { describe, it, test, suite, expect, beforeAll, afterAll, beforeEach, afterEach } = globalThis;
 `,
       },
       // Handle vitest imports by replacing them with global references
@@ -418,7 +536,7 @@ const { describe, it, test, expect, beforeAll, afterAll, beforeEach, afterEach }
         {
           name: 'vitest-globals',
           setup(build) {
-            // Replace vitest imports with empty module (globals are already defined)
+            // Replace vitest imports with globalThis references
             build.onResolve({ filter: /^vitest$/ }, () => ({
               path: 'vitest',
               namespace: 'vitest-globals',
@@ -428,6 +546,7 @@ const { describe, it, test, expect, beforeAll, afterAll, beforeEach, afterEach }
 export const describe = globalThis.describe;
 export const it = globalThis.it;
 export const test = globalThis.test;
+export const suite = globalThis.suite;
 export const expect = globalThis.expect;
 export const beforeAll = globalThis.beforeAll;
 export const afterAll = globalThis.afterAll;
@@ -468,31 +587,6 @@ export const vi = {
 
     this.log(`Bundled ${filePath}: ${code.length} bytes`);
     return code;
-  }
-
-  /**
-   * Emit a test result to Vitest.
-   */
-  private emitTestResult(filePath: string, result: TestResult): void {
-    // Convert our result format to Vitest's expected format
-    const vitestResult = {
-      type: 'test-result',
-      __vitest_worker_request__: true,
-      file: filePath,
-      name: result.fullName,
-      state: result.status === 'pass' ? 'pass' : result.status === 'fail' ? 'fail' : 'skip',
-      duration: result.duration,
-      errors: result.error
-        ? [{
-            message: result.error.message,
-            stack: result.error.stack,
-            expected: result.error.expected,
-            actual: result.error.actual,
-          }]
-        : [],
-    };
-
-    this.emit('message', vitestResult);
   }
 
   /**

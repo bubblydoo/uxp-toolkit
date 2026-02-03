@@ -5,12 +5,18 @@ export async function evaluateInCdp(
   expression: string,
   options: { awaitPromise: boolean; returnByValue: boolean } = { awaitPromise: true, returnByValue: false },
 ): Promise<unknown> {
+  const contextIdArg = 'uniqueId' in connection.executionContext
+    ? { uniqueContextId: connection.executionContext.uniqueId }
+    : 'id' in connection.executionContext
+      ? { executionContextId: connection.executionContext.id }
+      : {};
+  const sessionId = 'sessionId' in connection.executionContext ? connection.executionContext.sessionId : undefined;
   const result = await connection.cdp.Runtime.evaluate({
     expression,
-    uniqueContextId: connection.executionContextUniqueId,
+    ...contextIdArg,
     awaitPromise: options.awaitPromise,
     returnByValue: options.returnByValue,
-  });
+  }, sessionId);
 
   if (result.exceptionDetails) {
     const error = result.exceptionDetails.exception?.description
