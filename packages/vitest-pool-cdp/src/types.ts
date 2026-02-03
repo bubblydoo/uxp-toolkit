@@ -10,29 +10,9 @@ export interface ExecutionContextDescription {
   uniqueId: string;
 }
 
-/**
- * Options for the CDP pool.
- */
-export interface CdpPoolOptions {
-  /**
-   * WebSocket URL for the CDP connection, or an async function that returns one.
-   *
-   * @example
-   * // Static URL
-   * cdpUrl: "ws://localhost:9222/devtools/page/ABC123"
-   *
-   * @example
-   * // Dynamic URL (e.g., for Photoshop UXP)
-   * cdpUrl: async () => await setupDevtoolsUrl(pluginPath, pluginId)
-   */
-  cdpUrl: string | (() => Promise<string>);
+export type ExecutionContextOrSession = { uniqueId: string } | { id: number } | { sessionId: string };
 
-  /**
-   * Optional filter function to select a specific execution context.
-   * By default, waits for the first execution context created event.
-   */
-  contextFilter?: (context: ExecutionContextDescription) => boolean;
-
+export interface BaseCdpPoolOptions {
   /**
    * Enable debug logging.
    * @default false
@@ -53,6 +33,34 @@ export interface CdpPoolOptions {
 }
 
 /**
+ * Options for the CDP pool.
+ */
+export interface CdpPoolOptions extends BaseCdpPoolOptions {
+  /**
+   * WebSocket URL for the CDP connection, or an async function that returns one.
+   *
+   * @example
+   * // Static URL
+   * cdpUrl: "ws://localhost:9222/devtools/page/ABC123"
+   *
+   * @example
+   * // Dynamic URL (e.g., for Photoshop UXP)
+   * cdpUrl: async () => await setupDevtoolsUrl(pluginPath, pluginId)
+   */
+  cdp: string | (() => Promise<string>) | (() => Promise<{ url: string; teardown: () => Promise<void> }>);
+
+  /**
+   * Optional function to get the execution context or session id.
+   * By default, runs Target.setAutoAttach and waits for target to be attached and uses the target's session id.
+   */
+  executionContextOrSession?: (cdp: CDP.Client) => Promise<ExecutionContextOrSession>;
+}
+
+export interface RawCdpPoolOptions extends BaseCdpPoolOptions {
+  connection: () => Promise<CdpConnection>;
+}
+
+/**
  * Message prefix used for communication between pool and worker.
  */
 export const CDP_MESSAGE_PREFIX = '__VITEST_CDP_MSG__';
@@ -67,13 +75,7 @@ export const CDP_RECEIVE_FUNCTION = '__vitest_cdp_receive__';
  */
 export interface CdpConnection {
   cdp: CDP.Client;
-  executionContext: {
-    uniqueId: string;
-  } | {
-    id: number;
-  } | {
-    sessionId: string;
-  };
+  executionContextOrSession: ExecutionContextOrSession;
   disconnect: () => Promise<void>;
 }
 

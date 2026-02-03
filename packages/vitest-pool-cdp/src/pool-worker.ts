@@ -3,7 +3,7 @@ import type { BirpcReturn } from 'birpc';
 import type { RuntimeRPC } from 'vitest';
 import type { PoolOptions, PoolWorker, WorkerRequest } from 'vitest/node';
 import type { PoolFunctions, WorkerFunctions } from './rpc-types';
-import type { CdpConnection, CdpPoolOptions, EventCallback } from './types';
+import type { CdpConnection, CdpPoolOptions, EventCallback, RawCdpPoolOptions } from './types';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
@@ -29,7 +29,7 @@ export class CdpPoolWorker implements PoolWorker {
   name = 'cdp-pool';
 
   private poolOptions: PoolOptions;
-  private cdpOptions: CdpPoolOptions;
+  private rawCdpOptions: RawCdpPoolOptions;
   private connection: CdpConnection | null = null;
   private eventListeners: Map<string, Set<EventCallback>> = new Map();
   private workerInjected = false;
@@ -58,10 +58,12 @@ export class CdpPoolWorker implements PoolWorker {
    */
   private vitestRpcMessageHandler: ((data: unknown) => void) | null = null;
 
-  constructor(poolOptions: PoolOptions, cdpOptions: CdpPoolOptions) {
+  private teardownCdp: (() => Promise<void>) | null = null;
+
+  constructor(poolOptions: PoolOptions, rawCdpOptions: RawCdpPoolOptions) {
     this.poolOptions = poolOptions;
-    this.cdpOptions = cdpOptions;
-    this.log = cdpOptions.debug
+    this.rawCdpOptions = rawCdpOptions;
+    this.log = rawCdpOptions.debug
       ? (...args: unknown[]) => console.log('[vitest-pool-cdp]', ...args)
       : () => {};
   }
@@ -72,18 +74,12 @@ export class CdpPoolWorker implements PoolWorker {
   async start(): Promise<void> {
     this.log('Starting CDP pool worker...');
 
-    // Get the CDP URL (may be a function)
-    const cdpUrl = typeof this.cdpOptions.cdpUrl === 'function'
-      ? await this.cdpOptions.cdpUrl()
-      : this.cdpOptions.cdpUrl;
-
-    // Establish CDP connection
-    this.connection = await setupCdpConnection(cdpUrl, this.cdpOptions, this.log);
+    this.connection = await this.rawCdpOptions.connection();
 
     // Set up console message listener for responses from the worker
     this.connection.cdp.Runtime.on('consoleAPICalled', (event) => {
       // Log all console messages in debug mode
-      if (this.cdpOptions.debug && event.type !== 'debug') {
+      if (this.rawCdpOptions.debug && event.type !== 'debug') {
         const args = event.args?.map((arg: { value?: unknown; description?: string }) =>
           arg.value !== undefined ? arg.value : arg.description,
         );
@@ -139,6 +135,12 @@ export class CdpPoolWorker implements PoolWorker {
         return fsp.readFile(filePath, 'utf-8');
       },
 
+      onCollected: async (files: File[]) => {
+        this.log('Tests collected, forwarding to Vitest:', files.length, 'files');
+        // Forward collected files to Vitest via the Vitest RPC channel
+        await this.forwardCollectedFiles(files);
+      },
+
       onTaskUpdate: async (packs: unknown[]) => {
         this.log('Task update received:', packs);
         // Forward task updates to Vitest via the Vitest RPC channel
@@ -159,15 +161,10 @@ export class CdpPoolWorker implements PoolWorker {
         // Use devalue for serialization to handle complex types
         serialize: v => devalue.stringify(v),
         deserialize: v => devalue.parse(v as string),
-        timeout: this.cdpOptions.rpcTimeout ?? 30000,
+        timeout: this.rawCdpOptions.rpcTimeout ?? 30000,
       },
     );
   }
-
-  /**
-   * Incrementing message ID for Vitest RPC calls.
-   */
-  private vitestRpcMessageId = 0;
 
   /**
    * Create the birpc instance for communication with Vitest's pool runner.
@@ -245,6 +242,23 @@ export class CdpPoolWorker implements PoolWorker {
     }
 
     return files;
+  }
+
+  /**
+   * Forward collected files from the CDP worker to Vitest via the RPC channel.
+   * This is called during test collection (after imports, before execution).
+   */
+  private async forwardCollectedFiles(files: File[]): Promise<void> {
+    if (!this.vitestRpc) {
+      this.log('Warning: vitestRpc not initialized, cannot forward collected files');
+      return;
+    }
+
+    // Restore circular references in the files
+    const restoredFiles = this.restoreFileReferences(files);
+
+    this.log('Forwarding collected files to Vitest:', restoredFiles.length, 'files');
+    await this.vitestRpc.onCollected(restoredFiles);
   }
 
   /**
@@ -331,6 +345,19 @@ export class CdpPoolWorker implements PoolWorker {
       this.connection = null;
     }
 
+    if (this.teardownCdp) {
+      this.log('Calling CDP teardown...');
+      await this.teardownCdp();
+      this.teardownCdp = null;
+    }
+
+    // Emit stopped response BEFORE clearing listeners so Vitest receives it
+    this.emit('message', {
+      type: 'stopped',
+      __vitest_worker_response__: true,
+    });
+    this.log('Emitted stopped response');
+
     this.eventListeners.clear();
     this.workerInjected = false;
 
@@ -416,12 +443,21 @@ export class CdpPoolWorker implements PoolWorker {
       }
 
       // Signal that we're done with all files
-      this.log('Emitting done message');
+      // Vitest expects type: "testfileFinished" (see cli-api.B7PN_QUv.js:8033)
+      this.log('Emitting testfileFinished message');
       this.emit('message', {
-        type: 'done',
+        type: 'testfileFinished',
         __vitest_worker_response__: true,
       });
-      this.log('Done message emitted');
+      this.log('testfileFinished message emitted');
+      return;
+    }
+
+    if (msg.type === 'stop') {
+      // Vitest wants to stop the worker
+      this.log('Received stop request, stopping worker');
+      await this.stop();
+      // Note: stopped response is emitted inside stop()
       return;
     }
 
@@ -438,6 +474,12 @@ export class CdpPoolWorker implements PoolWorker {
     if (!this.vitestRpc) {
       throw new Error('Vitest RPC not initialized');
     }
+
+    // Configure the worker with project settings
+    const projectRoot = this.poolOptions.project.config?.root || process.cwd();
+    const projectName = this.poolOptions.project.config?.name;
+    this.log(`Setting config: root=${projectRoot}, projectName=${projectName}`);
+    this.rpc.setConfig({ root: projectRoot, projectName });
 
     // Bundle and send each test file to the worker
     for (const filePath of filePaths) {
@@ -462,22 +504,6 @@ export class CdpPoolWorker implements PoolWorker {
     }
 
     this.log('Test results:', results);
-
-    // Restore circular references in the results
-    // The CDP worker returns JSON-serialized data which loses circular refs
-    const restoredFiles = this.restoreFileReferences(results);
-
-    // Report collected files to Vitest via RPC
-    // This is crucial - Vitest needs onCollected to be called
-    this.log('Calling onCollected with', restoredFiles.length, 'files');
-    try {
-      const result = await this.vitestRpc.onCollected(restoredFiles);
-      this.log('onCollected completed successfully, result:', result);
-    }
-    catch (error) {
-      this.log('onCollected threw error:', error);
-      throw error;
-    }
     this.log('processTestFiles completed');
   }
 

@@ -1,18 +1,16 @@
+/* eslint-disable no-console */
+import type { LaunchOptions } from 'puppeteer';
 import puppeteer from 'puppeteer';
 import z from 'zod';
 
-export async function startChromium() {
+export async function startChromium(options: LaunchOptions = {}) {
   const browser = await puppeteer.launch({
     headless: true,
-    dumpio: true,
     debuggingPort: 9293,
     args: ['--remote-allow-origins=*'],
+    ...options,
   });
 
-  const [page] = await browser.pages();
-  const body = await page.evaluate(() => {
-    return document.body.tagName;
-  });
   const jsonVersionRes = await fetch('http://localhost:9293/json/version');
   const jsonVersionData = await jsonVersionRes.json();
   const { webSocketDebuggerUrl } = z.object({ webSocketDebuggerUrl: z.string() }).parse(jsonVersionData);
@@ -23,5 +21,10 @@ export async function startChromium() {
 
   console.log('Open devtools:', `devtools://devtools/bundled/inspector.html?ws=${urlWithoutWs}`);
 
-  return webSocketDebuggerUrl;
+  return {
+    url: webSocketDebuggerUrl,
+    teardown: async () => {
+      await browser.close();
+    },
+  };
 }

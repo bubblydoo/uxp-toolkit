@@ -1,34 +1,47 @@
-import type CDP from 'chrome-remote-interface';
 import type { CdpConnection, CdpPoolOptions } from './types';
-import { setupCdpSession, setupCdpSessionWithUxpDefaults, waitForExecutionContextCreated } from '@bubblydoo/uxp-cli-common';
+import CDP from 'chrome-remote-interface';
 import { evaluateInCdp } from './cdp-util';
+
+export async function setupCdpSession(cdtUrl: string) {
+  const cdp = await CDP({
+    useHostName: false,
+    local: true,
+    target: cdtUrl,
+  });
+
+  return cdp;
+}
+
+async function defaultExecutionContextOrSessionFn(cdp: CDP.Client) {
+  const attachedTargetPromise = waitForAttachedToTarget(cdp);
+
+  await cdp.Target.setAutoAttach({ autoAttach: true, waitForDebuggerOnStart: true, flatten: true });
+
+  const attachedTarget = await attachedTargetPromise;
+
+  return { sessionId: attachedTarget.sessionId };
+}
 
 /**
  * Set up a CDP session and wait for an execution context.
  */
 export async function setupCdpConnection(
   cdpUrl: string,
-  options: CdpPoolOptions,
-  log: (...args: unknown[]) => void,
+  options: {
+    executionContextOrSession?: CdpPoolOptions['executionContextOrSession'];
+    log: (...args: unknown[]) => void;
+  },
 ): Promise<CdpConnection> {
-  log('Connecting to CDP at', cdpUrl);
+  options.log('Connecting to CDP at', cdpUrl);
 
   const cdp = await setupCdpSession(cdpUrl);
 
-  const targetAttachedPromise = waitForAttachedToTarget(cdp);
+  const executionContextOrSessionFn = options.executionContextOrSession ?? defaultExecutionContextOrSessionFn;
+  options.log('Awaiting executionContextOrSessionFn');
+  const executionContextOrSession = await executionContextOrSessionFn(cdp);
+  console.log('Result:', executionContextOrSession);
 
-  const executionContextPromise = waitForExecutionContextCreated(cdp).then(context => ({ uniqueId: context.uniqueId }));
-
-  executionContextPromise.then((context) => {
-    console.log('executionContextPromise', context);
-  });
-
-  await cdp.Target.setAutoAttach({ autoAttach: true, waitForDebuggerOnStart: true, flatten: true });
-  await cdp.Target.setDiscoverTargets({ discover: true });
-  await cdp.Target.setRemoteLocations({ locations: [{ host: 'localhost', port: 9293 }] });
-  await cdp.Runtime.runIfWaitingForDebugger();
-
-  const { sessionId } = await targetAttachedPromise;
+  const sessionId = 'sessionId' in executionContextOrSession ? executionContextOrSession.sessionId : undefined;
 
   await cdp.Network.enable({}, sessionId);
   await cdp.Page.enable(sessionId);
@@ -36,7 +49,7 @@ export async function setupCdpConnection(
 
   return {
     cdp,
-    executionContext: { sessionId },
+    executionContextOrSession,
     disconnect: async () => {
       try {
         await cdp.close();

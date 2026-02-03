@@ -98,25 +98,35 @@ globalThis.beforeEach = beforeEach;
 globalThis.afterEach = afterEach;
 
 /**
- * Default runner configuration.
+ * Current config from the pool.
  */
-const defaultConfig: VitestRunnerConfig = {
+let currentProjectConfig: { root: string; projectName?: string } = {
   root: '/',
-  setupFiles: [],
-  passWithNoTests: false,
-  sequence: {
-    shuffle: false,
-    concurrent: false,
-    seed: Date.now(),
-    hooks: 'stack',
-    setupFiles: 'list',
-  },
-  maxConcurrency: 1,
-  testTimeout: 30000,
-  hookTimeout: 30000,
-  retry: 0,
-  includeTaskLocation: true,
+  projectName: undefined,
 };
+
+/**
+ * Get the runner configuration.
+ */
+function getRunnerConfig(): VitestRunnerConfig {
+  return {
+    root: currentProjectConfig.root,
+    setupFiles: [],
+    passWithNoTests: false,
+    sequence: {
+      shuffle: false,
+      concurrent: false,
+      seed: Date.now(),
+      hooks: 'stack',
+      setupFiles: 'list',
+    },
+    maxConcurrency: 1,
+    testTimeout: 30000,
+    hookTimeout: 30000,
+    retry: 0,
+    includeTaskLocation: true,
+  };
+}
 
 /**
  * Custom VitestRunner that executes pre-bundled test code.
@@ -126,7 +136,7 @@ class CdpVitestRunner implements VitestRunner {
   pool = 'cdp';
 
   constructor(config: Partial<VitestRunnerConfig> = {}) {
-    this.config = { ...defaultConfig, ...config };
+    this.config = { ...getRunnerConfig(), ...config };
   }
 
   /**
@@ -141,6 +151,17 @@ class CdpVitestRunner implements VitestRunner {
     // Execute the bundled code - this will call describe/it/test which register tests
     // eslint-disable-next-line no-eval
     globalThis.eval(code);
+  }
+
+  /**
+   * Called when tests are collected (after imports, before execution).
+   * This notifies Vitest about the test structure.
+   */
+  async onCollected(files: File[]): Promise<void> {
+    // Forward collected files to the pool via RPC
+    if (rpc) {
+      await rpc.onCollected(files);
+    }
   }
 
   /**
@@ -165,6 +186,15 @@ let runner: CdpVitestRunner | null = null;
 const workerFunctions: WorkerFunctions = {
   ping() {
     return 'pong';
+  },
+
+  /**
+   * Configure the runner with project settings.
+   */
+  setConfig(config: { root: string; projectName?: string }) {
+    currentProjectConfig = config;
+    // Reset runner so it picks up the new config
+    runner = null;
   },
 
   /**

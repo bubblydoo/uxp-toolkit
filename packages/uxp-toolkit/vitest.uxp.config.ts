@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { setupDevtoolsUrl } from '@bubblydoo/uxp-cli-common';
+import { setupDevtoolsUrl, waitForExecutionContextCreated } from '@bubblydoo/uxp-cli-common';
 import { cdpPool } from '@bubblydoo/vitest-pool-cdp';
 import { defineConfig } from 'vitest/config';
 
@@ -18,6 +18,10 @@ export default defineConfig({
     // Use the CDP pool to run tests in Photoshop
     pool: cdpPool({
       cdpUrl: async () => await devtoolsUrlPromise,
+      executionContextOrSession: async (cdp) => {
+        const desc = await waitForExecutionContextCreated(cdp);
+        return { uniqueId: desc.uniqueId };
+      },
       debug: true,
       connectionTimeout: 60000,
       rpcTimeout: 10000, // Shorter timeout for debugging

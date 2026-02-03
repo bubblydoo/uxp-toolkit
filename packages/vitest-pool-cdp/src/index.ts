@@ -1,5 +1,7 @@
+/* eslint-disable no-console */
 import type { PoolRunnerInitializer } from 'vitest/node';
 import type { CdpPoolOptions, ExecutionContextDescription } from './types';
+import { setupCdpConnection } from './cdp-bridge';
 import { CdpPoolWorker } from './pool-worker';
 
 export type { CdpPoolOptions, ExecutionContextDescription };
@@ -47,7 +49,10 @@ export type { CdpPoolOptions, ExecutionContextDescription };
  *   test: {
  *     pool: cdpPool({
  *       cdpUrl: "ws://localhost:9222/devtools/page/ABC123",
- *       contextFilter: (context) => context.origin.includes("my-app"),
+ *       executionContextOrSession: async (cdp) => {
+ *         const desc = await waitForExecutionContextCreated(cdp);
+ *         return { uniqueId: desc.uniqueId };
+ *       },
  *     }),
  *   },
  * });
@@ -55,7 +60,36 @@ export type { CdpPoolOptions, ExecutionContextDescription };
 export function cdpPool(options: CdpPoolOptions): PoolRunnerInitializer {
   return {
     name: 'cdp-pool',
-    createPoolWorker: poolOptions => new CdpPoolWorker(poolOptions, options),
+    createPoolWorker: poolOptions => new CdpPoolWorker(poolOptions, {
+      connection: async () => {
+        // Get the CDP URL (may be a function)
+        const cdpReturn = typeof options.cdp === 'function'
+          ? await options.cdp()
+          : options.cdp;
+
+        const cdpUrl = typeof cdpReturn === 'object' && 'url' in cdpReturn ? cdpReturn.url : cdpReturn;
+
+        const teardownFn = typeof cdpReturn === 'object' && 'teardown' in cdpReturn ? cdpReturn.teardown : null;
+
+        // Establish CDP connection
+        const connection = await setupCdpConnection(cdpUrl, {
+          executionContextOrSession: options.executionContextOrSession,
+          log: console.log,
+        });
+
+        if (teardownFn) {
+          connection.cdp.on('disconnect', () => {
+            console.log('CDP disconnected, tearing down...');
+            teardownFn();
+          });
+        }
+
+        return connection;
+      },
+      debug: options.debug,
+      connectionTimeout: options.connectionTimeout,
+      rpcTimeout: options.rpcTimeout,
+    }),
   };
 }
 

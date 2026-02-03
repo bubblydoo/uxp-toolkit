@@ -15,6 +15,12 @@ export interface WorkerFunctions {
   ping: () => 'pong';
 
   /**
+   * Configure the runner with project settings.
+   * Must be called before running tests.
+   */
+  setConfig: (config: { root: string; projectName?: string }) => void;
+
+  /**
    * Store bundled test code for a file path.
    * The code will be executed when the runner imports the file.
    */
@@ -59,6 +65,12 @@ export interface PoolFunctions {
    * Read a file from the filesystem.
    */
   readFile: (path: string) => Promise<string>;
+
+  /**
+   * Called when tests are collected (after imports, before execution).
+   * This allows Vitest to know about the test structure.
+   */
+  onCollected: (files: File[]) => Promise<void>;
 
   /**
    * Called when test tasks are updated (results, state changes).
