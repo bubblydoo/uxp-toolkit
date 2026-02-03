@@ -159,9 +159,9 @@ importers:
 
   packages/photoshop-mcp:
     dependencies:
-      '@bubblydoo/uxp-cli-common':
+      '@bubblydoo/uxp-devtools-common':
         specifier: workspace:*
-        version: link:../uxp-cli-common
+        version: link:../uxp-devtools-common
       '@hono/mcp':
         specifier: ^0.2.3
         version: 0.2.3(@modelcontextprotocol/sdk@1.25.3(hono@4.11.7)(zod@3.25.76))(hono-rate-limiter@0.4.2(hono@4.11.7))(hono@4.11.7)(zod@3.25.76)
@@ -252,9 +252,9 @@ importers:
 
   packages/uxp-cli:
     dependencies:
-      '@bubblydoo/uxp-cli-common':
+      '@bubblydoo/uxp-devtools-common':
         specifier: workspace:*
-        version: link:../uxp-cli-common
+        version: link:../uxp-devtools-common
       arg:
         specifier: ^5.0.2
         version: 5.0.2
@@ -278,14 +278,14 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
-  packages/uxp-cli-common:
+  packages/uxp-devtools-common:
     dependencies:
       '@adobe-fixed-uxp/uxp-devtools-core':
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.3
+        version: 1.6.3
       '@adobe-fixed-uxp/uxp-devtools-helper':
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^1.6.2
+        version: 1.6.2
       chrome-remote-interface:
         specifier: ^0.33.3
         version: 0.33.3
@@ -503,15 +503,15 @@ importers:
       '@bubblydoo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
-      '@bubblydoo/uxp-cli-common':
-        specifier: workspace:*
-        version: link:../uxp-cli-common
       '@bubblydoo/uxp-test-framework':
         specifier: workspace:*
         version: link:../uxp-test-framework
       '@bubblydoo/vitest-pool-cdp':
         specifier: workspace:*
         version: link:../vitest-pool-cdp
+      '@bubblydoo/vitest-pool-uxp':
+        specifier: workspace:*
+        version: link:../vitest-pool-uxp
       '@types/chai':
         specifier: ^5.2.3
         version: 5.2.3
@@ -585,9 +585,9 @@ importers:
 
   packages/vitest-pool-cdp:
     dependencies:
-      '@bubblydoo/uxp-cli-common':
+      '@bubblydoo/uxp-devtools-common':
         specifier: workspace:*
-        version: link:../uxp-cli-common
+        version: link:../uxp-devtools-common
       '@vitest/expect':
         specifier: ^4.0.18
         version: 4.0.18
@@ -647,16 +647,38 @@ importers:
         specifier: ^4.0.0
         version: 4.0.18(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2)
 
+  packages/vitest-pool-uxp:
+    dependencies:
+      '@bubblydoo/uxp-devtools-common':
+        specifier: workspace:*
+        version: link:../uxp-devtools-common
+      '@bubblydoo/vitest-pool-cdp':
+        specifier: workspace:*
+        version: link:../vitest-pool-cdp
+    devDependencies:
+      '@bubblydoo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: ^20.8.7
+        version: 20.19.30
+      tsup:
+        specifier: ^8.3.5
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.0
+        version: 4.0.18(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3)(tsx@4.21.0)(yaml@2.8.2)
+
 packages:
 
-  '@adobe-fixed-uxp/uxp-devtools-core@1.6.1':
-    resolution: {integrity: sha512-LaBH+0hr6mabNQGJeJa9RA3njTlckLAGFoCF2WHbcrTYgLrN1lmhHMq757GLqiOClpMkmTDS275/nxRfQu3RvA==}
+  '@adobe-fixed-uxp/uxp-devtools-core@1.6.3':
+    resolution: {integrity: sha512-RSgiUI4zKXcPWHx7F4Gq4bKBdvkobtml0Z95rRTxtP7u64TskaeYsneXAg3ZKH2V5UZc9oxUUp6u7FhSTCZAag==}
 
-  '@adobe-fixed-uxp/uxp-devtools-feature@1.6.0':
-    resolution: {integrity: sha512-Lexh6PlaP5f+QbqVWdZDOdrs5sZhyq+/5X20qPZhqz3FtWPl+OLwC+50CyeXGeIhOOW/jAM1aE4fJp4xi8vpoA==}
-
-  '@adobe-fixed-uxp/uxp-devtools-helper@1.6.1':
-    resolution: {integrity: sha512-HtlHKmyF8R4AvnXiMTrfSjOXSM+CwZeaeDJ1FMjYEvAzx/DKEfkNxwffCaZ1G8VWJ15NRIF/5IVPEZNKbHKZTg==}
+  '@adobe-fixed-uxp/uxp-devtools-helper@1.6.2':
+    resolution: {integrity: sha512-UZ99ck5LUXWwDp4Rz37COEF7/nA1D+6TMlpVpeJt3Noz48EWQJQlpHv16bNrpjUdcMe8bgbWjQm1Xzy9O0BEtA==}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -5864,9 +5886,9 @@ packages:
 
 snapshots:
 
-  '@adobe-fixed-uxp/uxp-devtools-core@1.6.1':
+  '@adobe-fixed-uxp/uxp-devtools-core@1.6.3':
     dependencies:
-      '@adobe-fixed-uxp/uxp-devtools-helper': 1.6.1
+      '@adobe-fixed-uxp/uxp-devtools-helper': 1.6.2
       archiver: 7.0.1
       chalk: 5.6.2
       chokidar: 4.0.3
@@ -5881,11 +5903,8 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@adobe-fixed-uxp/uxp-devtools-feature@1.6.0': {}
-
-  '@adobe-fixed-uxp/uxp-devtools-helper@1.6.1':
+  '@adobe-fixed-uxp/uxp-devtools-helper@1.6.2':
     dependencies:
-      '@adobe-fixed-uxp/uxp-devtools-feature': 1.6.0
       node-gyp-build: 4.8.4
       tar: 7.5.7
 

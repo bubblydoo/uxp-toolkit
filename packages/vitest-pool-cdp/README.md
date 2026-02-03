@@ -43,7 +43,7 @@ For environments where the CDP URL is determined at runtime:
 // vitest.config.ts
 import { defineConfig } from "vitest/config";
 import { cdpPool } from "@bubblydoo/vitest-pool-cdp";
-import { setupDevtoolsUrl } from "@bubblydoo/uxp-cli-common";
+import { setupDevtoolsUrl } from "@bubblydoo/uxp-devtools-common";
 
 const pluginPath = "./my-uxp-plugin";
 const pluginId = "com.example.myplugin";

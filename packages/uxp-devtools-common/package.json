@@ -1,5 +1,5 @@
 {
-  "name": "@bubblydoo/uxp-cli-common",
+  "name": "@bubblydoo/uxp-devtools-common",
   "type": "module",
   "version": "0.0.2",
   "exports": {
@@ -36,8 +36,8 @@
     "dev": "tsup --watch"
   },
   "dependencies": {
-    "@adobe-fixed-uxp/uxp-devtools-core": "^1.6.1",
-    "@adobe-fixed-uxp/uxp-devtools-helper": "^1.6.1",
+    "@adobe-fixed-uxp/uxp-devtools-core": "^1.6.3",
+    "@adobe-fixed-uxp/uxp-devtools-helper": "^1.6.2",
     "chrome-remote-interface": "^0.33.3",
     "zod": "^4.3.6"
   },

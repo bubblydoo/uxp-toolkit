@@ -33,7 +33,7 @@
     "vitest": ">=4"
   },
   "dependencies": {
-    "@bubblydoo/uxp-cli-common": "workspace:*",
+    "@bubblydoo/uxp-devtools-common": "workspace:*",
     "@vitest/expect": "^4.0.18",
     "@vitest/runner": "^4.0.18",
     "@vitest/utils": "^4.0.18",

@@ -4,7 +4,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { setupCdpSession, setupCdpSessionWithUxpDefaults, setupDevtoolsUrl, waitForExecutionContextCreated } from '@bubblydoo/uxp-cli-common';
+import { setupCdpSession, setupCdpSessionWithUxpDefaults, setupDevtoolsUrl, waitForExecutionContextCreated } from '@bubblydoo/uxp-devtools-common';
 import arg from 'arg';
 import { openDevtoolsSessionInChrome } from './open-devtools-session';
 
@@ -73,7 +73,7 @@ if (actionArgs['--help']) {
 }
 
 async function getPluginInfo(useFakePlugin: boolean) {
-  const fakePluginPath = path.resolve(__dirname, '../../uxp-cli-common/fake-plugin');
+  const fakePluginPath = path.resolve(__dirname, '../../uxp-devtools-common/fake-plugin');
 
   if (useFakePlugin) {
     console.log('Using fake plugin:');

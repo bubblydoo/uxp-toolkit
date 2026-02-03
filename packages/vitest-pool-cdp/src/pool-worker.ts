@@ -11,15 +11,40 @@ import { fileURLToPath } from 'node:url';
 import { createBirpc } from 'birpc';
 import * as devalue from 'devalue';
 import * as esbuild from 'esbuild';
-import * as flatted from 'flatted';
-import {
-  injectWorkerRuntime,
-  setupCdpConnection,
-} from './cdp-bridge';
+import { injectWorkerRuntime } from './cdp-bridge';
 import { evaluateInCdp } from './cdp-util';
 import { CDP_MESSAGE_PREFIX, CDP_RECEIVE_FUNCTION } from './types';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const vitestApiKeys = [
+  'afterAll',
+  'afterEach',
+  'assert',
+  'assertType',
+  'beforeAll',
+  'beforeEach',
+  'bench',
+  'BenchFactory',
+  'BenchTask',
+  'chai',
+  'createExpect',
+  'describe',
+  'EvaluatedModules',
+  'expect',
+  'expectTypeOf',
+  'Experimental',
+  'inject',
+  'it',
+  'onTestFailed',
+  'onTestFinished',
+  'recordArtifact',
+  'should',
+  'suite',
+  'test',
+  'vi',
+  'vitest',
+];
 
 /**
  * Custom Vitest pool worker that communicates over CDP using birpc.
@@ -542,51 +567,22 @@ export class CdpPoolWorker implements PoolWorker {
         'stream',
         'zlib',
       ],
-      // Define globals for vitest imports - they're already on globalThis
-      banner: {
-        js: `
-// Test globals are provided by the worker runtime on globalThis
-const { describe, it, test, suite, expect, beforeAll, afterAll, beforeEach, afterEach } = globalThis;
-`,
-      },
-      // Handle vitest imports by replacing them with global references
       plugins: [
         {
-          name: 'vitest-globals',
+          name: 'vitest-api',
           setup(build) {
-            // Replace vitest imports with globalThis references
+            // Replace vitest imports with globalThis.__vitest_api__ references
             build.onResolve({ filter: /^vitest$/ }, () => ({
               path: 'vitest',
-              namespace: 'vitest-globals',
+              namespace: 'vitest-api',
             }));
-            build.onLoad({ filter: /.*/, namespace: 'vitest-globals' }, () => ({
-              contents: `
-export const describe = globalThis.describe;
-export const it = globalThis.it;
-export const test = globalThis.test;
-export const suite = globalThis.suite;
-export const expect = globalThis.expect;
-export const beforeAll = globalThis.beforeAll;
-export const afterAll = globalThis.afterAll;
-export const beforeEach = globalThis.beforeEach;
-export const afterEach = globalThis.afterEach;
-export const vi = {
-  fn: () => {
-    const mockFn = (...args) => mockFn.mock.results.push({ value: undefined });
-    mockFn.mock = { calls: [], results: [] };
-    mockFn.mockReturnValue = (v) => { mockFn._returnValue = v; return mockFn; };
-    mockFn.mockImplementation = (fn) => { mockFn._impl = fn; return mockFn; };
-    return mockFn;
-  },
-  spyOn: () => {},
-  mock: () => {},
-  unmock: () => {},
-  resetAllMocks: () => {},
-  clearAllMocks: () => {},
-};
-              `,
-              loader: 'js',
-            }));
+            build.onLoad({ filter: /.*/, namespace: 'vitest-api' }, () => {
+              const code = vitestApiKeys.map(key => `export const ${key} = globalThis.__vitest_api__.${key};`).join('\n');
+              return {
+                contents: code,
+                loader: 'js',
+              };
+            });
           },
         },
       ],

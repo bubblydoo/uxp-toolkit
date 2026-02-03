@@ -1,4 +1,4 @@
-# @bubblydoo/uxp-cli-common
+# @bubblydoo/uxp-devtools-common
 
 ## 0.0.2
 

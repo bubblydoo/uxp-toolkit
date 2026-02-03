@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable ts/no-use-before-define */
 /* eslint-disable vars-on-top */
 /**
@@ -10,58 +11,23 @@
 
 import type {
   File,
-  SuiteAPI,
-  TestAPI,
   VitestRunner,
   VitestRunnerConfig,
 } from '@vitest/runner';
 import type { BirpcReturn } from 'birpc';
+import type * as vitestApi from 'vitest';
 import type { PoolFunctions, WorkerFunctions } from './rpc-types';
-import {
-  JestAsymmetricMatchers,
-  JestChaiExpect,
-  JestExtend,
-} from '@vitest/expect';
-import {
-  afterAll as runnerAfterAll,
-  afterEach as runnerAfterEach,
-  beforeAll as runnerBeforeAll,
-  beforeEach as runnerBeforeEach,
-  describe as runnerDescribe,
-  it as runnerIt,
-  suite as runnerSuite,
-  test as runnerTest,
-  startTests,
-  collectTests as vitestCollectTests,
-} from '@vitest/runner';
+import * as vitestRunner from '@vitest/runner';
 import { createBirpc } from 'birpc';
-import * as chai from 'chai';
 import * as devalue from 'devalue';
-
-// Re-export with original names for use in this file
-const describe = runnerDescribe;
-const it = runnerIt;
-const test = runnerTest;
-const suite = runnerSuite;
-const beforeAll = runnerBeforeAll;
-const afterAll = runnerAfterAll;
-const beforeEach = runnerBeforeEach;
-const afterEach = runnerAfterEach;
+import { createVitestApi } from './worker-runtime-vitest-api';
 
 declare global {
   var require: NodeJS.Require;
   var __VITEST_CDP_WORKER_RUNNING__: boolean;
   var __vitest_cdp_rpc__: BirpcReturn<PoolFunctions, WorkerFunctions>;
-  // Test globals - use the proper types from @vitest/runner
-  var describe: SuiteAPI;
-  var it: TestAPI;
-  var test: TestAPI;
-  var suite: SuiteAPI;
-  var expect: Chai.ExpectStatic;
-  var beforeAll: typeof runnerBeforeAll;
-  var afterAll: typeof runnerAfterAll;
-  var beforeEach: typeof runnerBeforeEach;
-  var afterEach: typeof runnerAfterEach;
+  var __vitest_cdp_receive__: (serialized: string) => void;
+  var __vitest_api__: typeof vitestApi;
 }
 
 const MESSAGE_PREFIX = '__VITEST_CDP_MSG__';
@@ -72,30 +38,9 @@ let messageHandler: ((data: string) => void) | null = null;
 // Store for pre-bundled test code that will be "imported" by the runner
 const bundledTestCode: Map<string, string> = new Map();
 
-/**
- * Set up chai with Vitest's expect plugins.
- */
-chai.use(JestExtend);
-chai.use(JestChaiExpect);
-chai.use(JestAsymmetricMatchers);
-
-/**
- * The expect function with Vitest's matchers.
- */
-const expect = chai.expect;
-
-/**
- * Expose test globals.
- */
-globalThis.describe = describe;
-globalThis.it = it;
-globalThis.test = test;
-globalThis.suite = suite;
-globalThis.expect = expect;
-globalThis.beforeAll = beforeAll;
-globalThis.afterAll = afterAll;
-globalThis.beforeEach = beforeEach;
-globalThis.afterEach = afterEach;
+// expose vitest api as global object, which will be used when doing
+// `import { expect } from 'vitest'` in test files
+globalThis.__vitest_api__ = createVitestApi();
 
 /**
  * Current config from the pool.
@@ -213,7 +158,7 @@ const workerFunctions: WorkerFunctions = {
     }
 
     const fileSpecs = specs.map(filepath => ({ filepath, testLocations: undefined }));
-    return startTests(fileSpecs, runner);
+    return vitestRunner.startTests(fileSpecs, runner);
   },
 
   /**
@@ -225,7 +170,7 @@ const workerFunctions: WorkerFunctions = {
     }
 
     const fileSpecs = specs.map(filepath => ({ filepath, testLocations: undefined }));
-    return vitestCollectTests(fileSpecs, runner);
+    return vitestRunner.collectTests(fileSpecs, runner);
   },
 
   /**
@@ -234,13 +179,6 @@ const workerFunctions: WorkerFunctions = {
   eval(code: string) {
     // eslint-disable-next-line no-eval
     return globalThis.eval(code);
-  },
-
-  getGlobals() {
-    return {
-      hasPhotoshop: typeof globalThis.require === 'function',
-      hasUxp: typeof globalThis.require === 'function',
-    };
   },
 };
 
@@ -268,7 +206,7 @@ const rpc = createBirpc<PoolFunctions, WorkerFunctions>(
  * Global function exposed for the pool to send messages via Runtime.evaluate.
  * Receives serialized string from pool and passes to birpc for deserialization.
  */
-(globalThis as Record<string, unknown>).__vitest_cdp_receive__ = (serialized: string): void => {
+globalThis.__vitest_cdp_receive__ = (serialized) => {
   try {
     if (messageHandler) {
       // Pass the serialized string directly to birpc - it will deserialize

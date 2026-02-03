@@ -42,14 +42,6 @@ export interface WorkerFunctions {
    * Evaluate arbitrary code in the CDP context (for debugging).
    */
   eval: (code: string) => unknown;
-
-  /**
-   * Get information about available globals in the CDP context.
-   */
-  getGlobals: () => {
-    hasPhotoshop: boolean;
-    hasUxp: boolean;
-  };
 }
 
 /**

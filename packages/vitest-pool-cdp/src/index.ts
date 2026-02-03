@@ -32,7 +32,7 @@ export type { CdpPoolOptions, ExecutionContextDescription };
  *
  * @example
  * // With dynamic URL (e.g., for Photoshop UXP)
- * import { setupDevtoolsUrl } from "@bubblydoo/uxp-cli-common";
+ * import { setupDevtoolsUrl } from "@bubblydoo/uxp-devtools-common";
  *
  * export default defineConfig({
  *   test: {
