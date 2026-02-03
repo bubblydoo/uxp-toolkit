@@ -30,6 +30,7 @@ export async function setupCdpConnection(
   options: {
     executionContextOrSession?: CdpPoolOptions['executionContextOrSession'];
     log: (...args: unknown[]) => void;
+    teardown?: () => Promise<void>;
   },
 ): Promise<CdpConnection> {
   options.log('Connecting to CDP at', cdpUrl);
@@ -53,6 +54,9 @@ export async function setupCdpConnection(
     disconnect: async () => {
       try {
         await cdp.close();
+        if (options.teardown) {
+          await options.teardown();
+        }
       }
       catch {
         // Ignore close errors

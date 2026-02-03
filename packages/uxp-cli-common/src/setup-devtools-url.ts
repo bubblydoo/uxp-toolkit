@@ -164,7 +164,54 @@ export async function setupDevtoolsUrl(pluginPath: string, ports: number[] = DEF
 
   const cdtUrl = result.wsdebugUrl.replace('ws=', 'ws://');
 
-  return { url: cdtUrl, teardown: async () => {
-    // todo: how to tear down server?
-  } };
+  return {
+    url: cdtUrl,
+    teardown: async () => {
+      console.log('Tearing down devtools URL');
+      // Unload the plugin from Photoshop
+      try {
+        await callPluginHandler(
+          psClient,
+          {
+            action: 'unload',
+            command: 'Plugin',
+            pluginSessionId,
+          },
+          z.object({
+            command: z.literal('reply'),
+            requestId: z.number(),
+          }),
+        );
+        console.log('Plugin unloaded');
+      }
+      catch (error) {
+        console.error('Error unloading plugin:', error);
+      }
+
+      // Stop the server (no public stop method, so we access private fields)
+      try {
+        const serverAny = server as unknown as {
+          _httpServer?: { close: (callback?: (err?: Error) => void) => void };
+          _io?: { close: () => void };
+        };
+        serverAny._io?.close();
+        await new Promise<void>((resolve, reject) => {
+          if (serverAny._httpServer) {
+            serverAny._httpServer.close((err) => {
+              if (err)
+                reject(err);
+              else resolve();
+            });
+          }
+          else {
+            resolve();
+          }
+        });
+        console.log('Server stopped');
+      }
+      catch (error) {
+        console.error('Error stopping server:', error);
+      }
+    },
+  };
 }

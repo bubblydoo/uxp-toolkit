@@ -69,20 +69,14 @@ export function cdpPool(options: CdpPoolOptions): PoolRunnerInitializer {
 
         const cdpUrl = typeof cdpReturn === 'object' && 'url' in cdpReturn ? cdpReturn.url : cdpReturn;
 
-        const teardownFn = typeof cdpReturn === 'object' && 'teardown' in cdpReturn ? cdpReturn.teardown : null;
+        const teardownFn = typeof cdpReturn === 'object' && 'teardown' in cdpReturn ? cdpReturn.teardown : undefined;
 
         // Establish CDP connection
         const connection = await setupCdpConnection(cdpUrl, {
           executionContextOrSession: options.executionContextOrSession,
           log: console.log,
+          teardown: teardownFn,
         });
-
-        if (teardownFn) {
-          connection.cdp.on('disconnect', () => {
-            console.log('CDP disconnected, tearing down...');
-            teardownFn();
-          });
-        }
 
         return connection;
       },

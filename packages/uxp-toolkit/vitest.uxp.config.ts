@@ -15,6 +15,7 @@ export default defineConfig({
     include: ['src/**/*.uxp-test.ts', 'test/**/*.uxp-test.ts'],
     // Use the CDP pool to run tests in Photoshop
     pool: cdpPool({
+      debug: true,
       cdp: async () => {
         return await setupDevtoolsUrl(pluginPath);
       },

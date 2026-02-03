@@ -58,8 +58,6 @@ export class CdpPoolWorker implements PoolWorker {
    */
   private vitestRpcMessageHandler: ((data: unknown) => void) | null = null;
 
-  private teardownCdp: (() => Promise<void>) | null = null;
-
   constructor(poolOptions: PoolOptions, rawCdpOptions: RawCdpPoolOptions) {
     this.poolOptions = poolOptions;
     this.rawCdpOptions = rawCdpOptions;
@@ -343,12 +341,6 @@ export class CdpPoolWorker implements PoolWorker {
     if (this.connection) {
       await this.connection.disconnect();
       this.connection = null;
-    }
-
-    if (this.teardownCdp) {
-      this.log('Calling CDP teardown...');
-      await this.teardownCdp();
-      this.teardownCdp = null;
     }
 
     // Emit stopped response BEFORE clearing listeners so Vitest receives it
