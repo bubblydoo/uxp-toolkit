@@ -164,5 +164,7 @@ export async function setupDevtoolsUrl(pluginPath: string, ports: number[] = DEF
 
   const cdtUrl = result.wsdebugUrl.replace('ws=', 'ws://');
 
-  return cdtUrl;
+  return { url: cdtUrl, teardown: async () => {
+    // todo: how to tear down server?
+  } };
 }
