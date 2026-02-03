@@ -1,10 +1,8 @@
-import type { Test } from '@bubblydoo/uxp-test-framework';
-import { expect } from 'chai';
 import { core } from 'photoshop';
+import { describe, expect, it } from 'vitest';
 
-export const executeAsModalErrorTest: Test = {
-  name: 'meta: executeAsModal should throw correctly',
-  async run() {
+describe('meta: executeAsModal', () => {
+  it('should throw correctly', async () => {
     let threw = false;
     try {
       await core.executeAsModal(
@@ -16,17 +14,13 @@ export const executeAsModalErrorTest: Test = {
         },
       );
     }
-    catch (_e) {
+    catch {
       threw = true;
     }
-    // eslint-disable-next-line ts/no-unused-expressions
-    expect(threw).to.be.true;
-  },
-};
+    expect(threw).toBe(true);
+  });
 
-export const executeAsModalReturnTest: Test = {
-  name: 'meta: executeAsModal should return correctly',
-  async run() {
+  it('should return correctly', async () => {
     const result = await core.executeAsModal(
       async () => {
         return 'test';
@@ -35,6 +29,6 @@ export const executeAsModalReturnTest: Test = {
         commandName: 'Test',
       },
     );
-    expect(result).to.equal('test');
-  },
-};
+    expect(result).toBe('test');
+  });
+});

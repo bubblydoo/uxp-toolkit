@@ -1,9 +1,18 @@
-import type { Test } from '@bubblydoo/uxp-test-framework';
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 
-export const builtinModulesTest: Test = {
-  name: 'meta: some builtin modules should be available',
-  async run() {
+function doesImportExist(module: string) {
+  try {
+    // eslint-disable-next-line ts/no-require-imports
+    require(module);
+    return true;
+  }
+  catch {
+    return false;
+  }
+}
+
+describe('meta: builtin modules', () => {
+  it('should have expected builtin modules available', async () => {
     const testModules = [
       'photoshop',
       'uxp',
@@ -21,7 +30,7 @@ export const builtinModulesTest: Test = {
       'zlib',
     ];
     const successModules = testModules.filter(module => doesImportExist(module));
-    expect(successModules).to.deep.eq([
+    expect(successModules).toEqual([
       'photoshop',
       'uxp',
       'fs',
@@ -29,16 +38,5 @@ export const builtinModulesTest: Test = {
       'path',
       'process',
     ]);
-  },
-};
-
-function doesImportExist(module: string) {
-  try {
-    // eslint-disable-next-line ts/no-require-imports
-    require(module);
-    return true;
-  }
-  catch {
-    return false;
-  }
-}
+  });
+});

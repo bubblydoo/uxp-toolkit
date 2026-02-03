@@ -111,10 +111,10 @@ async function getPluginInfo(useFakePlugin: boolean) {
 }
 
 async function openDevtools() {
-  const { pluginPath, pluginId } = await getPluginInfo(false);
+  const { pluginPath } = await getPluginInfo(false);
 
   console.log('\nSetting up devtools URL...');
-  const cdtUrl = await setupDevtoolsUrl(pluginPath, pluginId);
+  const cdtUrl = await setupDevtoolsUrl(pluginPath);
   console.log(`DevTools URL: ${cdtUrl}\n`);
 
   await openDevtoolsSessionInChrome(cdtUrl);
@@ -125,10 +125,10 @@ async function openDevtools() {
 }
 
 async function dumpObject() {
-  const { pluginPath, pluginId } = await getPluginInfo(true);
+  const { pluginPath } = await getPluginInfo(true);
 
   console.log('\nSetting up devtools URL...');
-  const cdtUrl = await setupDevtoolsUrl(pluginPath, pluginId);
+  const cdtUrl = await setupDevtoolsUrl(pluginPath);
   console.log(`DevTools URL: ${cdtUrl}\n`);
 
   console.log('Setting up CDP session...');

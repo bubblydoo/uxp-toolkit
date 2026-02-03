@@ -1,0 +1,49 @@
+{
+  "name": "@bubblydoo/vitest-pool-cdp",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Custom Vitest pool that runs tests in CDP-connected environments (browsers, Photoshop UXP, Electron, etc.)",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "vitest": ">=4"
+  },
+  "dependencies": {
+    "@bubblydoo/uxp-cli-common": "workspace:*",
+    "birpc": "^4.0.0",
+    "chrome-remote-interface": "^0.33.3",
+    "devalue": "^5.1.1",
+    "esbuild": "^0.24.0"
+  },
+  "devDependencies": {
+    "@bubblydoo/tsconfig": "workspace:*",
+    "@types/chrome-remote-interface": "^0.33.0",
+    "@types/node": "^20.8.7",
+    "tsup": "^8.3.5",
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.0"
+  }
+}

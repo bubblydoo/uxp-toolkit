@@ -58,10 +58,10 @@ export async function getOrReusePhotoshopConnection(): Promise<PhotoshopConnecti
     return currentConnection;
   }
 
-  const { pluginPath, pluginId } = getPluginConfig();
+  const { pluginPath } = getPluginConfig();
 
   console.error('[photoshop-mcp] Setting up devtools URL...');
-  const cdtUrl = await setupDevtoolsUrl(pluginPath, pluginId);
+  const cdtUrl = await setupDevtoolsUrl(pluginPath);
   console.error(`[photoshop-mcp] DevTools URL: ${cdtUrl}`);
 
   console.error('[photoshop-mcp] Setting up CDP session...');

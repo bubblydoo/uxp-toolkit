@@ -1,6 +1,5 @@
-import type { Test } from '@bubblydoo/uxp-test-framework';
-import { expect } from 'chai';
 import { app } from 'photoshop';
+import { describe, expect, it } from 'vitest';
 import { executeAsModal } from '../core/executeAsModal';
 import { openFileByPath } from '../filesystem/openFileByPath';
 import { getDocumentLayerDescriptors } from '../ut-tree/getDocumentLayerDescriptors';
@@ -17,16 +16,15 @@ async function getFirstLayer() {
   };
 }
 
-export const renameLayerTest: Test = {
-  name: 'Rename Layer',
-  async run() {
+describe('renameLayer', () => {
+  it('should rename a layer', async () => {
     await openFileByPath('plugin:/fixtures/one-layer.psd');
     const layer = await getFirstLayer();
-    expect(layer.name).to.equal('Layer 1');
+    expect(layer.name).toBe('Layer 1');
     await executeAsModal('Rename Layer', async (ctx) => {
       await ctx.batchPlayCommand(createRenameLayerCommand(layer.ref, 'New Name'));
     });
     const layer2 = await getFirstLayer();
-    expect(layer2.name).to.equal('New Name');
-  },
-};
+    expect(layer2.name).toBe('New Name');
+  });
+});

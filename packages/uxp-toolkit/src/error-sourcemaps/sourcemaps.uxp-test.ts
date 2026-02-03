@@ -1,14 +1,12 @@
-import type { Test } from '@bubblydoo/uxp-test-framework';
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 import { parseUxpErrorSourcemaps } from './sourcemaps';
 
 function throwError() {
   throw new Error('Uncaught error'); // this error should stay exactly here in the source code, see below
 }
 
-export const sourcemapsTest: Test = {
-  name: 'sourcemaps: should parse error sourcemaps',
-  async run() {
+describe('sourcemaps', () => {
+  it('should parse error sourcemaps', async () => {
     let error: Error;
     try {
       throwError();
@@ -18,8 +16,8 @@ export const sourcemapsTest: Test = {
     }
     const parsedError = await parseUxpErrorSourcemaps(error!);
     console.log(parsedError);
-    expect(parsedError[0]!.fileName).to.include('sourcemaps.uxp-test.ts');
-    expect(parsedError[0]!.lineNumber).to.eq(6);
-    expect(parsedError[0]!.columnNumber).to.eq(8);
-  },
-};
+    expect(parsedError[0]!.fileName).toContain('sourcemaps.uxp-test.ts');
+    expect(parsedError[0]!.lineNumber).toBe(5);
+    expect(parsedError[0]!.columnNumber).toBe(8);
+  });
+});

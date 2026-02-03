@@ -1,11 +1,9 @@
-import type { Test } from '@bubblydoo/uxp-test-framework';
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 import { photoshopGetApplicationInfo } from './applicationInfo';
 
-export const applicationInfoTest: Test = {
-  name: 'Application Info',
-  async run() {
+describe('applicationInfo', () => {
+  it('should get application info', async () => {
     const info = await photoshopGetApplicationInfo();
-    expect(info.hostName).to.include('Adobe Photoshop');
-  },
-};
+    expect(info.hostName).toContain('Adobe Photoshop');
+  });
+});

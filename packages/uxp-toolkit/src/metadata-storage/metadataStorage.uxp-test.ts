@@ -1,6 +1,5 @@
-import type { Test } from '@bubblydoo/uxp-test-framework';
-import { expect } from 'chai';
 import { app } from 'photoshop';
+import { describe, expect, it } from 'vitest';
 import { openFileByPath } from '../filesystem/openFileByPath';
 import {
   readDocumentMetadata,
@@ -12,9 +11,8 @@ const TEST_PREFIX_NAMESPACE = 'https://example.com/bubbly-test';
 const TEST_KEY = 'testKey';
 const TEST_VALUE = 'test-value-written-by-uxp-test';
 
-export const metadataStorageTest: Test = {
-  name: 'Metadata Storage',
-  async run() {
+describe('metadataStorage', () => {
+  it('should write and read document metadata', async () => {
     await openFileByPath('plugin:/fixtures/one-layer.psd');
     const document = app.activeDocument!;
 
@@ -30,6 +28,6 @@ export const metadataStorageTest: Test = {
       prefix: TEST_PREFIX,
     });
 
-    expect(readBack).to.equal(TEST_VALUE);
-  },
-};
+    expect(readBack).toBe(TEST_VALUE);
+  });
+});

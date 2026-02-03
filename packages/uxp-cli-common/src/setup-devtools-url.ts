@@ -32,9 +32,22 @@ const debugReplySchema = z.object({
   chromeDevToolsUrl: z.string(),
 });
 
-export async function setupDevtoolsUrl(pluginPath: string, pluginId: string, ports: number[] = DEFAULT_PORTS) {
+async function fileExists(path: string) {
+  try {
+    await fs.access(path);
+    return true;
+  }
+  catch {
+    return false;
+  }
+}
+
+export async function setupDevtoolsUrl(pluginPath: string, ports: number[] = DEFAULT_PORTS) {
   if (!path.isAbsolute(pluginPath)) {
     throw new Error('pluginPath must be an absolute path');
+  }
+  if (!await fileExists(`${pluginPath}/manifest.json`)) {
+    throw new Error('manifest.json not found');
   }
 
   const devtoolsManager = new DevToolsHelper(true);
@@ -52,6 +65,8 @@ export async function setupDevtoolsUrl(pluginPath: string, pluginId: string, por
 
   // this goes through Adobe's Vulcan system, which is a binary black box
   devtoolsManager.setServerDetails(PORT);
+
+  console.log('port', PORT);
 
   await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -96,6 +111,9 @@ export async function setupDevtoolsUrl(pluginPath: string, pluginId: string, por
     });
   }
 
+  const manifest = JSON.parse(await fs.readFile(`${pluginPath}/manifest.json`, 'utf8'));
+  const pluginId = manifest.id;
+
   const validateResult = await callPluginHandler(
     psClient,
     {
@@ -108,7 +126,7 @@ export async function setupDevtoolsUrl(pluginPath: string, pluginId: string, por
           path: pluginPath,
         },
       },
-      manifest: JSON.parse(await fs.readFile(`${pluginPath}/manifest.json`, 'utf8')),
+      manifest,
     },
     validateReplySchema,
   );

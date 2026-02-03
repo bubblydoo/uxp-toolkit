@@ -1,18 +1,16 @@
-import type { Test } from '@bubblydoo/uxp-test-framework';
-import { expect } from 'chai';
 import { app } from 'photoshop';
+import { describe, expect, it } from 'vitest';
 import { suspendHistory } from './suspendHistory';
 
-export const suspendHistoryTest: Test = {
-  name: 'core/suspendHistory should return correctly',
-  async run() {
+describe('core/suspendHistory', () => {
+  it('should return correctly', async () => {
     const document = app.activeDocument;
     if (!document) {
       throw new Error('No active document');
     }
-    const result = await suspendHistory(document, 'Test', async (context) => {
+    const result = await suspendHistory(document, 'Test', async () => {
       return 'test';
     });
-    expect(result).to.equal('test');
-  },
-};
+    expect(result).toBe('test');
+  });
+});

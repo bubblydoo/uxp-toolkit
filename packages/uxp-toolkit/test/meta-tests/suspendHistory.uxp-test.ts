@@ -1,10 +1,8 @@
-import type { Test } from '@bubblydoo/uxp-test-framework';
-import { expect } from 'chai';
 import { app } from 'photoshop';
+import { describe, expect, it } from 'vitest';
 
-export const suspendHistoryErrorTest: Test = {
-  name: 'meta: suspendHistory should throw correctly',
-  async run() {
+describe('meta: suspendHistory', () => {
+  it('should throw correctly', async () => {
     const document = app.activeDocument;
     if (!document) {
       throw new Error('No active document');
@@ -13,16 +11,15 @@ export const suspendHistoryErrorTest: Test = {
     let threw = false;
     try {
       await document.suspendHistory(
-        async (context) => {
+        async () => {
           throw new Error('Uncaught error');
         },
         'Test',
       );
     }
-    catch (_e) {
+    catch {
       threw = true;
     }
-    // eslint-disable-next-line ts/no-unused-expressions
-    expect(threw).to.be.true;
-  },
-};
+    expect(threw).toBe(true);
+  });
+});
