@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { openFileByPath } from '../filesystem/openFileByPath';
+import { openFixture } from '../../test/open-fixture';
 import { getDocumentLayerDescriptors } from './getDocumentLayerDescriptors';
 import { photoshopLayerDescriptorsToUTLayers } from './photoshopLayerDescriptorsToUTLayers';
 
 describe('photoshopLayerDescriptorsToUTLayers', () => {
   it('should convert clipping layers correctly', async () => {
-    const doc = await openFileByPath('plugin:/fixtures/clipping-layers.psd');
+    const doc = await openFixture('clipping-layers.psd');
     const descriptors = await getDocumentLayerDescriptors(doc.id);
 
     console.log(descriptors);
@@ -54,7 +54,7 @@ describe('photoshopLayerDescriptorsToUTLayers', () => {
   });
 
   it('should convert layers with background correctly', async () => {
-    const doc = await openFileByPath('plugin:/fixtures/one-layer-with-bg.psd');
+    const doc = await openFixture('one-layer-with-bg.psd');
     const descriptors = await getDocumentLayerDescriptors(doc.id);
     console.log(descriptors);
     const layers = photoshopLayerDescriptorsToUTLayers(descriptors);
@@ -72,7 +72,7 @@ describe('photoshopLayerDescriptorsToUTLayers', () => {
     expect(layers[1]).toMatchObject({
       name: 'Background',
       visible: true,
-      kind: 'background',
+      kind: 'pixel',
       blendMode: 'normal',
       isClippingMask: false,
       effects: {},

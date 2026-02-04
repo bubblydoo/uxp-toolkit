@@ -42,7 +42,14 @@ async function fileExists(path: string) {
   }
 }
 
-export async function setupDevtoolsUrl(pluginPath: string, ports: number[] = DEFAULT_PORTS) {
+export interface DevtoolsConnection {
+  /** Debugger websocket URL */
+  url: string;
+  /** Unload the plugin and tear down the Vulcan connection */
+  teardown: () => Promise<void>;
+}
+
+export async function setupDevtoolsConnection(pluginPath: string, ports: number[] = DEFAULT_PORTS): Promise<DevtoolsConnection> {
   if (!path.isAbsolute(pluginPath)) {
     throw new Error('pluginPath must be an absolute path');
   }
@@ -164,7 +171,7 @@ export async function setupDevtoolsUrl(pluginPath: string, ports: number[] = DEF
 
   const cdtUrl = result.wsdebugUrl.replace('ws=', 'ws://');
 
-  return {
+  const connection: DevtoolsConnection = {
     url: cdtUrl,
     teardown: async () => {
       console.log('Tearing down devtools URL');
@@ -188,7 +195,6 @@ export async function setupDevtoolsUrl(pluginPath: string, ports: number[] = DEF
         console.error('Error unloading plugin:', error);
       }
 
-      // Stop the server by accessing private fields (no public close method)
       try {
         await server.close();
       }
@@ -207,4 +213,6 @@ export async function setupDevtoolsUrl(pluginPath: string, ports: number[] = DEF
       }
     },
   };
+
+  return connection;
 }

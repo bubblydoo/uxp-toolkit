@@ -1,7 +1,7 @@
 import { app } from 'photoshop';
 import { describe, expect, it } from 'vitest';
+import { openFixture } from '../../test/open-fixture';
 import { executeAsModal } from '../core/executeAsModal';
-import { openFileByPath } from '../filesystem/openFileByPath';
 import { getDocumentLayerDescriptors } from '../ut-tree/getDocumentLayerDescriptors';
 import { createRenameLayerCommand } from './renameLayer';
 
@@ -18,7 +18,7 @@ async function getFirstLayer() {
 
 describe('renameLayer', () => {
   it('should rename a layer', async () => {
-    await openFileByPath('plugin:/fixtures/one-layer.psd');
+    await openFixture('one-layer.psd');
     const layer = await getFirstLayer();
     expect(layer.name).toBe('Layer 1');
     await executeAsModal('Rename Layer', async (ctx) => {

@@ -1,4 +1,5 @@
 import type CDP from 'chrome-remote-interface';
+import type esbuild from 'esbuild';
 
 /**
  * Description of a JavaScript execution context in the CDP target.
@@ -11,6 +12,13 @@ export interface ExecutionContextDescription {
 }
 
 export type ExecutionContextOrSession = { uniqueId: string } | { id: number } | { sessionId: string };
+
+export interface PoolEsbuildOptions {
+  define?: esbuild.BuildOptions['define'];
+  external?: esbuild.BuildOptions['external'];
+  alias?: esbuild.BuildOptions['alias'];
+  plugins?: esbuild.Plugin[];
+}
 
 export interface BaseCdpPoolOptions {
   /**
@@ -30,6 +38,11 @@ export interface BaseCdpPoolOptions {
    * @default 30000
    */
   rpcTimeout?: number;
+
+  /**
+   * Options for esbuild.
+   */
+  esbuildOptions?: PoolEsbuildOptions;
 }
 
 /**

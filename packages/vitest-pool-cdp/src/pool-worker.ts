@@ -3,7 +3,7 @@ import type { BirpcReturn } from 'birpc';
 import type { RuntimeRPC } from 'vitest';
 import type { PoolOptions, PoolWorker, WorkerRequest } from 'vitest/node';
 import type { PoolFunctions, WorkerFunctions } from './rpc-types';
-import type { CdpConnection, CdpPoolOptions, EventCallback, RawCdpPoolOptions } from './types';
+import type { CdpConnection, EventCallback, PoolEsbuildOptions, RawCdpPoolOptions } from './types';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
@@ -545,6 +545,8 @@ export class CdpPoolWorker implements PoolWorker {
       mainFields: ['module', 'main'],
       target: 'es2022',
       sourcemap: 'inline',
+      define: this.rawCdpOptions.esbuildOptions?.define || {},
+      alias: this.rawCdpOptions.esbuildOptions?.alias || {},
       // Mark vitest, runner packages, and UXP/Node built-in modules as external
       // These are provided by the worker runtime
       external: [
@@ -558,14 +560,7 @@ export class CdpPoolWorker implements PoolWorker {
         'os',
         'path',
         'process',
-        'shell',
-        'http',
-        'https',
-        'url',
-        'util',
-        'crypto',
-        'stream',
-        'zlib',
+        ...(this.rawCdpOptions.esbuildOptions?.external || []),
       ],
       plugins: [
         {
@@ -585,6 +580,7 @@ export class CdpPoolWorker implements PoolWorker {
             });
           },
         },
+        ...(this.rawCdpOptions.esbuildOptions?.plugins || []),
       ],
       // Resolve from the project root
       absWorkingDir: projectRoot,

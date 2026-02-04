@@ -1,6 +1,6 @@
 import { app } from 'photoshop';
 import { describe, expect, it } from 'vitest';
-import { openFileByPath } from '../filesystem/openFileByPath';
+import { openFixture } from '../../test/open-fixture';
 import {
   readDocumentMetadata,
   writeDocumentMetadata,
@@ -13,7 +13,7 @@ const TEST_VALUE = 'test-value-written-by-uxp-test';
 
 describe('metadataStorage', () => {
   it('should write and read document metadata', async () => {
-    await openFileByPath('plugin:/fixtures/one-layer.psd');
+    await openFixture('one-layer.psd');
     const document = app.activeDocument!;
 
     await writeDocumentMetadata(document, {

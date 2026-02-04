@@ -1,12 +1,15 @@
 import type { PoolRunnerInitializer } from 'vitest/node';
 import path from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import {
   setupCdpSessionWithUxpDefaults,
-  setupDevtoolsUrl,
+  setupDevtoolsConnection,
   waitForExecutionContextCreated,
 } from '@bubblydoo/uxp-devtools-common';
 import { cdpPool } from '@bubblydoo/vitest-pool-cdp';
+
+type CdpPoolOptions = Parameters<typeof cdpPool>[0];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,7 +26,7 @@ export function getDefaultPluginPath(): string {
 /**
  * Options for the UXP pool.
  */
-export interface UxpPoolOptions {
+export interface UxpPoolOptions extends Omit<CdpPoolOptions, 'cdp'> {
   /**
    * Path to the UXP plugin directory.
    * Defaults to the built-in "Vitest UXP Test Runner" plugin.
@@ -31,29 +34,26 @@ export interface UxpPoolOptions {
   pluginPath?: string;
 
   /**
-   * Enable debug logging.
-   * @default false
+   * This string gets passed as "UXP_MAIN_DIRECTORY" to the test file.
+   *
+   * @default process.cwd()
    */
-  debug?: boolean;
-
-  /**
-   * Timeout in milliseconds for establishing the CDP connection.
-   * @default 60000
-   */
-  connectionTimeout?: number;
-
-  /**
-   * Timeout in milliseconds for RPC calls.
-   * @default 10000
-   */
-  rpcTimeout?: number;
+  mainDirectory?: string;
 }
+
+// Cached connection - with isolate: false and fileParallelism: false,
+// there's only one worker so we just need simple caching
+let cachedConnection: { url: string; teardown: () => Promise<void> } | null = null;
 
 /**
  * Create a Vitest pool that runs tests in Adobe UXP environments (Photoshop, etc.).
  *
  * This pool wraps `@bubblydoo/vitest-pool-cdp` and `@bubblydoo/uxp-devtools-common`
  * to provide a simple way to run Vitest tests inside UXP.
+ *
+ * IMPORTANT: Adobe's Vulcan system only supports a single connection per process.
+ * You MUST use `isolate: false` and `fileParallelism: false` in your vitest config
+ * to prevent multiple workers from trying to initialize Vulcan simultaneously.
  *
  * @param options - Configuration options for the UXP pool
  * @returns A PoolRunnerInitializer for Vitest
@@ -67,6 +67,9 @@ export interface UxpPoolOptions {
  *   test: {
  *     include: ['src/**\/*.uxp-test.ts'],
  *     pool: uxpPool(),
+ *     // Required: UXP/Vulcan only supports a single connection
+ *     isolate: false,
+ *     fileParallelism: false,
  *     testTimeout: 30000,
  *     watch: false,
  *   },
@@ -82,6 +85,8 @@ export interface UxpPoolOptions {
  *       pluginPath: "./my-uxp-plugin",
  *       debug: true,
  *     }),
+ *     isolate: false,
+ *     fileParallelism: false,
  *   },
  * });
  */
@@ -89,18 +94,30 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
   const {
     pluginPath = getDefaultPluginPath(),
     debug = false,
-    connectionTimeout = 60000,
-    rpcTimeout = 10000,
+    mainDirectory = process.cwd(),
   } = options;
 
   const resolvedPluginPath = path.isAbsolute(pluginPath)
     ? pluginPath
     : path.resolve(process.cwd(), pluginPath);
 
+  const log = debug
+    ? (...args: unknown[]) => console.log('[vitest-pool-uxp]', ...args)
+    : () => {};
+
   return cdpPool({
-    debug,
     cdp: async () => {
-      return await setupDevtoolsUrl(resolvedPluginPath);
+      // Reuse existing connection if available
+      if (cachedConnection) {
+        log('Reusing existing UXP connection');
+        return cachedConnection;
+      }
+
+      log('Creating new UXP connection...');
+      cachedConnection = await setupDevtoolsConnection(resolvedPluginPath);
+      log(`UXP connection established: ${cachedConnection.url}`);
+
+      return cachedConnection;
     },
     executionContextOrSession: async (cdp) => {
       const executionContextPromise = waitForExecutionContextCreated(cdp);
@@ -108,8 +125,14 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
       const desc = await executionContextPromise;
       return { uniqueId: desc.uniqueId };
     },
-    connectionTimeout,
-    rpcTimeout,
+    ...options,
+    esbuildOptions: {
+      ...options.esbuildOptions,
+      define: {
+        ...options.esbuildOptions?.define,
+        UXP_MAIN_DIRECTORY: JSON.stringify(mainDirectory),
+      },
+    },
   });
 }
 

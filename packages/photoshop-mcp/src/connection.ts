@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import {
   setupCdpSession,
   setupCdpSessionWithUxpDefaults,
-  setupDevtoolsUrl,
+  setupDevtoolsConnection,
   waitForExecutionContextCreated,
 } from '@bubblydoo/uxp-devtools-common';
 
@@ -61,11 +61,11 @@ export async function getOrReusePhotoshopConnection(): Promise<PhotoshopConnecti
   const { pluginPath } = getPluginConfig();
 
   console.error('[photoshop-mcp] Setting up devtools URL...');
-  const cdtUrl = await setupDevtoolsUrl(pluginPath);
-  console.error(`[photoshop-mcp] DevTools URL: ${cdtUrl}`);
+  const devtoolsConnection = await setupDevtoolsConnection(pluginPath);
+  console.error(`[photoshop-mcp] DevTools URL: ${devtoolsConnection.url}`);
 
   console.error('[photoshop-mcp] Setting up CDP session...');
-  const cdp = await setupCdpSession(cdtUrl);
+  const cdp = await setupCdpSession(devtoolsConnection.url);
 
   const executionContextCreatedPromise = waitForExecutionContextCreated(cdp);
 
@@ -81,6 +81,7 @@ export async function getOrReusePhotoshopConnection(): Promise<PhotoshopConnecti
     disconnect: async () => {
       try {
         await cdp.close();
+        await devtoolsConnection.teardown();
       }
       catch {
         // Ignore close errors

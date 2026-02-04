@@ -7,8 +7,18 @@ export default defineConfig({
     include: ['src/**/*.uxp-test.ts', 'test/**/*.uxp-test.ts'],
     // Use the UXP pool to run tests in Photoshop
     pool: uxpPool({
-      debug: true,
+      esbuildOptions: {
+        alias: {
+          url: 'url-shim',
+        },
+      },
     }),
+    // IMPORTANT: UXP/Vulcan only supports a single connection
+    // Disable VM isolation to share state across test files
+    isolate: false,
+    // Force sequential file execution
+    fileParallelism: false,
+    maxWorkers: 1,
     // Longer timeout for UXP tests
     testTimeout: 30000,
     // Don't run in watch mode by default

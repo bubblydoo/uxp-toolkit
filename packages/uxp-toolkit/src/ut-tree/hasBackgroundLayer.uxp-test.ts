@@ -1,14 +1,14 @@
 import { app } from 'photoshop';
 import { describe, expect, it } from 'vitest';
+import { openFixture } from '../../test/open-fixture';
 import { createGetDocumentHasBackgroundLayerCommand } from '../commands-library/getDocument';
 import { createGetBackgroundLayerCommand } from '../commands-library/getLayer';
 import { batchPlayCommand } from '../core/command';
 import { executeAsModal } from '../core/executeAsModal';
-import { openFileByPath } from '../filesystem/openFileByPath';
 
 describe('hasBackgroundLayer', () => {
   it('should detect background layer in document with background', async () => {
-    const doc = await openFileByPath('plugin:/fixtures/one-layer-with-bg.psd');
+    const doc = await openFixture('one-layer-with-bg.psd');
     const hasBackgroundLayer = await batchPlayCommand(
       createGetDocumentHasBackgroundLayerCommand(doc.id),
     );
@@ -21,7 +21,7 @@ describe('hasBackgroundLayer', () => {
   });
 
   it('should not detect background layer in document without background', async () => {
-    const doc2 = await openFileByPath('plugin:/fixtures/one-layer.psd');
+    const doc2 = await openFixture('one-layer.psd');
 
     const hasBackgroundLayer2 = await batchPlayCommand(
       createGetDocumentHasBackgroundLayerCommand(doc2.id),

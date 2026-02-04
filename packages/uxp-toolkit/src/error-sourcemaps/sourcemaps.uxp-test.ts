@@ -15,7 +15,6 @@ describe('sourcemaps', () => {
       error = e as Error;
     }
     const parsedError = await parseUxpErrorSourcemaps(error!);
-    console.log(parsedError);
     expect(parsedError[0]!.fileName).toContain('sourcemaps.uxp-test.ts');
     expect(parsedError[0]!.lineNumber).toBe(5);
     expect(parsedError[0]!.columnNumber).toBe(8);
