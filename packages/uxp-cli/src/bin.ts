@@ -4,7 +4,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { setupCdpSession, setupCdpSessionWithUxpDefaults, setupDevtoolsUrl, waitForExecutionContextCreated } from '@bubblydoo/uxp-devtools-common';
+import { setupCdpSession, setupCdpSessionWithUxpDefaults, setupDevtoolsConnection, waitForExecutionContextCreated } from '@bubblydoo/uxp-devtools-common';
 import arg from 'arg';
 import { openDevtoolsSessionInChrome } from './open-devtools-session';
 
@@ -114,10 +114,10 @@ async function openDevtools() {
   const { pluginPath } = await getPluginInfo(false);
 
   console.log('\nSetting up devtools URL...');
-  const cdtUrl = await setupDevtoolsUrl(pluginPath);
-  console.log(`DevTools URL: ${cdtUrl}\n`);
+  const devtoolsConnection = await setupDevtoolsConnection(pluginPath);
+  console.log(`DevTools URL: ${devtoolsConnection.url}\n`);
 
-  await openDevtoolsSessionInChrome(cdtUrl);
+  await openDevtoolsSessionInChrome(devtoolsConnection.url);
   console.log('Chrome DevTools opened');
 
   console.log('\nPress Ctrl+C to exit...');
@@ -128,18 +128,15 @@ async function dumpObject() {
   const { pluginPath } = await getPluginInfo(true);
 
   console.log('\nSetting up devtools URL...');
-  const cdtUrl = await setupDevtoolsUrl(pluginPath);
-  console.log(`DevTools URL: ${cdtUrl}\n`);
+  const devtoolsConnection = await setupDevtoolsConnection(pluginPath);
+  console.log(`DevTools URL: ${devtoolsConnection.url}\n`);
 
   console.log('Setting up CDP session...');
-  const cdp = await setupCdpSession(cdtUrl);
+  const cdp = await setupCdpSession(devtoolsConnection.url);
 
-  const executionContextCreatedPromise = waitForExecutionContextCreated(cdp);
-
-  await setupCdpSessionWithUxpDefaults(cdp);
-
-  console.log('Waiting for execution context...');
-  const executionContext = await executionContextCreatedPromise;
+  const executionContext = await waitForExecutionContextCreated(cdp, async () => {
+    await setupCdpSessionWithUxpDefaults(cdp);
+  });
 
   console.log('Evaluating expression...');
   const result = await cdp.Runtime.evaluate({

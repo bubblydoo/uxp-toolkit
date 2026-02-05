@@ -1,9 +1,10 @@
+/* eslint-disable no-console */
 import type { File, TaskEventPack, TaskResultPack } from '@vitest/runner';
 import type { BirpcReturn } from 'birpc';
 import type { RuntimeRPC } from 'vitest';
 import type { PoolOptions, PoolWorker, WorkerRequest } from 'vitest/node';
 import type { PoolFunctions, WorkerFunctions } from './rpc-types';
-import type { CdpConnection, EventCallback, PoolEsbuildOptions, RawCdpPoolOptions } from './types';
+import type { CdpConnection, EventCallback, RawCdpPoolOptions } from './types';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
@@ -101,6 +102,10 @@ export class CdpPoolWorker implements PoolWorker {
 
     // Set up console message listener for responses from the worker
     this.connection.cdp.Runtime.on('consoleAPICalled', (event) => {
+      if (event.args[0] && event.args[0].type === 'string' && event.args[0].value !== '__VITEST_CDP_MSG__') {
+        console.log(`[CDP console.${event.type}]`, ...event.args.map(x => x.value));
+      }
+
       // Log all console messages in debug mode
       if (this.rawCdpOptions.debug && event.type !== 'debug') {
         const args = event.args?.map((arg: { value?: unknown; description?: string }) =>
@@ -537,6 +542,7 @@ export class CdpPoolWorker implements PoolWorker {
     const result = await esbuild.build({
       entryPoints: [filePath],
       bundle: true,
+      outdir: 'internal',
       write: false,
       format: 'iife',
       // Use 'neutral' platform - this makes esbuild generate simpler require calls
@@ -544,7 +550,7 @@ export class CdpPoolWorker implements PoolWorker {
       // Main fields for neutral platform - look for module then main
       mainFields: ['module', 'main'],
       target: 'es2022',
-      sourcemap: 'inline',
+      sourcemap: this.rawCdpOptions.embedSourcemap ? 'external' : false,
       define: this.rawCdpOptions.esbuildOptions?.define || {},
       alias: this.rawCdpOptions.esbuildOptions?.alias || {},
       // Mark vitest, runner packages, and UXP/Node built-in modules as external
@@ -590,12 +596,29 @@ export class CdpPoolWorker implements PoolWorker {
       throw new Error(`Failed to bundle ${filePath}: ${result.errors.map(e => e.text).join(', ')}`);
     }
 
-    const code = result.outputFiles?.[0]?.text;
-    if (!code) {
-      throw new Error(`No output from bundling ${filePath}`);
+    const outputFiles = result.outputFiles;
+    if (!outputFiles) {
+      throw new Error(`No output files from bundling ${filePath}`);
     }
 
+    const code = outputFiles.find(file => file.path.endsWith('.js'))?.text;
+    if (!code) {
+      throw new Error(`No code output from bundling ${filePath}`);
+    }
     this.log(`Bundled ${filePath}: ${code.length} bytes`);
+
+    if (this.rawCdpOptions.embedSourcemap) {
+      const sourcemap = outputFiles.find(file => file.path.endsWith('.js.map'))?.text;
+      if (!sourcemap) {
+        throw new Error(`No sourcemap output from bundling ${filePath}`);
+      }
+
+      this.log(`Embedding sourcemap for ${filePath}: ${sourcemap.length} bytes`);
+
+      // we embed the sourcemap in the evaled code, so that
+      return `${code}\nvar EVAL_SOURCEMAP = ${JSON.stringify(sourcemap)};`;
+    }
+
     return code;
   }
 

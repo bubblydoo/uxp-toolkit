@@ -27,11 +27,14 @@ interface ExecutionContextDescription {
   uniqueId: string;
 }
 
-export function waitForExecutionContextCreated(cdp: CDP.Client) {
+export async function waitForExecutionContextCreated(cdp: CDP.Client, runAfterListenerAttached?: () => Promise<void>) {
   const executionContextCreatedPromise = new Promise<ExecutionContextDescription>((resolve) => {
     cdp.Runtime.on('executionContextCreated', (event) => {
       resolve(event.context);
     });
   });
+  if (runAfterListenerAttached) {
+    await runAfterListenerAttached();
+  }
   return executionContextCreatedPromise;
 }

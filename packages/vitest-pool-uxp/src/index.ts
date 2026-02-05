@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { PoolRunnerInitializer } from 'vitest/node';
 import path from 'node:path';
 import process from 'node:process';
@@ -95,6 +96,7 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
     pluginPath = getDefaultPluginPath(),
     debug = false,
     mainDirectory = process.cwd(),
+    embedSourcemap = true,
   } = options;
 
   const resolvedPluginPath = path.isAbsolute(pluginPath)
@@ -120,11 +122,12 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
       return cachedConnection;
     },
     executionContextOrSession: async (cdp) => {
-      const executionContextPromise = waitForExecutionContextCreated(cdp);
-      await setupCdpSessionWithUxpDefaults(cdp);
-      const desc = await executionContextPromise;
+      const desc = await waitForExecutionContextCreated(cdp, async () => {
+        await setupCdpSessionWithUxpDefaults(cdp);
+      });
       return { uniqueId: desc.uniqueId };
     },
+    embedSourcemap,
     ...options,
     esbuildOptions: {
       ...options.esbuildOptions,

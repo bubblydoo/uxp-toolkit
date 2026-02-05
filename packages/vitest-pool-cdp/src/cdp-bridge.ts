@@ -13,11 +13,9 @@ export async function setupCdpSession(cdtUrl: string) {
 }
 
 async function defaultExecutionContextOrSessionFn(cdp: CDP.Client) {
-  const attachedTargetPromise = waitForAttachedToTarget(cdp);
-
-  await cdp.Target.setAutoAttach({ autoAttach: true, waitForDebuggerOnStart: true, flatten: true });
-
-  const attachedTarget = await attachedTargetPromise;
+  const attachedTarget = await waitForAttachedToTarget(cdp, async () => {
+    await cdp.Target.setAutoAttach({ autoAttach: true, waitForDebuggerOnStart: true, flatten: true });
+  });
 
   return { sessionId: attachedTarget.sessionId };
 }
@@ -87,10 +85,14 @@ export async function injectWorkerRuntime(
   log('Worker runtime injected successfully');
 }
 
-export async function waitForAttachedToTarget(cdp: CDP.Client): Promise<{ sessionId: string; targetId: string }> {
-  return new Promise((resolve) => {
+export async function waitForAttachedToTarget(cdp: CDP.Client, runAfterListenerAttached?: () => Promise<void>): Promise<{ sessionId: string; targetId: string }> {
+  const attachedToTargetPromise = new Promise<{ sessionId: string; targetId: string }>((resolve) => {
     cdp.Target.on('attachedToTarget', (event) => {
       resolve({ sessionId: event.sessionId, targetId: event.targetInfo.targetId });
     });
   });
+  if (runAfterListenerAttached) {
+    await runAfterListenerAttached();
+  }
+  return attachedToTargetPromise;
 }

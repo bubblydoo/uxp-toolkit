@@ -43,6 +43,11 @@ export interface BaseCdpPoolOptions {
    * Options for esbuild.
    */
   esbuildOptions?: PoolEsbuildOptions;
+
+  /**
+   * Whether to embed the sourcemap as the "EVAL_SOURCEMAP" global variable.
+   */
+  embedSourcemap?: boolean;
 }
 
 /**

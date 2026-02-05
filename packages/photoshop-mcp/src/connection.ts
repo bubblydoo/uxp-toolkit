@@ -67,12 +67,11 @@ export async function getOrReusePhotoshopConnection(): Promise<PhotoshopConnecti
   console.error('[photoshop-mcp] Setting up CDP session...');
   const cdp = await setupCdpSession(devtoolsConnection.url);
 
-  const executionContextCreatedPromise = waitForExecutionContextCreated(cdp);
-
-  await setupCdpSessionWithUxpDefaults(cdp);
-
   console.error('[photoshop-mcp] Waiting for execution context...');
-  const executionContext = await executionContextCreatedPromise;
+  const executionContext = await waitForExecutionContextCreated(cdp, async () => {
+    console.error('[photoshop-mcp] Setting up CDP session with UXP defaults...');
+    await setupCdpSessionWithUxpDefaults(cdp);
+  });
   console.error('[photoshop-mcp] Execution context ready');
 
   const connection: PhotoshopConnection = {
