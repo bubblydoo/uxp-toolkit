@@ -1,53 +1,38 @@
 /**
- * Defines a rectangle. This is a WIP.
+ * Defines a rectangle.
  *
  * @targetfolder objects
  * @optionobject
  */
-export class ImagingBounds {
-  private _left;
-  private _right;
-  private _top;
-  private _bottom;
+export interface ImagingBounds {
   /**
    * Coordinate of the left edge.
    * @minVersion 22.5
    */
-  get left(): number;
-  set left(coordinate: number);
+  left: number;
   /**
    * Coordinate of the right edge.
    * @minVersion 22.5
    */
-  get right(): number;
-  set right(coordinate: number);
+  right: number;
   /**
    * Coordinate of the top edge.
    * @minVersion 22.5
    */
-  get top(): number;
-  set top(coordinate: number);
+  top: number;
   /**
    * Coordinate of the bottom edge.
    * @minVersion 22.5
    */
-  get bottom(): number;
-  set bottom(coordinate: number);
+  bottom: number;
   /**
-   * Calculated width.
+   * Calculated width (readonly when returned from Photoshop).
    * @minVersion 22.5
    */
-  get width(): number;
+  readonly width?: number;
   /**
-   * Calculated height.
+   * Calculated height (readonly when returned from Photoshop).
    * @minVersion 22.5
    */
-  get height(): number;
-  /**
-   * The class name of the referenced object: *"Bounds"*.
-   * @minVersion 22.5
-   */
-  get typename(): 'Bounds';
-  /** @ignore */
-  constructor();
+  readonly height?: number;
 }

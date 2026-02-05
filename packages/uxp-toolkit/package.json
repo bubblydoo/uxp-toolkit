@@ -24,8 +24,10 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "vitest run",
-    "test:uxp": "node --import tsx ./node_modules/vitest/vitest.mjs run --config vitest.uxp.config.ts",
+    "test-base": "node --import tsx ./node_modules/vitest/vitest.mjs",
+    "test:unit": "pnpm test-base --project unit",
+    "test:uxp": "pnpm test-base --project uxp",
+    "test": "pnpm test:unit",
     "uxp-test:build": "uxp-test build",
     "uxp-test:dev": "uxp-test dev",
     "typecheck": "tsc --noEmit",

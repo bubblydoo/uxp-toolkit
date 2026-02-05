@@ -56,6 +56,7 @@ let currentProjectConfig: { root: string; projectName?: string } = {
 function getRunnerConfig(): VitestRunnerConfig {
   return {
     root: currentProjectConfig.root,
+    name: currentProjectConfig.projectName,
     setupFiles: [],
     passWithNoTests: false,
     sequence: {

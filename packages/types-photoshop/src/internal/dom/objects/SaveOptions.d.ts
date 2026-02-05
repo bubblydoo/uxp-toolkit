@@ -9,59 +9,42 @@ import type { SolidColor } from './SolidColor';
  * ```javascript
  * const doc = app.activeDocument;
  * const saveFile = await require('uxp').storage.localFileSystem.getFileForSaving("image.bmp");
- * const saveOptions = new BMPSaveOptions();
- * saveOptions.depth = constants.BMPDepthType.BMP_24BITS;
- * saveOptions.osType = constants.OperatingSystem.WINDOWS;
- * await doc.saveAs.bmp(saveFile, saveOptions);
+ * await doc.saveAs.bmp(saveFile, {
+ *   depth: constants.BMPDepthType.BMP_24BITS,
+ *   osType: constants.OperatingSystem.WINDOWS
+ * });
  * ```
  *
  * @targetfolder objects/saveoptions
  * @minVersion 22.5
  */
-export class BMPSaveOptions {
-  private _alphaChannels;
-  private _depth;
-  private _flipRowOrder;
-  private _osType;
-  private _rleCompression;
+export interface BMPSaveOptions {
   /**
    * True to save the alpha channels.
    * @minVersion 22.5
    */
-  get alphaChannels(): boolean;
-  set alphaChannels(value: boolean);
+  alphaChannels?: boolean;
   /**
    * The number of bits per channel.
    * @minVersion 22.5
    */
-  get depth(): Constants.BMPDepthType;
-  set depth(value: Constants.BMPDepthType);
+  depth?: Constants.BMPDepthType;
   /**
    * True to write the image from top to bottom,
    * available only when osType is OperatingSystem.WINDOWS
    * @minVersion 22.5
    */
-  get flipRowOrder(): boolean;
-  set flipRowOrder(value: boolean);
+  flipRowOrder?: boolean;
   /**
    * The target OS.
    * @minVersion 22.5
    */
-  get osType(): Constants.OperatingSystem;
-  set osType(value: Constants.OperatingSystem);
+  osType?: Constants.OperatingSystem;
   /**
    * True to use RLE compression
    * @minVersion 22.5
    */
-  get rleCompression(): boolean;
-  set rleCompression(value: boolean);
-  /**
-   * The class name of the referenced object: *"BMPSaveOptions"*.
-   * @minVersion 22.5
-   */
-  get typename(): 'BMPSaveOptions';
-  /** @ignore */
-  constructor();
+  rleCompression?: boolean;
 }
 /**
  * Options for saving a document in JPEG format using the {@link Document.saveAs} method
@@ -72,24 +55,17 @@ export class BMPSaveOptions {
  * ```javascript
  * const doc = app.activeDocument;
  * const saveFile = await require('uxp').storage.localFileSystem.getFileForSaving("image.jpg");
- * const saveOptions = new JPEGSaveOptions();
- * saveOptions.quality = 10;
- * saveOptions.embedColorProfile = true;
- * await doc.saveAs.jpg(saveFile, saveOptions);
+ * await doc.saveAs.jpg(saveFile, {
+ *   quality: 10,
+ *   embedColorProfile: true
+ * });
  * ```
  *
  * @targetfolder objects/saveoptions
  * @optionobject
  * @minVersion 22.5
  */
-export class JPEGSaveOptions {
-  private _quality;
-  private _formatOptions;
-  private _scans;
-  private _color;
-  private _matteColor;
-  private _customMatte;
-  private _embedColorProfile;
+export interface JPEGSaveOptions {
   /**
    * The image quality setting to use; affects file size and compression.
    *
@@ -97,15 +73,13 @@ export class JPEGSaveOptions {
    * @range 0...12
    * @minVersion 22.5
    */
-  get quality(): number;
-  set quality(value: number);
+  quality?: number;
   /**
    * The JPEG format option to use.
    * @default STANDARDBASELINE
    * @minVersion 22.5
    */
-  get formatOptions(): Constants.JPEGFormatOptions;
-  set formatOptions(value: Constants.JPEGFormatOptions);
+  formatOptions?: Constants.JPEGFormatOptions;
   /**
    * The number of scans to incrementally display the image on the page.
    * formatOptions must be JPEGFormatOptions.PROGRESSIVE.
@@ -113,41 +87,29 @@ export class JPEGSaveOptions {
    * @range 3...5
    * @minVersion 22.5
    */
-  get scans(): number;
-  set scans(value: number);
+  scans?: number;
   /**
    * A custom color to use to fill anti-aliased edges adjacent to transparent areas of the image.
    * Mutually exclusive with 'matteColor'.
    * @minVersion 22.5
    */
-  get color(): SolidColor;
-  set color(value: SolidColor);
+  color?: SolidColor;
   /**
    * The color to use to fill anti-aliased edges adjacent to transparent areas of the image.
    * Mutually exclusive with 'color'.
    * @minVersion 22.5
    */
-  get matteColor(): Constants.MatteColor;
-  set matteColor(value: Constants.MatteColor);
+  matteColor?: Constants.MatteColor;
   /**
    * Custom matting color; overrides matteColor
    * @minVersion 22.5
    */
-  get customMatte(): SolidColor;
-  set customMatte(value: SolidColor);
+  customMatte?: SolidColor;
   /**
    * False to skip embedding the color profile in the document
    * @minVersion 22.5
    */
-  get embedColorProfile(): boolean;
-  set embedColorProfile(value: boolean);
-  /**
-   * The class name of the referenced object: *"JPEGSaveOptions"*.
-   * @minVersion 22.5
-   */
-  get typename(): 'JPEGSaveOptions';
-  /** @ignore */
-  constructor();
+  embedColorProfile?: boolean;
 }
 /**
  * Options for saving a document in GIF format using the {@link Document.saveAs} method
@@ -158,96 +120,71 @@ export class JPEGSaveOptions {
  * ```javascript
  * const doc = app.activeDocument;
  * const saveFile = await require('uxp').storage.localFileSystem.getFileForSaving("image.gif");
- * const saveOptions = new GIFSaveOptions();
- * saveOptions.colors = 256;
- * saveOptions.transparency = true;
- * saveOptions.interlaced = false;
- * await doc.saveAs.gif(saveFile, saveOptions);
+ * await doc.saveAs.gif(saveFile, {
+ *   colors: 256,
+ *   transparency: true,
+ *   interlaced: false
+ * });
  * ```
  *
  * @targetfolder objects/saveoptions
  * @optionobject
  * @minVersion 22.5
  */
-export class GIFSaveOptions {
-  private _colors;
-  private _dither;
-  private _ditherAmount;
-  private _forced;
-  private _interlaced;
-  private _matte;
-  private _palette;
-  private _preserveExactColors;
-  private _transparency;
+export interface GIFSaveOptions {
   /**
    * The number of palette colors. Valid only when palette is:
    *
    * Palette.LOCALADAPTIVE, LOCALPERCEPTUAL, LOCALSELECTIVE, MACOSPALETTE, UNIFORM, WEBPALETTE; or WINDOWSPALETTE
    * @minVersion 22.5
    */
-  get colors(): number;
-  set colors(value: number);
+  colors?: number;
   /**
    * The dither type.
    * @minVersion 22.5
    */
-  get dither(): Constants.Dither;
-  set dither(value: Constants.Dither);
+  dither?: Constants.Dither;
   /**
    * The amount of dither.
    *
    * Valid only when dither = Dither.DIFFUSION.
    * @minVersion 22.5
    */
-  get ditherAmount(): number;
-  set ditherAmount(value: number);
+  ditherAmount?: number;
   /**
    * The type of colors to force into the color palette.
    * @minVersion 22.5
    */
-  get forced(): Constants.ForcedColors;
-  set forced(value: Constants.ForcedColors);
+  forced?: Constants.ForcedColors;
   /**
    * True if rows should be interlaced.
    * @minVersion 22.5
    */
-  get interlaced(): boolean;
-  set interlaced(value: boolean);
+  interlaced?: boolean;
   /**
    * The color to use to fill anti-aliased edges adjacent to transparent  areas of the image.
    *
    * When transparency is turned off for an image, the matte color is applied to transparent areas.
    * @minVersion 22.5
    */
-  get matte(): Constants.MatteColor;
-  set matte(value: Constants.MatteColor);
+  matte?: Constants.MatteColor;
   /**
    * The type of palette to use.
    * @minVersion 22.5
    */
-  get palette(): Constants.Palette;
-  set palette(value: Constants.Palette);
+  palette?: Constants.Palette;
   /**
    * True to protect colors in the image that contain entries in the color table from being dithered.
    *
    * Valid only when dither = DITHER.DIFFUSION
    * @minVersion 22.5
    */
-  get preserveExactColors(): boolean;
-  set preserveExactColors(value: boolean);
+  preserveExactColors?: boolean;
   /**
    * True to preserve transparent areas of the image during conversion to GIF format.
    * @minVersion 22.5
    */
-  get transparency(): boolean;
-  set transparency(value: boolean);
-  /**
-   * The class name of the referenced object: *"GIFSaveOptions"*.
-   * @minVersion 22.5
-   */
-  get typename(): 'GIFSaveOptions';
-  /** @ignore */
-  constructor();
+  transparency?: boolean;
 }
 /**
  * Options for saving a document in PNG format using the {@link Document.saveAs} method
@@ -258,28 +195,22 @@ export class GIFSaveOptions {
  * ```javascript
  * const doc = app.activeDocument;
  * const saveFile = await require('uxp').storage.localFileSystem.getFileForSaving("image.png");
- * const saveOptions = new PNGSaveOptions();
- * saveOptions.compression = 6;
- * saveOptions.interlaced = false;
- * await doc.saveAs.png(saveFile, saveOptions);
+ * await doc.saveAs.png(saveFile, {
+ *   compression: 6,
+ *   interlaced: false
+ * });
  * ```
  *
  * @targetfolder objects/saveoptions
  * @optionobject
  * @minVersion 22.5
  */
-export class PNGSaveOptions {
-  private _method;
-  private _compression;
-  private _interlaced;
-  /** @ignore */
-  constructor();
+export interface PNGSaveOptions {
   /**
    * PNG File Size optimization method.
    * @minVersion 22.5
    */
-  get method(): Constants.PNGMethod;
-  set method(value: Constants.PNGMethod);
+  method?: Constants.PNGMethod;
   /**
    * The compression value to be used when method = PNGMethod.QUICK
    *
@@ -287,21 +218,14 @@ export class PNGSaveOptions {
    * @default 6
    * @minVersion 22.5
    */
-  get compression(): number;
-  set compression(value: number);
+  compression?: number;
   /**
    * True to interlace rows when method = PNGMethod.QUICK
    *
    * @default false
    * @minVersion 22.5
    */
-  get interlaced(): boolean;
-  set interlaced(value: boolean);
-  /**
-   * The class name of the referenced object: *"PNGSaveOptions"*.
-   * @minVersion 22.5
-   */
-  get typename(): 'PNGSaveOptions';
+  interlaced?: boolean;
 }
 /**
  * Options for saving a document in Photoshop (PSD) format using the {@link Document.saveAs} method
@@ -312,65 +236,46 @@ export class PNGSaveOptions {
  * ```javascript
  * const doc = app.activeDocument;
  * const saveFile = await require('uxp').storage.localFileSystem.getFileForSaving("document.psd");
- * const saveOptions = new PhotoshopSaveOptions();
- * saveOptions.layers = true;
- * saveOptions.embedColorProfile = true;
- * saveOptions.maximizeCompatibility = true;
- * await doc.saveAs.psd(saveFile, saveOptions);
+ * await doc.saveAs.psd(saveFile, {
+ *   layers: true,
+ *   embedColorProfile: true,
+ *   maximizeCompatibility: true
+ * });
  * ```
  *
  * @targetfolder objects/saveoptions
  * @optionobject
  * @minVersion 22.5
  */
-export class PhotoshopSaveOptions {
-  private _alphaChannels;
-  private _annotations;
-  private _embedColorProfile;
-  private _layers;
-  private _spotColor;
-  private _maximizeCompatibility;
+export interface PhotoshopSaveOptions {
   /**
    * True to save the alpha channels.
    * @minVersion 22.5
    */
-  get alphaChannels(): boolean;
-  set alphaChannels(value: boolean);
+  alphaChannels?: boolean;
   /**
    * True to save the annotations.
    * @minVersion 22.5
    */
-  get annotations(): boolean;
-  set annotations(value: boolean);
+  annotations?: boolean;
   /**
    * True to embed the color profiles in the document.
    * @minVersion 22.5
    */
-  get embedColorProfile(): boolean;
-  set embedColorProfile(value: boolean);
+  embedColorProfile?: boolean;
   /**
    * True to preserve the layers.
    * @minVersion 22.5
    */
-  get layers(): boolean;
-  set layers(value: boolean);
+  layers?: boolean;
   /**
    * True to save the spot colors.
    * @minVersion 22.5
    */
-  get spotColor(): boolean;
-  set spotColor(value: boolean);
+  spotColor?: boolean;
   /**
    * Maximize Compatibility with older versions
    * @minVersion 22.5
    */
-  get maximizeCompatibility(): boolean;
-  set maximizeCompatibility(value: boolean);
-  /**
-   * The class name of the referenced object: *"PhotoshopSaveOptions"*.
-   * @minVersion 22.5
-   */
-  get typename(): 'PhotoshopSaveOptions';
-  /** @ignore */
-  constructor();
+  maximizeCompatibility?: boolean;
 }

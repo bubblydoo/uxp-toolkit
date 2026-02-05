@@ -4,8 +4,8 @@ import { getDocumentLayerDescriptors } from './getDocumentLayerDescriptors';
 import { photoshopLayerDescriptorsToUTLayers } from './photoshopLayerDescriptorsToUTLayers';
 
 describe('photoshopLayerDescriptorsToUTLayers', () => {
-  it('should convert clipping layers correctly', async () => {
-    const doc = await openFixture('clipping-layers.psd');
+  it('should convert clipping layers correctly', async (t) => {
+    const doc = await openFixture(t, 'clipping-layers.psd');
     const descriptors = await getDocumentLayerDescriptors(doc.id);
 
     console.log(descriptors);
@@ -53,8 +53,8 @@ describe('photoshopLayerDescriptorsToUTLayers', () => {
     });
   });
 
-  it('should convert layers with background correctly', async () => {
-    const doc = await openFixture('one-layer-with-bg.psd');
+  it('should convert layers with background correctly', async (t) => {
+    const doc = await openFixture(t, 'one-layer-with-bg.psd');
     const descriptors = await getDocumentLayerDescriptors(doc.id);
     console.log(descriptors);
     const layers = photoshopLayerDescriptorsToUTLayers(descriptors);

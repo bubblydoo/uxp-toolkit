@@ -84,6 +84,7 @@ export function cdpPool(options: CdpPoolOptions): PoolRunnerInitializer {
       connectionTimeout: options.connectionTimeout,
       rpcTimeout: options.rpcTimeout,
       esbuildOptions: options.esbuildOptions,
+      embedSourcemap: options.embedSourcemap,
     }),
   };
 }

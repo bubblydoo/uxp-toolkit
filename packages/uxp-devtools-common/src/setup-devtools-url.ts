@@ -3,7 +3,6 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import AppClient from '@adobe-fixed-uxp/uxp-devtools-core/core/service/clients/AppClient';
 import Server from '@adobe-fixed-uxp/uxp-devtools-core/core/service/Server';
-import DevToolsHelper from '@adobe-fixed-uxp/uxp-devtools-helper';
 import z from 'zod';
 import { setGlobalUxpLogger } from './uxp-logger';
 
@@ -50,6 +49,8 @@ export interface DevtoolsConnection {
 }
 
 export async function setupDevtoolsConnection(pluginPath: string, ports: number[] = DEFAULT_PORTS): Promise<DevtoolsConnection> {
+  const { default: DevToolsHelper } = await import('@adobe-fixed-uxp/uxp-devtools-helper');
+
   if (!path.isAbsolute(pluginPath)) {
     throw new Error('pluginPath must be an absolute path');
   }
@@ -175,7 +176,6 @@ export async function setupDevtoolsConnection(pluginPath: string, ports: number[
   const connection: DevtoolsConnection = {
     url: cdtUrl,
     teardown: async () => {
-      console.log('Tearing down devtools URL');
       // Unload the plugin from Photoshop
       try {
         await callPluginHandler(

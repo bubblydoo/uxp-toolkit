@@ -17,8 +17,8 @@ async function getFirstLayer() {
 }
 
 describe('renameLayer', () => {
-  it('should rename a layer', async () => {
-    await openFixture('one-layer.psd');
+  it('should rename a layer', async (t) => {
+    await openFixture(t, 'one-layer.psd');
     const layer = await getFirstLayer();
     expect(layer.name).toBe('Layer 1');
     await executeAsModal('Rename Layer', async (ctx) => {

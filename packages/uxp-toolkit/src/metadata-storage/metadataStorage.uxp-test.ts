@@ -1,4 +1,3 @@
-import { app } from 'photoshop';
 import { describe, expect, it } from 'vitest';
 import { openFixture } from '../../test/open-fixture';
 import {
@@ -12,9 +11,8 @@ const TEST_KEY = 'testKey';
 const TEST_VALUE = 'test-value-written-by-uxp-test';
 
 describe('metadataStorage', () => {
-  it('should write and read document metadata', async () => {
-    await openFixture('one-layer.psd');
-    const document = app.activeDocument!;
+  it('should write and read document metadata', async (t) => {
+    const document = await openFixture(t, 'one-layer.psd');
 
     await writeDocumentMetadata(document, {
       key: TEST_KEY,

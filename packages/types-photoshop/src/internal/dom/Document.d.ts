@@ -1,3 +1,4 @@
+import type { File } from 'uxp';
 import type { Channel } from './Channel';
 import type { Channels } from './collections/Channels';
 import type { ColorSamplers } from './collections/ColorSamplers';
@@ -19,6 +20,7 @@ import type { SolidColor } from './objects/SolidColor';
 import type { Selection } from './Selection';
 import type { CalculationsOptions } from './types/CalculationsTypes';
 import type { GroupLayerCreateOptions, PixelLayerCreateOptions, TextLayerCreateOptions } from './types/LayerTypes';
+
 /**
  * Execution Context with the Document injected for modal execution within Document.suspendHistory
  * @ignore

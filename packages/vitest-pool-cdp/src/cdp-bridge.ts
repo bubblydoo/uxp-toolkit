@@ -58,9 +58,7 @@ export async function setupCdpConnection(
       }
       if (options.teardown) {
         try {
-          console.log('Tearing down devtools URL');
           await options.teardown();
-          console.log('Teardown complete');
         }
         catch (error) {
           console.error('Teardown error:', error);

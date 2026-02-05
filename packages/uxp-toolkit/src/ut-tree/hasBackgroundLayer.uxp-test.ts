@@ -4,11 +4,10 @@ import { openFixture } from '../../test/open-fixture';
 import { createGetDocumentHasBackgroundLayerCommand } from '../commands-library/getDocument';
 import { createGetBackgroundLayerCommand } from '../commands-library/getLayer';
 import { batchPlayCommand } from '../core/command';
-import { executeAsModal } from '../core/executeAsModal';
 
 describe('hasBackgroundLayer', () => {
-  it('should detect background layer in document with background', async () => {
-    const doc = await openFixture('one-layer-with-bg.psd');
+  it('should detect background layer in document with background', async (t) => {
+    const doc = await openFixture(t, 'one-layer-with-bg.psd');
     const hasBackgroundLayer = await batchPlayCommand(
       createGetDocumentHasBackgroundLayerCommand(doc.id),
     );
@@ -17,11 +16,10 @@ describe('hasBackgroundLayer', () => {
       createGetBackgroundLayerCommand(app.activeDocument.id),
     );
     expect(layer.name).toBe('Background');
-    await executeAsModal('Close Document', async () => await doc.close(0));
   });
 
-  it('should not detect background layer in document without background', async () => {
-    const doc2 = await openFixture('one-layer.psd');
+  it('should not detect background layer in document without background', async (t) => {
+    const doc2 = await openFixture(t, 'one-layer.psd');
 
     const hasBackgroundLayer2 = await batchPlayCommand(
       createGetDocumentHasBackgroundLayerCommand(doc2.id),
@@ -37,7 +35,5 @@ describe('hasBackgroundLayer', () => {
       rejected = true;
     }
     expect(rejected).toBe(true);
-
-    await executeAsModal('Close Document', async () => await doc2.close(0));
   });
 });

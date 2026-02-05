@@ -1,3 +1,10 @@
+export interface ICMYKColor {
+  black: number;
+  cyan: number;
+  magenta: number;
+  yellow: number;
+}
+
 /**
  * Defines a CMYK color, used in {@link SolidColor} object.
  *
@@ -9,7 +16,7 @@
  * @targetfolder colors
  * @minVersion 23.0
  */
-export class CMYKColor {
+export class CMYKColor implements ICMYKColor {
   /**
    * The black color value, as percentage.
    * @default 0
