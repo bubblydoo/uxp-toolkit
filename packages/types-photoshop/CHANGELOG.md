@@ -1,5 +1,11 @@
 # @adobe-uxp-types/photoshop
 
+## 0.1.4
+
+### Patch Changes
+
+- 4f6d7f6: Vitest improvements
+
 ## 0.1.3
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.13
+
+### Patch Changes
+
+- 4f6d7f6: Vitest improvements
+
 ## 0.0.12
 
 ### Patch Changes
