@@ -53,7 +53,8 @@ export async function setupDevtoolsConnection(pluginPath: string, ports: number[
   if (!path.isAbsolute(pluginPath)) {
     throw new Error('pluginPath must be an absolute path');
   }
-  if (!await fileExists(`${pluginPath}/manifest.json`)) {
+  const manifestPath = path.join(pluginPath, 'manifest.json');
+  if (!await fileExists(manifestPath)) {
     throw new Error('manifest.json not found');
   }
 
@@ -118,7 +119,7 @@ export async function setupDevtoolsConnection(pluginPath: string, ports: number[
     });
   }
 
-  const manifest = JSON.parse(await fs.readFile(`${pluginPath}/manifest.json`, 'utf8'));
+  const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
   const pluginId = manifest.id;
 
   const validateResult = await callPluginHandler(

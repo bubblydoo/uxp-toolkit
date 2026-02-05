@@ -43,7 +43,9 @@ export interface UxpPoolOptions extends Omit<CdpPoolOptions, 'cdp'> {
 }
 
 // Cached connection - with isolate: false and fileParallelism: false,
-// there's only one worker so we just need simple caching
+// there's only one worker so we just need simple caching.
+// The cache is cleared when teardown runs to ensure subsequent pool
+// initializations don't reuse a stale connection.
 let cachedConnection: { url: string; teardown: () => Promise<void> } | null = null;
 
 /**
@@ -116,8 +118,20 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
       }
 
       log('Creating new UXP connection...');
-      cachedConnection = await setupDevtoolsConnection(resolvedPluginPath);
-      log(`UXP connection established: ${cachedConnection.url}`);
+      const connection = await setupDevtoolsConnection(resolvedPluginPath);
+      log(`UXP connection established: ${connection.url}`);
+
+      // Wrap teardown to clear the cache when the connection is closed
+      const originalTeardown = connection.teardown;
+      cachedConnection = {
+        url: connection.url,
+        teardown: async () => {
+          log('Tearing down UXP connection and clearing cache...');
+          cachedConnection = null;
+          await originalTeardown();
+          log('UXP connection teardown complete');
+        },
+      };
 
       return cachedConnection;
     },
