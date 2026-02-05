@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-devtools-common
 
+## 0.0.4
+
+### Patch Changes
+
+- 4f6d7f6: Vitest improvements
+
 ## 0.0.3
 
 ### Patch Changes
