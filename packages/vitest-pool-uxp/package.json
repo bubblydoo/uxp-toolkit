@@ -29,9 +29,6 @@
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit"
   },
-  "peerDependencies": {
-    "vitest": ">=4"
-  },
   "dependencies": {
     "@bubblydoo/uxp-devtools-common": "workspace:*",
     "@bubblydoo/vitest-pool-cdp": "workspace:*"

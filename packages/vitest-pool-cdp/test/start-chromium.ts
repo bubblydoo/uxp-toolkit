@@ -3,11 +3,19 @@ import type { LaunchOptions } from 'puppeteer';
 import puppeteer from 'puppeteer';
 import z from 'zod';
 
+const ARGS = ['--remote-allow-origins=*'];
+
 export async function startChromium(options: LaunchOptions = {}) {
   const browser = await puppeteer.launch({
     headless: true,
     debuggingPort: 9293,
-    args: ['--remote-allow-origins=*'],
+    // [2423:2423:0205/142910.232787:FATAL:content/browser/zygote_host/zygote_host_impl_linux.cc:128] No usable sandbox!
+    // If you are running on Ubuntu 23.10+ or another Linux distro that has disabled unprivileged user namespaces with AppArmor,
+    // see https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md.
+    // Otherwise see https://chromium.googlesource.com/chromium/src/+/main/docs/linux/suid_sandbox_development.md for more
+    // information on developing with the (older) SUID sandbox.
+    // If you want to live dangerously and need an immediate workaround, you can try using --no-sandbox.
+    args: ARGS.concat(process.env.GITHUB_ACTIONS ? ['--no-sandbox'] : []),
     ...options,
   });
 
