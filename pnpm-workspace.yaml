@@ -1,16 +1,3 @@
-packages:
-  - packages/*
-
-ignoredBuiltDependencies:
-  - puppeteer
-
-onlyBuiltDependencies:
-  - '@adobe-fixed-uxp/uxp-devtools-helper'
-
-patchedDependencies:
-  mutationobserver-shim: patches/mutationobserver-shim.patch
-  vite-uxp-plugin: patches/vite-uxp-plugin.patch
-
 shellEmulator: true
 
 trustPolicy: no-downgrade
@@ -18,5 +5,18 @@ trustPolicy: no-downgrade
 trustPolicyExclude:
   - chokidar@4.0.3
   - sass@1.97.3
+
+packages:
+  - packages/*
+
+patchedDependencies:
+  mutationobserver-shim: patches/mutationobserver-shim.patch
+  vite-uxp-plugin: patches/vite-uxp-plugin.patch
+
+ignoredBuiltDependencies:
+  - puppeteer
+
+onlyBuiltDependencies:
+  - '@adobe-fixed-uxp/uxp-devtools-helper'
 
 trustPolicyIgnoreAfter: 4320
