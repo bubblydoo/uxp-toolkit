@@ -1,7 +1,7 @@
 {
   "name": "@bubblydoo/uxp-test-framework",
   "type": "module",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-test-framework",

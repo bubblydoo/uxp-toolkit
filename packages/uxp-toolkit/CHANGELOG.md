@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.12
+
+### Patch Changes
+
+- 7370ae5: Get Vitest pool to work
+
 ## 0.0.11
 
 ### Patch Changes
