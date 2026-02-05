@@ -4,7 +4,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { setupCdpSession, setupCdpSessionWithDefaults, setupDevtoolsUrl, waitForExecutionContextCreated } from '@bubblydoo/uxp-cli-common';
+import { setupCdpSession, setupCdpSessionWithUxpDefaults, setupDevtoolsConnection, waitForExecutionContextCreated } from '@bubblydoo/uxp-devtools-common';
 import arg from 'arg';
 import { openDevtoolsSessionInChrome } from './open-devtools-session';
 
@@ -73,7 +73,7 @@ if (actionArgs['--help']) {
 }
 
 async function getPluginInfo(useFakePlugin: boolean) {
-  const fakePluginPath = path.resolve(__dirname, '../../uxp-cli-common/fake-plugin');
+  const fakePluginPath = path.resolve(__dirname, '../../uxp-devtools-common/fake-plugin');
 
   if (useFakePlugin) {
     console.log('Using fake plugin:');
@@ -111,13 +111,13 @@ async function getPluginInfo(useFakePlugin: boolean) {
 }
 
 async function openDevtools() {
-  const { pluginPath, pluginId } = await getPluginInfo(false);
+  const { pluginPath } = await getPluginInfo(false);
 
   console.log('\nSetting up devtools URL...');
-  const cdtUrl = await setupDevtoolsUrl(pluginPath, pluginId);
-  console.log(`DevTools URL: ${cdtUrl}\n`);
+  const devtoolsConnection = await setupDevtoolsConnection(pluginPath);
+  console.log(`DevTools URL: ${devtoolsConnection.url}\n`);
 
-  await openDevtoolsSessionInChrome(cdtUrl);
+  await openDevtoolsSessionInChrome(devtoolsConnection.url);
   console.log('Chrome DevTools opened');
 
   console.log('\nPress Ctrl+C to exit...');
@@ -125,21 +125,18 @@ async function openDevtools() {
 }
 
 async function dumpObject() {
-  const { pluginPath, pluginId } = await getPluginInfo(true);
+  const { pluginPath } = await getPluginInfo(true);
 
   console.log('\nSetting up devtools URL...');
-  const cdtUrl = await setupDevtoolsUrl(pluginPath, pluginId);
-  console.log(`DevTools URL: ${cdtUrl}\n`);
+  const devtoolsConnection = await setupDevtoolsConnection(pluginPath);
+  console.log(`DevTools URL: ${devtoolsConnection.url}\n`);
 
   console.log('Setting up CDP session...');
-  const cdp = await setupCdpSession(cdtUrl);
+  const cdp = await setupCdpSession(devtoolsConnection.url);
 
-  const executionContextCreatedPromise = waitForExecutionContextCreated(cdp);
-
-  await setupCdpSessionWithDefaults(cdp);
-
-  console.log('Waiting for execution context...');
-  const executionContext = await executionContextCreatedPromise;
+  const executionContext = await waitForExecutionContextCreated(cdp, async () => {
+    await setupCdpSessionWithUxpDefaults(cdp);
+  });
 
   console.log('Evaluating expression...');
   const result = await cdp.Runtime.evaluate({

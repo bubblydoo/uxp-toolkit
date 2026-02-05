@@ -30,7 +30,7 @@
     "dev": "tsup --watch"
   },
   "dependencies": {
-    "@bubblydoo/uxp-cli-common": "workspace:*",
+    "@bubblydoo/uxp-devtools-common": "workspace:*",
     "arg": "^5.0.2",
     "chrome-remote-interface": "^0.33.3"
   },

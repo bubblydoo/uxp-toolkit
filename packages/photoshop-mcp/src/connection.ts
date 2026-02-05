@@ -3,10 +3,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   setupCdpSession,
-  setupCdpSessionWithDefaults,
-  setupDevtoolsUrl,
+  setupCdpSessionWithUxpDefaults,
+  setupDevtoolsConnection,
   waitForExecutionContextCreated,
-} from '@bubblydoo/uxp-cli-common';
+} from '@bubblydoo/uxp-devtools-common';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -26,11 +26,11 @@ export interface PhotoshopConnection {
 let currentConnection: PhotoshopConnection | null = null;
 
 /**
- * Get the fake plugin path from uxp-cli-common
+ * Get the fake plugin path from uxp-devtools-common
  */
 function getFakePluginPath(): string {
-  // Navigate from dist/connection.js to uxp-cli-common/fake-plugin
-  return path.resolve(__dirname, '../../uxp-cli-common/fake-plugin');
+  // Navigate from dist/connection.js to uxp-devtools-common/fake-plugin
+  return path.resolve(__dirname, '../../uxp-devtools-common/fake-plugin');
 }
 
 /**
@@ -44,7 +44,7 @@ function getPluginConfig(): { pluginPath: string; pluginId: string } {
 
 /**
  * Establishes a connection to Photoshop via CDP.
- * Uses the fake-plugin from uxp-cli-common by default.
+ * Uses the fake-plugin from uxp-devtools-common by default.
  *
  * Configuration via environment variables:
  * - PHOTOSHOP_MCP_PLUGIN_PATH: Path to the UXP plugin directory
@@ -58,21 +58,20 @@ export async function getOrReusePhotoshopConnection(): Promise<PhotoshopConnecti
     return currentConnection;
   }
 
-  const { pluginPath, pluginId } = getPluginConfig();
+  const { pluginPath } = getPluginConfig();
 
   console.error('[photoshop-mcp] Setting up devtools URL...');
-  const cdtUrl = await setupDevtoolsUrl(pluginPath, pluginId);
-  console.error(`[photoshop-mcp] DevTools URL: ${cdtUrl}`);
+  const devtoolsConnection = await setupDevtoolsConnection(pluginPath);
+  console.error(`[photoshop-mcp] DevTools URL: ${devtoolsConnection.url}`);
 
   console.error('[photoshop-mcp] Setting up CDP session...');
-  const cdp = await setupCdpSession(cdtUrl);
-
-  const executionContextCreatedPromise = waitForExecutionContextCreated(cdp);
-
-  await setupCdpSessionWithDefaults(cdp);
+  const cdp = await setupCdpSession(devtoolsConnection.url);
 
   console.error('[photoshop-mcp] Waiting for execution context...');
-  const executionContext = await executionContextCreatedPromise;
+  const executionContext = await waitForExecutionContextCreated(cdp, async () => {
+    console.error('[photoshop-mcp] Setting up CDP session with UXP defaults...');
+    await setupCdpSessionWithUxpDefaults(cdp);
+  });
   console.error('[photoshop-mcp] Execution context ready');
 
   const connection: PhotoshopConnection = {
@@ -81,6 +80,7 @@ export async function getOrReusePhotoshopConnection(): Promise<PhotoshopConnecti
     disconnect: async () => {
       try {
         await cdp.close();
+        await devtoolsConnection.teardown();
       }
       catch {
         // Ignore close errors

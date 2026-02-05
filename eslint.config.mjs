@@ -18,6 +18,8 @@ export default antfu(
       'no-console': 'warn',
       'ts/explicit-function-return-type': 'off',
       'node/prefer-global/process': 'off',
+      'node/prefer-node-protocol': 'off',
+      'unicorn/prefer-node-protocol': 'off',
       'unused-imports/no-unused-vars': [
         'warn',
         {

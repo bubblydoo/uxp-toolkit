@@ -1,7 +1,8 @@
 {
-  "name": "@bubblydoo/uxp-cli-common",
+  "name": "@bubblydoo/vitest-pool-uxp",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.0.1",
+  "description": "Vitest pool for running tests in Adobe UXP environments (Photoshop, etc.)",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -16,14 +17,6 @@
         "types": "./dist/index.d.ts",
         "import": "./dist/index.js"
       },
-      "./setup-devtools-url": {
-        "types": "./dist/setup-devtools-url.d.ts",
-        "import": "./dist/setup-devtools-url.js"
-      },
-      "./uxp-logger": {
-        "types": "./dist/uxp-logger.d.ts",
-        "import": "./dist/uxp-logger.js"
-      },
       "./package.json": "./package.json"
     }
   },
@@ -33,19 +26,18 @@
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@adobe-fixed-uxp/uxp-devtools-core": "^1.6.1",
-    "@adobe-fixed-uxp/uxp-devtools-helper": "^1.6.1",
-    "chrome-remote-interface": "^0.33.3",
-    "zod": "^4.3.6"
+    "@bubblydoo/uxp-devtools-common": "workspace:*",
+    "@bubblydoo/vitest-pool-cdp": "workspace:*"
   },
   "devDependencies": {
     "@bubblydoo/tsconfig": "workspace:*",
-    "@types/chrome-remote-interface": "^0.33.0",
     "@types/node": "^20.8.7",
     "tsup": "^8.3.5",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.0"
   }
 }

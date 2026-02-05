@@ -32,9 +32,30 @@ const debugReplySchema = z.object({
   chromeDevToolsUrl: z.string(),
 });
 
-export async function setupDevtoolsUrl(pluginPath: string, pluginId: string, ports: number[] = DEFAULT_PORTS) {
+async function fileExists(path: string) {
+  try {
+    await fs.access(path);
+    return true;
+  }
+  catch {
+    return false;
+  }
+}
+
+export interface DevtoolsConnection {
+  /** Debugger websocket URL */
+  url: string;
+  /** Unload the plugin and tear down the Vulcan connection */
+  teardown: () => Promise<void>;
+}
+
+export async function setupDevtoolsConnection(pluginPath: string, ports: number[] = DEFAULT_PORTS): Promise<DevtoolsConnection> {
   if (!path.isAbsolute(pluginPath)) {
     throw new Error('pluginPath must be an absolute path');
+  }
+  const manifestPath = path.join(pluginPath, 'manifest.json');
+  if (!await fileExists(manifestPath)) {
+    throw new Error('manifest.json not found');
   }
 
   const devtoolsManager = new DevToolsHelper(true);
@@ -52,6 +73,8 @@ export async function setupDevtoolsUrl(pluginPath: string, pluginId: string, por
 
   // this goes through Adobe's Vulcan system, which is a binary black box
   devtoolsManager.setServerDetails(PORT);
+
+  console.log('port', PORT);
 
   await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -96,6 +119,9 @@ export async function setupDevtoolsUrl(pluginPath: string, pluginId: string, por
     });
   }
 
+  const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
+  const pluginId = manifest.id;
+
   const validateResult = await callPluginHandler(
     psClient,
     {
@@ -108,7 +134,7 @@ export async function setupDevtoolsUrl(pluginPath: string, pluginId: string, por
           path: pluginPath,
         },
       },
-      manifest: JSON.parse(await fs.readFile(`${pluginPath}/manifest.json`, 'utf8')),
+      manifest,
     },
     validateReplySchema,
   );
@@ -146,5 +172,48 @@ export async function setupDevtoolsUrl(pluginPath: string, pluginId: string, por
 
   const cdtUrl = result.wsdebugUrl.replace('ws=', 'ws://');
 
-  return cdtUrl;
+  const connection: DevtoolsConnection = {
+    url: cdtUrl,
+    teardown: async () => {
+      console.log('Tearing down devtools URL');
+      // Unload the plugin from Photoshop
+      try {
+        await callPluginHandler(
+          psClient,
+          {
+            action: 'unload',
+            command: 'Plugin',
+            pluginSessionId,
+          },
+          z.object({
+            command: z.literal('reply'),
+            requestId: z.number(),
+          }),
+        );
+        console.log('Plugin unloaded');
+      }
+      catch (error) {
+        console.error('Error unloading plugin:', error);
+      }
+
+      try {
+        await server.close();
+      }
+      catch (error) {
+        console.error('Error closing server:', error);
+      }
+
+      // Terminate the DevToolsHelper (Adobe Vulcan native library)
+      // This is crucial to prevent hanging handles
+      try {
+        devtoolsManager.terminate();
+        console.log('DevToolsHelper terminated');
+      }
+      catch (error) {
+        console.error('Error terminating DevToolsHelper:', error);
+      }
+    },
+  };
+
+  return connection;
 }

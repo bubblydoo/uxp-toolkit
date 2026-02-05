@@ -18,3 +18,5 @@ dist-vite
 dist-runtime
 dist-schemas
 dist-readmes
+chrome
+uxp-tests-plugin

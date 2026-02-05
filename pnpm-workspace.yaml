@@ -1,10 +1,10 @@
 shellEmulator: true
 
 trustPolicy: no-downgrade
-trustPolicyIgnoreAfter: 4320 # 3 days
 trustPolicyExclude:
   - chokidar@4.0.3
   - sass@1.97.3
+trustPolicyIgnoreAfter: 4320
 
 packages:
   - packages/*
@@ -12,3 +12,9 @@ packages:
 patchedDependencies:
   mutationobserver-shim: patches/mutationobserver-shim.patch
   vite-uxp-plugin: patches/vite-uxp-plugin.patch
+
+ignoredBuiltDependencies:
+  - puppeteer
+
+onlyBuiltDependencies:
+  - '@adobe-fixed-uxp/uxp-devtools-helper'

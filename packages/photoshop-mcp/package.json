@@ -34,7 +34,7 @@
     "dev": "tsx watch src/index.ts"
   },
   "dependencies": {
-    "@bubblydoo/uxp-cli-common": "workspace:*",
+    "@bubblydoo/uxp-devtools-common": "workspace:*",
     "@hono/mcp": "^0.2.3",
     "@hono/node-server": "^1.19.9",
     "@modelcontextprotocol/sdk": "^1.25.3",

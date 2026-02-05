@@ -25,6 +25,7 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
+    "test:uxp": "node --import tsx ./node_modules/vitest/vitest.mjs run --config vitest.uxp.config.ts",
     "uxp-test:build": "uxp-test build",
     "uxp-test:dev": "uxp-test dev",
     "typecheck": "tsc --noEmit",
@@ -57,13 +58,17 @@
     "@adobe-uxp-types/uxp": "workspace:*",
     "@bubblydoo/tsconfig": "workspace:*",
     "@bubblydoo/uxp-test-framework": "workspace:*",
+    "@bubblydoo/vitest-pool-cdp": "workspace:*",
+    "@bubblydoo/vitest-pool-uxp": "workspace:*",
     "@types/chai": "^5.2.3",
     "@types/node": "^20.8.7",
     "chai": "^6.2.2",
     "dedent": "^1.7.1",
     "rollup": "^4.57.0",
     "tsup": "^8.5.1",
+    "tsx": "^4.20.2",
     "typescript": "^5.8.3",
+    "url-shim": "^1.0.1",
     "vitest": "^4.0.18",
     "zod": "^4.3.6"
   }

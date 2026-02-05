@@ -1,18 +1,18 @@
-import type { Test } from '@bubblydoo/uxp-test-framework';
-import { expect } from 'chai';
-import { app } from 'photoshop';
+import { constants } from 'photoshop';
+import { describe, expect, it } from 'vitest';
+import { openFixture } from '../../test/open-fixture';
+import { executeAsModal } from './executeAsModal';
 import { suspendHistory } from './suspendHistory';
 
-export const suspendHistoryTest: Test = {
-  name: 'core/suspendHistory should return correctly',
-  async run() {
-    const document = app.activeDocument;
-    if (!document) {
-      throw new Error('No active document');
-    }
-    const result = await suspendHistory(document, 'Test', async (context) => {
+describe('core/suspendHistory', () => {
+  it('should return correctly', async (t) => {
+    const doc = await openFixture('one-layer.psd'); // some document needs to be open
+    t.onTestFinished(() => executeAsModal('Close document', async () => {
+      doc.close(constants.SaveOptions.DONOTSAVECHANGES);
+    }));
+    const result = await suspendHistory(doc, 'Test', async () => {
       return 'test';
     });
-    expect(result).to.equal('test');
-  },
-};
+    expect(result).toBe('test');
+  });
+});

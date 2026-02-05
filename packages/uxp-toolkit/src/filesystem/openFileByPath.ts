@@ -5,6 +5,7 @@ import { isFile } from './isFileOrFolder';
 
 export async function openFileByPath(path: string) {
   const fs = storage.localFileSystem;
+  console.log('path', path);
   const entry = await fs.getEntryWithUrl(path);
   if (!isFile(entry)) {
     throw new Error('Entry is not a file');

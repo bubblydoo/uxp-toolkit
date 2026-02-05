@@ -1,0 +1,51 @@
+{
+  "name": "@bubblydoo/uxp-devtools-common",
+  "type": "module",
+  "version": "0.0.2",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./setup-devtools-url": {
+        "types": "./dist/setup-devtools-url.d.ts",
+        "import": "./dist/setup-devtools-url.js"
+      },
+      "./uxp-logger": {
+        "types": "./dist/uxp-logger.d.ts",
+        "import": "./dist/uxp-logger.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "files": [
+    "dist",
+    "fake-plugin"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "@adobe-fixed-uxp/uxp-devtools-core": "^1.6.3",
+    "@adobe-fixed-uxp/uxp-devtools-helper": "^1.6.2",
+    "chrome-remote-interface": "^0.33.3",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@bubblydoo/tsconfig": "workspace:*",
+    "@types/chrome-remote-interface": "^0.33.0",
+    "@types/node": "^20.8.7",
+    "tsup": "^8.3.5",
+    "typescript": "^5.8.3"
+  }
+}
