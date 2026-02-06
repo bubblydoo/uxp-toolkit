@@ -1,12 +1,9 @@
-import { app } from 'photoshop';
 import { describe, expect, it } from 'vitest';
+import { openFixture } from '../../test/open-fixture';
 
 describe('meta: suspendHistory', () => {
-  it('should throw correctly', async () => {
-    const document = app.activeDocument;
-    if (!document) {
-      throw new Error('No active document');
-    }
+  it('should throw correctly', async (t) => {
+    const document = await openFixture(t, 'one-layer.psd');
 
     let threw = false;
     try {

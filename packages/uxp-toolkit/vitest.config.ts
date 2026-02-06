@@ -13,10 +13,10 @@ export default defineConfig({
         extends: true,
         test: {
           name: 'unit',
-          include: ['src/**/*.test.ts'],
+          include: ['{src,test}/**/*.test.ts'],
           typecheck: {
             enabled: true,
-            include: ['src/**/*.test-d.ts'],
+            include: ['{src,test}/**/*.test-d.ts'],
           },
           sequence: {
             groupOrder: 0,
@@ -28,9 +28,12 @@ export default defineConfig({
         extends: true,
         test: {
           name: 'uxp',
-          include: ['src/**/*.uxp-test.ts', 'test/**/*.uxp-test.ts'],
+          include: ['{src,test}/**/*.uxp-test.ts'],
           pool: uxpPool({
-            debug: true,
+            // debug: true,
+            enableErrorSourcemapping: true,
+            embedSourcemap: true,
+            showBundledStackTrace: true,
             esbuildOptions: {
               alias: {
                 url: 'url-shim',

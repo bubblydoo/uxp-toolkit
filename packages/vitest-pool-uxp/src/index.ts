@@ -99,6 +99,7 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
     debug = false,
     mainDirectory = process.cwd(),
     embedSourcemap = true,
+    enableErrorSourcemapping = true,
   } = options;
 
   const resolvedPluginPath = path.isAbsolute(pluginPath)
@@ -142,6 +143,7 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
       return { uniqueId: desc.uniqueId };
     },
     embedSourcemap,
+    enableErrorSourcemapping,
     ...options,
     esbuildOptions: {
       ...options.esbuildOptions,

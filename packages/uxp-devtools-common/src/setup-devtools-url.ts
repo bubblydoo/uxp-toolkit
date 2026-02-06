@@ -173,6 +173,12 @@ export async function setupDevtoolsConnection(pluginPath: string, ports: number[
 
   const cdtUrl = result.wsdebugUrl.replace('ws=', 'ws://');
 
+  console.log('cdtUrl', cdtUrl);
+
+  const openDevtoolsUrl = new URL('devtools://devtools/bundled/inspector.html');
+  openDevtoolsUrl.searchParams.set('ws', cdtUrl.replace('ws://', ''));
+  console.log('openDevtoolsUrl', openDevtoolsUrl.toString());
+
   const connection: DevtoolsConnection = {
     url: cdtUrl,
     teardown: async () => {

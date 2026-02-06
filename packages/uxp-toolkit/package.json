@@ -51,8 +51,8 @@
     "zod": "^4.0.0"
   },
   "dependencies": {
+    "@jridgewell/trace-mapping": "^0.3.31",
     "error-stack-parser": "^2.1.4",
-    "source-map-js": "^1.2.1",
     "xmlbuilder2": "^4.0.3"
   },
   "devDependencies": {

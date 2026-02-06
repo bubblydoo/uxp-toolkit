@@ -45,9 +45,35 @@ export interface BaseCdpPoolOptions {
   esbuildOptions?: PoolEsbuildOptions;
 
   /**
-   * Whether to embed the sourcemap as the "EVAL_SOURCEMAP" global variable.
+   * Whether to embed the sourcemap as the `EVAL_SOURCEMAP` global variable
+   * in the bundled code. This makes it available to code running in the CDP
+   * context for its own use.
+   *
+   * @default false
    */
   embedSourcemap?: boolean;
+
+  /**
+   * Enable error sourcemapping: remaps stack traces, task locations, and
+   * error frames from bundled (esbuild output) positions back to original
+   * source positions. Also injects `//# sourceURL=filepath` so V8
+   * attributes eval'd code to the original file.
+   *
+   * @default true
+   */
+  enableErrorSourcemapping?: boolean;
+
+  /**
+   * When true and `enableErrorSourcemapping` is also true, the original
+   * (bundled) stack trace is preserved as `error.bundledStack` alongside
+   * the remapped `error.stack`. Worker runtime frames are kept in the
+   * bundled stack (no frame filtering).
+   *
+   * Useful for debugging sourcemap remapping issues.
+   *
+   * @default false
+   */
+  showBundledStackTrace?: boolean;
 }
 
 /**

@@ -484,12 +484,12 @@ importers:
 
   packages/uxp-toolkit:
     dependencies:
+      '@jridgewell/trace-mapping':
+        specifier: ^0.3.31
+        version: 0.3.31
       error-stack-parser:
         specifier: ^2.1.4
         version: 2.1.4
-      source-map-js:
-        specifier: ^1.2.1
-        version: 1.2.1
       xmlbuilder2:
         specifier: ^4.0.3
         version: 4.0.3
@@ -591,6 +591,9 @@ importers:
       '@bubblydoo/uxp-devtools-common':
         specifier: workspace:*
         version: link:../uxp-devtools-common
+      '@jridgewell/trace-mapping':
+        specifier: ^0.3.31
+        version: 0.3.31
       '@vitest/expect':
         specifier: ^4.0.18
         version: 4.0.18
