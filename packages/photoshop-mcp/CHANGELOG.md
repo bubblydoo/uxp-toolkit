@@ -1,5 +1,13 @@
 # @bubblydoo/photoshop-mcp
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [9dd7d73]
+- Updated dependencies [e5911d6]
+  - @bubblydoo/uxp-devtools-common@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @bubblydoo/uxp-devtools-common
 
+## 0.0.5
+
+### Patch Changes
+
+- 9dd7d73: Improve stacktraces and add uxp inspect option
+- e5911d6: Better inspect output, fix Vitest watch mode
+
 ## 0.0.4
 
 ### Patch Changes
