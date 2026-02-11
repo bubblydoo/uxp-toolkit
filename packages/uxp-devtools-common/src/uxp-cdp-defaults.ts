@@ -2,7 +2,7 @@ import type CDP from 'chrome-remote-interface';
 
 export async function setupCdpSessionWithUxpDefaults(cdp: CDP.Client) {
   // these were all copied from wireshark
-  console.log('Setting up CDP defaults');
+  // console.log('Setting up CDP defaults');
   await cdp.Network.enable();
   await cdp.Page.enable();
   await cdp.Page.getResourceTree();

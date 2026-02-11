@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+import type http from 'node:http';
 import EventEmitter from 'node:events';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -43,7 +43,7 @@ async function fileExists(path: string) {
 }
 
 interface DevtoolsConnectionEventMap {
-  connection: [];
+  connection: [socket: unknown, req: http.IncomingMessage];
 }
 
 export interface DevtoolsConnection {
@@ -82,7 +82,7 @@ export async function setupDevtoolsConnection(pluginPath: string, ports: number[
   // this goes through Adobe's Vulcan system, which is a binary black box
   devtoolsManager.setServerDetails(PORT);
 
-  console.log('port', PORT);
+  // console.log('port', PORT);
 
   await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -121,7 +121,7 @@ export async function setupDevtoolsConnection(pluginPath: string, ports: number[
           reject(error);
           return;
         }
-        console.log('response for', message.action, response);
+        // console.log('response for', message.action, response);
         resolve(schema.parse(response));
       });
     });
@@ -197,7 +197,7 @@ export async function setupDevtoolsConnection(pluginPath: string, ports: number[
             requestId: z.number(),
           }),
         );
-        console.log('Plugin unloaded');
+        // console.log('Plugin unloaded');
       }
       catch (error) {
         console.error('Error unloading plugin:', error);
@@ -214,7 +214,7 @@ export async function setupDevtoolsConnection(pluginPath: string, ports: number[
       // This is crucial to prevent hanging handles
       try {
         devtoolsManager.terminate();
-        console.log('DevToolsHelper terminated');
+        // console.log('DevToolsHelper terminated');
       }
       catch (error) {
         console.error('Error terminating DevToolsHelper:', error);
@@ -223,8 +223,8 @@ export async function setupDevtoolsConnection(pluginPath: string, ports: number[
     events: new EventEmitter<DevtoolsConnectionEventMap>(),
   };
 
-  (server as any)._io.on('connection', () => {
-    connection.events.emit('connection');
+  server.on('socketConnection', (socket, req) => {
+    connection.events.emit('connection', socket, req);
   });
 
   return connection;

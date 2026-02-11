@@ -281,8 +281,8 @@ importers:
   packages/uxp-devtools-common:
     dependencies:
       '@adobe-fixed-uxp/uxp-devtools-core':
-        specifier: ^1.6.4
-        version: 1.6.4
+        specifier: ^1.6.5
+        version: 1.6.5
       '@adobe-fixed-uxp/uxp-devtools-helper':
         specifier: ^1.6.2
         version: 1.6.2
@@ -680,8 +680,8 @@ importers:
 
 packages:
 
-  '@adobe-fixed-uxp/uxp-devtools-core@1.6.4':
-    resolution: {integrity: sha512-e3BleGv4uREePTczNX5HLIQPRHdnK4nSehdpSkDmIVZ+NBdx2tZnnqoMh1lSin4UZh+OdbveE0z/SXiAnPpY8A==}
+  '@adobe-fixed-uxp/uxp-devtools-core@1.6.5':
+    resolution: {integrity: sha512-9otww2MrioRgAdL09fOftaoXvbW2ibX/ep8uXqnfR62931jIHN6LUoUI05rUG7E941pkkhogN22D642DXshT0g==}
 
   '@adobe-fixed-uxp/uxp-devtools-helper@1.6.2':
     resolution: {integrity: sha512-UZ99ck5LUXWwDp4Rz37COEF7/nA1D+6TMlpVpeJt3Noz48EWQJQlpHv16bNrpjUdcMe8bgbWjQm1Xzy9O0BEtA==}
@@ -5897,7 +5897,7 @@ packages:
 
 snapshots:
 
-  '@adobe-fixed-uxp/uxp-devtools-core@1.6.4':
+  '@adobe-fixed-uxp/uxp-devtools-core@1.6.5':
     dependencies:
       '@adobe-fixed-uxp/uxp-devtools-helper': 1.6.2
       archiver: 7.0.1

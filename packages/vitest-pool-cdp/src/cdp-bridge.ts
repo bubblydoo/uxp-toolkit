@@ -37,9 +37,9 @@ export async function setupCdpConnection(
   const cdp = await setupCdpSession(cdpUrl);
 
   const executionContextOrSessionFn = options.executionContextOrSession ?? defaultExecutionContextOrSessionFn;
-  options.log('Awaiting executionContextOrSessionFn');
+  // options.log('Awaiting executionContextOrSessionFn');
   const executionContextOrSession = await executionContextOrSessionFn(cdp);
-  console.log('Result:', executionContextOrSession);
+  // console.log('Result:', executionContextOrSession);
 
   const sessionId = 'sessionId' in executionContextOrSession ? executionContextOrSession.sessionId : undefined;
 
