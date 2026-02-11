@@ -1,6 +1,7 @@
 import type { CdpConnection, CdpPoolOptions } from './types';
 import CDP from 'chrome-remote-interface';
 import { evaluateInCdp } from './cdp-util';
+import { CDP_BINDING_NAME } from './types';
 
 export async function setupCdpSession(cdtUrl: string) {
   const cdp = await CDP({
@@ -45,6 +46,11 @@ export async function setupCdpConnection(
   await cdp.Network.enable({}, sessionId);
   await cdp.Page.enable(sessionId);
   await cdp.Runtime.enable(sessionId);
+
+  // Create a dedicated binding for worker→pool RPC messages.
+  // Unlike consoleAPICalled, bindings are owned by the client that created
+  // them, so a second debugger (e.g. Chrome DevTools) won't steal the events.
+  await cdp.Runtime.addBinding({ name: CDP_BINDING_NAME }, sessionId);
 
   return {
     cdp,

@@ -1,7 +1,7 @@
 /* eslint-disable vars-on-top */
 import type { File } from 'uxp';
+import { originalPositionFor, TraceMap } from '@jridgewell/trace-mapping';
 import ErrorStackParser from 'error-stack-parser';
-import { SourceMapConsumer } from 'source-map-js';
 import { storage } from 'uxp';
 import { UTError } from '../errors/ut-error';
 import { pathResolve } from '../node-compat/path/resolvePath';
@@ -47,7 +47,9 @@ export async function parseUxpErrorSourcemaps(
       parsedMappedError.push(parseEvalAnonymousFrame(frame, evalAndAnonymouseUnsourcemappedHeaderLines));
       continue;
     }
-    const entryPath = `plugin:${frame.fileName}`;
+    console.log('frame.fileName', frame.fileName);
+    const entryPath = frame.fileName.startsWith('/') ? `file:${frame.fileName}` : `plugin:${frame.fileName}`;
+    console.log('entryPath', entryPath);
     const file = loadedFilesCache[entryPath] ?? await getEntryAssertFile(entryPath);
     loadedFilesCache[entryPath] = file;
     if (!file.isFile) {
@@ -66,12 +68,12 @@ export async function parseUxpErrorSourcemaps(
       throw new TypeError(`Read sourcemap ${sourcemapFileEntryPath} is not a string`);
     }
     const sourcemap = JSON.parse(sourcemapContents);
-    const smc = new SourceMapConsumer(sourcemap);
-    const mappedFrame = smc.originalPositionFor({
+    const traceMap = new TraceMap(sourcemap);
+    const mappedFrame = originalPositionFor(traceMap, {
       line: frame.lineNumber - unsourcemappedHeaderLines,
       column: frame.columnNumber,
     });
-    if (mappedFrame.source && mappedFrame.line && mappedFrame.column) {
+    if (mappedFrame.source && mappedFrame.line != null && mappedFrame.column != null) {
       parsedMappedError.push({
         ...frame,
         fileName: mappedFrame.source,
@@ -90,17 +92,17 @@ export async function parseUxpErrorSourcemaps(
 function parseEvalAnonymousFrame(frame: BasicStackFrame, evalAndAnonymouseUnsourcemappedHeaderLines: number): BasicStackFrame {
   if (typeof EVAL_SOURCEMAP === 'string') {
     const sourcemap = JSON.parse(EVAL_SOURCEMAP);
-    const smc = new SourceMapConsumer(sourcemap);
-    const mappedFrame = smc.originalPositionFor({
+    const traceMap = new TraceMap(sourcemap);
+    const mappedFrame = originalPositionFor(traceMap, {
       line: frame.lineNumber! - evalAndAnonymouseUnsourcemappedHeaderLines,
       column: frame.columnNumber!,
     });
-    if (mappedFrame.source && mappedFrame.line && mappedFrame.column) {
+    if (mappedFrame.source && mappedFrame.line != null && mappedFrame.column != null) {
       return {
         ...frame,
         fileName: mappedFrame.source,
-        lineNumber: mappedFrame.line!,
-        columnNumber: mappedFrame.column!,
+        lineNumber: mappedFrame.line,
+        columnNumber: mappedFrame.column,
       };
     }
   }

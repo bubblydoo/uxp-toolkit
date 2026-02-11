@@ -9,9 +9,9 @@ export async function setupCdpSessionWithUxpDefaults(cdp: CDP.Client) {
   await cdp.Runtime.enable();
   await cdp.DOM.enable();
   await cdp.CSS.enable();
-  await cdp.Debugger.enable({ maxScriptsCacheSize: 10000000 });
-  await cdp.Debugger.setPauseOnExceptions({ state: 'none' });
-  await cdp.Debugger.setAsyncCallStackDepth({ maxDepth: 32 });
+  // await cdp.Debugger.enable({ maxScriptsCacheSize: 10000000 });
+  // await cdp.Debugger.setPauseOnExceptions({ state: 'none' });
+  // await cdp.Debugger.setAsyncCallStackDepth({ maxDepth: 32 });
   await cdp.Overlay.enable();
   await cdp.Overlay.setShowViewportSizeOnResize({ show: true });
   await cdp.Profiler.enable();

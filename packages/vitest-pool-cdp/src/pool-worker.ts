@@ -14,7 +14,8 @@ import * as devalue from 'devalue';
 import * as esbuild from 'esbuild';
 import { injectWorkerRuntime } from './cdp-bridge';
 import { evaluateInCdp } from './cdp-util';
-import { CDP_MESSAGE_PREFIX, CDP_RECEIVE_FUNCTION } from './types';
+import { StackRemapper } from './stack-remapper';
+import { CDP_BINDING_NAME, CDP_RECEIVE_FUNCTION } from './types';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -60,6 +61,12 @@ export class CdpPoolWorker implements PoolWorker {
   private eventListeners: Map<string, Set<EventCallback>> = new Map();
   private workerInjected = false;
   private log: (...args: unknown[]) => void;
+  private projectRoot: string;
+  /**
+   * Stack remapper for sourcemap-based error stack and task location remapping.
+   * Only initialized when `enableErrorSourcemapping` is true (the default).
+   */
+  private stackRemapper: StackRemapper | null = null;
 
   /**
    * birpc instance for communication with the CDP worker.
@@ -87,9 +94,19 @@ export class CdpPoolWorker implements PoolWorker {
   constructor(poolOptions: PoolOptions, rawCdpOptions: RawCdpPoolOptions) {
     this.poolOptions = poolOptions;
     this.rawCdpOptions = rawCdpOptions;
+    this.projectRoot = poolOptions.project.config?.root || process.cwd();
     this.log = rawCdpOptions.debug
       ? (...args: unknown[]) => console.log('[vitest-pool-cdp]', ...args)
       : () => {};
+
+    // Error sourcemapping is on by default
+    const enableErrorSourcemapping = rawCdpOptions.enableErrorSourcemapping ?? true;
+    if (enableErrorSourcemapping) {
+      this.stackRemapper = new StackRemapper(this.projectRoot, {
+        debug: rawCdpOptions.debug,
+        showOriginalStackTrace: rawCdpOptions.showBundledStackTrace,
+      });
+    }
   }
 
   /**
@@ -100,30 +117,32 @@ export class CdpPoolWorker implements PoolWorker {
 
     this.connection = await this.rawCdpOptions.connection();
 
-    // Set up console message listener for responses from the worker
+    // Forward console output from the CDP context to the terminal
     this.connection.cdp.Runtime.on('consoleAPICalled', (event) => {
-      if (event.args[0] && event.args[0].type === 'string' && event.args[0].value !== '__VITEST_CDP_MSG__') {
-        console.log(`[CDP console.${event.type}]`, ...event.args.map(x => x.value));
+      const args = event.args?.map((arg: { value?: unknown; description?: string }) =>
+        arg.value !== undefined ? arg.value : arg.description,
+      );
+      if (args?.length) {
+        this.log(`[CDP console.${event.type}]`, ...args);
       }
+    });
 
-      // Log all console messages in debug mode
-      if (this.rawCdpOptions.debug && event.type !== 'debug') {
-        const args = event.args?.map((arg: { value?: unknown; description?: string }) =>
-          arg.value !== undefined ? arg.value : arg.description,
-        );
-        this.log(`[CDP console.${event.type}]`, ...(args || []));
-      }
+    if (this.rawCdpOptions.runBeforeTests) {
+      this.log('Running "runBeforeTests" function...');
+      await this.rawCdpOptions.runBeforeTests(this.connection.cdp);
+    }
 
-      // Only process debug messages for our protocol
-      if (event.type !== 'debug') {
+    // Listen for RPC messages via the dedicated binding channel.
+    // Unlike consoleAPICalled, bindingCalled events are tied to the client
+    // that created the binding, so they won't be stolen by Chrome DevTools.
+    this.connection.cdp.Runtime.on('bindingCalled', (event) => {
+      if (event.name !== CDP_BINDING_NAME) {
         return;
       }
 
-      // Parse the console message for birpc messages
-      const message = this.parseConsoleMessage(event.args);
-      if (message !== null && this.rpcMessageHandler) {
-        this.log('Received birpc message from CDP:', message);
-        this.rpcMessageHandler(message);
+      if (this.rpcMessageHandler) {
+        this.log('Received birpc message from CDP binding');
+        this.rpcMessageHandler(event.payload);
       }
     });
 
@@ -240,18 +259,21 @@ export class CdpPoolWorker implements PoolWorker {
    * Restore circular references in File objects.
    * Vitest expects file.tasks[].file to point back to file,
    * and tasks to have suite references to their parent suite.
+   *
+   * These references are lost during devalue serialization over birpc
+   * (CDP worker → pool worker), so we rebuild them here.
    */
   private restoreFileReferences(files: File[]): File[] {
     const restoreTask = (task: File['tasks'][0], file: File, parentSuite?: File['tasks'][0]): void => {
-      // Restore file reference
+      // Point task.file back to the root file
       (task as unknown as { file: File }).file = file;
 
-      // Restore suite reference for tests/suites
+      // Point task.suite back to its parent suite
       if (parentSuite && 'suite' in task) {
         (task as unknown as { suite: File['tasks'][0] }).suite = parentSuite;
       }
 
-      // Process nested tasks
+      // Recurse into nested tasks (suites contain sub-tasks)
       if ('tasks' in task && task.tasks) {
         for (const subtask of task.tasks) {
           restoreTask(subtask, file, task);
@@ -263,7 +285,6 @@ export class CdpPoolWorker implements PoolWorker {
       // File.file should point to itself
       file.file = file;
 
-      // Restore references in all tasks
       for (const task of file.tasks) {
         restoreTask(task, file);
       }
@@ -285,6 +306,16 @@ export class CdpPoolWorker implements PoolWorker {
     // Restore circular references in the files
     const restoredFiles = this.restoreFileReferences(files);
 
+    // Remap error stacks and task locations from bundled code to original source
+    if (this.stackRemapper) {
+      for (const file of restoredFiles) {
+        if (file.result) {
+          this.stackRemapper.remapErrorStacks(file.result);
+        }
+        this.stackRemapper.remapTaskLocations(file.tasks);
+      }
+    }
+
     this.log('Forwarding collected files to Vitest:', restoredFiles.length, 'files');
     await this.vitestRpc.onCollected(restoredFiles);
   }
@@ -300,6 +331,10 @@ export class CdpPoolWorker implements PoolWorker {
 
     for (const [taskId, result, meta] of packs) {
       this.log(`Task ${taskId} updated:`, result, meta);
+      // Remap error stacks in task results
+      if (result && this.stackRemapper) {
+        this.stackRemapper.remapErrorStacks(result);
+      }
     }
 
     // Convert packs to events - each pack gets a corresponding event
@@ -329,32 +364,6 @@ export class CdpPoolWorker implements PoolWorker {
     this.log('Sending birpc message to CDP');
 
     await evaluateInCdp(this.connection, expression, { awaitPromise: false, returnByValue: false });
-  }
-
-  /**
-   * Parse a console message to extract birpc messages.
-   * Returns the serialized string (not parsed) - birpc will deserialize it.
-   */
-  private parseConsoleMessage(args: Array<{ type: string; value?: unknown }>): string | null {
-    // Our messages are sent as: console.debug("__VITEST_CDP_MSG__", serializedData)
-    if (args.length !== 2) {
-      return null;
-    }
-
-    const [prefix, data] = args;
-
-    // Check if first argument is our message prefix
-    if (prefix.type !== 'string' || prefix.value !== CDP_MESSAGE_PREFIX) {
-      return null;
-    }
-
-    // Second argument should be the serialized message string
-    if (data.type !== 'string' || typeof data.value !== 'string') {
-      return null;
-    }
-
-    // Return the serialized string - birpc will deserialize it
-    return data.value;
   }
 
   /**
@@ -539,10 +548,13 @@ export class CdpPoolWorker implements PoolWorker {
     const projectRoot = this.poolOptions.project.config?.root
       || process.cwd();
 
+    // Generate sourcemaps if either embedSourcemap or enableErrorSourcemapping needs them
+    const needsSourcemap = this.rawCdpOptions.embedSourcemap || !!this.stackRemapper;
+
     const result = await esbuild.build({
       entryPoints: [filePath],
       bundle: true,
-      outdir: 'internal',
+      outdir: '.', // this is important for sourcemap code frame generation
       write: false,
       format: 'iife',
       // Use 'neutral' platform - this makes esbuild generate simpler require calls
@@ -550,9 +562,10 @@ export class CdpPoolWorker implements PoolWorker {
       // Main fields for neutral platform - look for module then main
       mainFields: ['module', 'main'],
       target: 'es2022',
-      sourcemap: this.rawCdpOptions.embedSourcemap ? 'external' : false,
+      sourcemap: needsSourcemap ? 'external' : false,
       define: this.rawCdpOptions.esbuildOptions?.define || {},
       alias: this.rawCdpOptions.esbuildOptions?.alias || {},
+      absWorkingDir: projectRoot,
       // Mark vitest, runner packages, and UXP/Node built-in modules as external
       // These are provided by the worker runtime
       external: [
@@ -588,8 +601,6 @@ export class CdpPoolWorker implements PoolWorker {
         },
         ...(this.rawCdpOptions.esbuildOptions?.plugins || []),
       ],
-      // Resolve from the project root
-      absWorkingDir: projectRoot,
     });
 
     if (result.errors.length > 0) {
@@ -601,25 +612,36 @@ export class CdpPoolWorker implements PoolWorker {
       throw new Error(`No output files from bundling ${filePath}`);
     }
 
-    const code = outputFiles.find(file => file.path.endsWith('.js'))?.text;
-    if (!code) {
-      throw new Error(`No code output from bundling ${filePath}`);
+    const jsOutputFile = outputFiles.find(file => file.path.endsWith('.js'));
+    if (!jsOutputFile) {
+      throw new Error(`No JS output file from bundling ${filePath}`);
     }
+    const code = jsOutputFile.text;
     this.log(`Bundled ${filePath}: ${code.length} bytes`);
 
-    if (this.rawCdpOptions.embedSourcemap) {
-      const sourcemap = outputFiles.find(file => file.path.endsWith('.js.map'))?.text;
-      if (!sourcemap) {
+    let output = code;
+
+    if (needsSourcemap) {
+      const sourcemapFile = outputFiles.find(file => file.path.endsWith('.js.map'));
+      if (!sourcemapFile) {
         throw new Error(`No sourcemap output from bundling ${filePath}`);
       }
 
-      this.log(`Embedding sourcemap for ${filePath}: ${sourcemap.length} bytes`);
+      const sourcemapText = sourcemapFile.text;
 
-      // we embed the sourcemap in the evaled code, so that
-      return `${code}\nvar EVAL_SOURCEMAP = ${JSON.stringify(sourcemap)};`;
+      // Store sourcemap for error remapping (if enabled)
+      if (this.stackRemapper) {
+        this.stackRemapper.storeSourceMap('eval-anonymous', sourcemapText);
+      }
+
+      // Embed sourcemap as EVAL_SOURCEMAP variable for in-context use (if enabled)
+      if (this.rawCdpOptions.embedSourcemap) {
+        this.log(`Embedding sourcemap for ${filePath}: ${sourcemapText.length} bytes`);
+        output = `${output}\nvar EVAL_SOURCEMAP = ${JSON.stringify(sourcemapText)};`;
+      }
     }
 
-    return code;
+    return output;
   }
 
   /**
@@ -692,5 +714,9 @@ export class CdpPoolWorker implements PoolWorker {
       `Could not find worker runtime. Tried: ${possiblePaths.join(', ')}. `
       + 'Make sure to run `pnpm build` in the vitest-pool-cdp package.',
     );
+  }
+
+  public canReuse(): boolean {
+    return true;
   }
 }

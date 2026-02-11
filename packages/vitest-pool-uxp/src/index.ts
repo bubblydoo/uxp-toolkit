@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import type { DevtoolsConnection } from '@bubblydoo/uxp-devtools-common';
 import type { PoolRunnerInitializer } from 'vitest/node';
 import path from 'node:path';
 import process from 'node:process';
@@ -29,6 +30,12 @@ export function getDefaultPluginPath(): string {
  */
 export interface UxpPoolOptions extends Omit<CdpPoolOptions, 'cdp'> {
   /**
+   * Whether to enable the inspect mode.
+   * Defaults to `process.env.UXP_INSPECT` or `false`.
+   */
+  inspect?: boolean;
+
+  /**
    * Path to the UXP plugin directory.
    * Defaults to the built-in "Vitest UXP Test Runner" plugin.
    */
@@ -46,7 +53,7 @@ export interface UxpPoolOptions extends Omit<CdpPoolOptions, 'cdp'> {
 // there's only one worker so we just need simple caching.
 // The cache is cleared when teardown runs to ensure subsequent pool
 // initializations don't reuse a stale connection.
-let cachedConnection: { url: string; teardown: () => Promise<void> } | null = null;
+let cachedConnection: DevtoolsConnection | null = null;
 
 /**
  * Create a Vitest pool that runs tests in Adobe UXP environments (Photoshop, etc.).
@@ -96,9 +103,11 @@ let cachedConnection: { url: string; teardown: () => Promise<void> } | null = nu
 export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
   const {
     pluginPath = getDefaultPluginPath(),
+    inspect = false,
     debug = false,
     mainDirectory = process.cwd(),
     embedSourcemap = true,
+    enableErrorSourcemapping = true,
   } = options;
 
   const resolvedPluginPath = path.isAbsolute(pluginPath)
@@ -108,6 +117,8 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
   const log = debug
     ? (...args: unknown[]) => console.log('[vitest-pool-uxp]', ...args)
     : () => {};
+
+  const enableInspect = inspect || ['1', 'true'].includes(process.env.UXP_INSPECT ?? '');
 
   return cdpPool({
     cdp: async () => {
@@ -124,7 +135,7 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
       // Wrap teardown to clear the cache when the connection is closed
       const originalTeardown = connection.teardown;
       cachedConnection = {
-        url: connection.url,
+        ...connection,
         teardown: async () => {
           log('Tearing down UXP connection and clearing cache...');
           cachedConnection = null;
@@ -141,7 +152,23 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
       });
       return { uniqueId: desc.uniqueId };
     },
+    runBeforeTests: enableInspect
+      ? async () => {
+        const openDevtoolsUrl = new URL('devtools://devtools/bundled/inspector.html');
+        openDevtoolsUrl.searchParams.set('ws', cachedConnection!.url.replace('ws://', ''));
+        console.log('Open this devtools URL in Chrome to continue:', openDevtoolsUrl.toString());
+
+        await new Promise<void>((resolve) => {
+          cachedConnection!.events.on('connection', () => {
+            resolve();
+          });
+        });
+
+        console.log('New connection established, continuing...');
+      }
+      : undefined,
     embedSourcemap,
+    enableErrorSourcemapping,
     ...options,
     esbuildOptions: {
       ...options.esbuildOptions,
