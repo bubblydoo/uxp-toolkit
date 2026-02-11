@@ -1,5 +1,12 @@
 # @bubblydoo/uxp-toolkit-react
 
+## 0.0.14
+
+### Patch Changes
+
+- Updated dependencies [9dd7d73]
+  - @bubblydoo/uxp-toolkit@0.0.14
+
 ## 0.0.13
 
 ### Patch Changes

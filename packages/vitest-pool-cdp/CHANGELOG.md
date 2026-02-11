@@ -1,5 +1,15 @@
 # @bubblydoo/vitest-pool-cdp
 
+## 0.0.4
+
+### Patch Changes
+
+- 9dd7d73: Improve stacktraces and add uxp inspect option
+- e5911d6: Better inspect output, fix Vitest watch mode
+- Updated dependencies [9dd7d73]
+- Updated dependencies [e5911d6]
+  - @bubblydoo/uxp-devtools-common@0.0.5
+
 ## 0.0.3
 
 ### Patch Changes

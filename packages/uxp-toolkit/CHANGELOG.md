@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.14
+
+### Patch Changes
+
+- 9dd7d73: Improve stacktraces and add uxp inspect option
+
 ## 0.0.13
 
 ### Patch Changes
