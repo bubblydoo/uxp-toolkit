@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import EventEmitter from 'node:events';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import AppClient from '@adobe-fixed-uxp/uxp-devtools-core/core/service/clients/AppClient';
@@ -41,11 +42,17 @@ async function fileExists(path: string) {
   }
 }
 
+interface DevtoolsConnectionEventMap {
+  connection: [];
+}
+
 export interface DevtoolsConnection {
   /** Debugger websocket URL */
   url: string;
   /** Unload the plugin and tear down the Vulcan connection */
   teardown: () => Promise<void>;
+
+  events: EventEmitter<DevtoolsConnectionEventMap>;
 }
 
 export async function setupDevtoolsConnection(pluginPath: string, ports: number[] = DEFAULT_PORTS): Promise<DevtoolsConnection> {
@@ -173,12 +180,6 @@ export async function setupDevtoolsConnection(pluginPath: string, ports: number[
 
   const cdtUrl = result.wsdebugUrl.replace('ws=', 'ws://');
 
-  console.log('cdtUrl', cdtUrl);
-
-  const openDevtoolsUrl = new URL('devtools://devtools/bundled/inspector.html');
-  openDevtoolsUrl.searchParams.set('ws', cdtUrl.replace('ws://', ''));
-  console.log('openDevtoolsUrl', openDevtoolsUrl.toString());
-
   const connection: DevtoolsConnection = {
     url: cdtUrl,
     teardown: async () => {
@@ -219,7 +220,12 @@ export async function setupDevtoolsConnection(pluginPath: string, ports: number[
         console.error('Error terminating DevToolsHelper:', error);
       }
     },
+    events: new EventEmitter<DevtoolsConnectionEventMap>(),
   };
+
+  (server as any)._io.on('connection', () => {
+    connection.events.emit('connection');
+  });
 
   return connection;
 }

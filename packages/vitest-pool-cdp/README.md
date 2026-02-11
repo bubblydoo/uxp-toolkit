@@ -95,14 +95,14 @@ export default defineConfig({
 │   │ send()      │───┼──Runtime.evaluate──┼──►│ receive()   │   │
 │   └─────────────┘   │                    │   └─────────────┘   │
 │                     │                    │                     │
-│   ┌─────────────┐   │  consoleAPICalled  │   ┌─────────────┐   │
+│   ┌─────────────┐   │  bindingCalled     │   ┌─────────────┐   │
 │   │ on('msg')   │◄──┼────────────────────┼───│ post()      │   │
 │   └─────────────┘   │                    │   └─────────────┘   │
 └─────────────────────┘                    └─────────────────────┘
 ```
 
 1. **Pool to Worker**: Messages are sent via `Runtime.evaluate()` calling a global function
-2. **Worker to Pool**: Responses are sent via `console.debug()` with a special prefix, captured by `Runtime.consoleAPICalled` events
+2. **Worker to Pool**: Responses are sent via a `Runtime.addBinding` channel (`bindingCalled` events), which is immune to other debugger clients (e.g. Chrome DevTools) connecting to the same target
 3. **Serialization**: Uses `devalue` for structured cloneable data (same as Vitest internally)
 
 ## Requirements
@@ -110,7 +110,7 @@ export default defineConfig({
 - Vitest v4 or later
 - A CDP-enabled target environment
 - The target environment must support:
-  - `console.debug()` for sending messages
+  - `Runtime.addBinding` / `Runtime.bindingCalled` for sending messages
   - Global function assignment for receiving messages
 
 ## Limitations

@@ -15,7 +15,7 @@ import * as esbuild from 'esbuild';
 import { injectWorkerRuntime } from './cdp-bridge';
 import { evaluateInCdp } from './cdp-util';
 import { StackRemapper } from './stack-remapper';
-import { CDP_MESSAGE_PREFIX, CDP_RECEIVE_FUNCTION } from './types';
+import { CDP_BINDING_NAME, CDP_RECEIVE_FUNCTION } from './types';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -117,30 +117,32 @@ export class CdpPoolWorker implements PoolWorker {
 
     this.connection = await this.rawCdpOptions.connection();
 
-    // Set up console message listener for responses from the worker
+    // Forward console output from the CDP context to the terminal
     this.connection.cdp.Runtime.on('consoleAPICalled', (event) => {
-      if (event.args[0] && event.args[0].type === 'string' && event.args[0].value !== '__VITEST_CDP_MSG__') {
-        console.log(`[CDP console.${event.type}]`, ...event.args.map(x => x.value));
+      const args = event.args?.map((arg: { value?: unknown; description?: string }) =>
+        arg.value !== undefined ? arg.value : arg.description,
+      );
+      if (args?.length) {
+        this.log(`[CDP console.${event.type}]`, ...args);
       }
+    });
 
-      // Log all console messages in debug mode
-      if (this.rawCdpOptions.debug && event.type !== 'debug') {
-        const args = event.args?.map((arg: { value?: unknown; description?: string }) =>
-          arg.value !== undefined ? arg.value : arg.description,
-        );
-        this.log(`[CDP console.${event.type}]`, ...(args || []));
-      }
+    if (this.rawCdpOptions.runBeforeTests) {
+      this.log('Running "runBeforeTests" function...');
+      await this.rawCdpOptions.runBeforeTests(this.connection.cdp);
+    }
 
-      // Only process debug messages for our protocol
-      if (event.type !== 'debug') {
+    // Listen for RPC messages via the dedicated binding channel.
+    // Unlike consoleAPICalled, bindingCalled events are tied to the client
+    // that created the binding, so they won't be stolen by Chrome DevTools.
+    this.connection.cdp.Runtime.on('bindingCalled', (event) => {
+      if (event.name !== CDP_BINDING_NAME) {
         return;
       }
 
-      // Parse the console message for birpc messages
-      const message = this.parseConsoleMessage(event.args);
-      if (message !== null && this.rpcMessageHandler) {
-        this.log('Received birpc message from CDP:', message);
-        this.rpcMessageHandler(message);
+      if (this.rpcMessageHandler) {
+        this.log('Received birpc message from CDP binding');
+        this.rpcMessageHandler(event.payload);
       }
     });
 
@@ -362,32 +364,6 @@ export class CdpPoolWorker implements PoolWorker {
     this.log('Sending birpc message to CDP');
 
     await evaluateInCdp(this.connection, expression, { awaitPromise: false, returnByValue: false });
-  }
-
-  /**
-   * Parse a console message to extract birpc messages.
-   * Returns the serialized string (not parsed) - birpc will deserialize it.
-   */
-  private parseConsoleMessage(args: Array<{ type: string; value?: unknown }>): string | null {
-    // Our messages are sent as: console.debug("__VITEST_CDP_MSG__", serializedData)
-    if (args.length !== 2) {
-      return null;
-    }
-
-    const [prefix, data] = args;
-
-    // Check if first argument is our message prefix
-    if (prefix.type !== 'string' || prefix.value !== CDP_MESSAGE_PREFIX) {
-      return null;
-    }
-
-    // Second argument should be the serialized message string
-    if (data.type !== 'string' || typeof data.value !== 'string') {
-      return null;
-    }
-
-    // Return the serialized string - birpc will deserialize it
-    return data.value;
   }
 
   /**
@@ -738,5 +714,9 @@ export class CdpPoolWorker implements PoolWorker {
       `Could not find worker runtime. Tried: ${possiblePaths.join(', ')}. `
       + 'Make sure to run `pnpm build` in the vitest-pool-cdp package.',
     );
+  }
+
+  public canReuse(): boolean {
+    return true;
   }
 }

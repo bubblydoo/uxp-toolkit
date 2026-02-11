@@ -74,6 +74,12 @@ export interface BaseCdpPoolOptions {
    * @default false
    */
   showBundledStackTrace?: boolean;
+
+  /**
+   * Optional function to run after the CDP connection is established.
+   * Useful for waiting for debugger or something.
+   */
+  runBeforeTests?: (cdp: CDP.Client) => Promise<void>;
 }
 
 /**
@@ -105,12 +111,14 @@ export interface RawCdpPoolOptions extends BaseCdpPoolOptions {
 }
 
 /**
- * Message prefix used for communication between pool and worker.
+ * Name of the CDP binding used for worker → pool communication.
+ * Created via Runtime.addBinding, this provides a dedicated message channel
+ * that doesn't conflict with Chrome DevTools (unlike consoleAPICalled).
  */
-export const CDP_MESSAGE_PREFIX = '__VITEST_CDP_MSG__';
+export const CDP_BINDING_NAME = '__vitest_cdp_send__';
 
 /**
- * Global function name exposed in the CDP context for receiving messages.
+ * Global function name exposed in the CDP context for receiving messages (pool → worker).
  */
 export const CDP_RECEIVE_FUNCTION = '__vitest_cdp_receive__';
 

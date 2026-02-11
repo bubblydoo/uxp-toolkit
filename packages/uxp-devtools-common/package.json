@@ -36,7 +36,7 @@
     "dev": "tsup --watch"
   },
   "dependencies": {
-    "@adobe-fixed-uxp/uxp-devtools-core": "^1.6.3",
+    "@adobe-fixed-uxp/uxp-devtools-core": "^1.6.4",
     "@adobe-fixed-uxp/uxp-devtools-helper": "^1.6.2",
     "chrome-remote-interface": "^0.33.3",
     "zod": "^4.3.6"

@@ -27,10 +27,10 @@ declare global {
   var __VITEST_CDP_WORKER_RUNNING__: boolean;
   var __vitest_cdp_rpc__: BirpcReturn<PoolFunctions, WorkerFunctions>;
   var __vitest_cdp_receive__: (serialized: string) => void;
+  /** Binding created by Runtime.addBinding on the pool side for worker→pool RPC. */
+  var __vitest_cdp_send__: (payload: string) => void;
   var __vitest_api__: typeof vitestApi;
 }
-
-const MESSAGE_PREFIX = '__VITEST_CDP_MSG__';
 
 // Message handler callback registered by birpc
 let messageHandler: ((data: string) => void) | null = null;
@@ -191,8 +191,9 @@ const rpc = createBirpc<PoolFunctions, WorkerFunctions>(
   workerFunctions,
   {
     post: (data: string) => {
-      // data is already serialized by birpc using devalue.stringify
-      console.debug(MESSAGE_PREFIX, data);
+      // Send via the dedicated CDP binding (created by Runtime.addBinding on the pool side).
+      // Unlike console.debug, this channel is not affected by Chrome DevTools connecting.
+      globalThis.__vitest_cdp_send__(data);
     },
     on: (fn) => {
       messageHandler = fn;
