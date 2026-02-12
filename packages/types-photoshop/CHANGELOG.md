@@ -1,5 +1,11 @@
 # @adobe-uxp-types/photoshop
 
+## 0.1.5
+
+### Patch Changes
+
+- 83a06be: Update types for PS 27.4
+
 ## 0.1.4
 
 ### Patch Changes
