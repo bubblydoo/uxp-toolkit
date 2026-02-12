@@ -1,5 +1,12 @@
 # @bubblydoo/vitest-pool-cdp
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [c378b02]
+  - @bubblydoo/uxp-devtools-common@0.0.6
+
 ## 0.0.4
 
 ### Patch Changes
