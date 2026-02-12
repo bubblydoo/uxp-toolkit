@@ -157,6 +157,31 @@ importers:
         specifier: ^8.14.2
         version: 8.19.0
 
+  packages/example-puppeteer-integration:
+    dependencies:
+      '@bubblydoo/uxp-devtools-common':
+        specifier: workspace:^
+        version: link:../uxp-devtools-common
+      '@bubblydoo/uxp-puppeteer-transport':
+        specifier: workspace:^
+        version: link:../uxp-puppeteer-transport
+      puppeteer-core:
+        specifier: ^24.0.0
+        version: 24.36.1
+    devDependencies:
+      '@bubblydoo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: ^20.8.7
+        version: 20.19.30
+      tsx:
+        specifier: ^4.19.0
+        version: 4.21.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+
   packages/photoshop-mcp:
     dependencies:
       '@bubblydoo/uxp-devtools-common':
@@ -281,11 +306,11 @@ importers:
   packages/uxp-devtools-common:
     dependencies:
       '@adobe-fixed-uxp/uxp-devtools-core':
-        specifier: ^1.6.5
-        version: 1.6.5
+        specifier: ^1.6.6
+        version: 1.6.6
       '@adobe-fixed-uxp/uxp-devtools-helper':
-        specifier: ^1.6.2
-        version: 1.6.2
+        specifier: ^1.6.3
+        version: 1.6.3
       chrome-remote-interface:
         specifier: ^0.33.3
         version: 0.33.3
@@ -325,6 +350,31 @@ importers:
         version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       typescript:
         specifier: ^5.9.3
+        version: 5.9.3
+
+  packages/uxp-puppeteer-transport:
+    dependencies:
+      ws:
+        specifier: ^8.19.0
+        version: 8.19.0
+    devDependencies:
+      '@bubblydoo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: ^20.8.7
+        version: 20.19.30
+      '@types/ws':
+        specifier: ^8.18.1
+        version: 8.18.1
+      puppeteer-core:
+        specifier: ^24.0.0
+        version: 24.36.1
+      tsup:
+        specifier: ^8.3.5
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      typescript:
+        specifier: ^5.8.3
         version: 5.9.3
 
   packages/uxp-test-framework:
@@ -680,11 +730,11 @@ importers:
 
 packages:
 
-  '@adobe-fixed-uxp/uxp-devtools-core@1.6.5':
-    resolution: {integrity: sha512-9otww2MrioRgAdL09fOftaoXvbW2ibX/ep8uXqnfR62931jIHN6LUoUI05rUG7E941pkkhogN22D642DXshT0g==}
+  '@adobe-fixed-uxp/uxp-devtools-core@1.6.6':
+    resolution: {integrity: sha512-mudngJgPknFVFKuMzwKQ4wh3R3jIPdwVgqueqUA8cDMwH9a83JhmXTtpCBGZgXdUIOc/EMYP6cBPgwj2yRa2Pg==}
 
-  '@adobe-fixed-uxp/uxp-devtools-helper@1.6.2':
-    resolution: {integrity: sha512-UZ99ck5LUXWwDp4Rz37COEF7/nA1D+6TMlpVpeJt3Noz48EWQJQlpHv16bNrpjUdcMe8bgbWjQm1Xzy9O0BEtA==}
+  '@adobe-fixed-uxp/uxp-devtools-helper@1.6.3':
+    resolution: {integrity: sha512-9lqA9AgxH3D7DjkVBQICtLx8x37YXelAKB2QDwRkSPf/W+eIXe4KSoFiPYsqYMl6cP9p5IIa4R741njbKvGDwQ==}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -5897,9 +5947,9 @@ packages:
 
 snapshots:
 
-  '@adobe-fixed-uxp/uxp-devtools-core@1.6.5':
+  '@adobe-fixed-uxp/uxp-devtools-core@1.6.6':
     dependencies:
-      '@adobe-fixed-uxp/uxp-devtools-helper': 1.6.2
+      '@adobe-fixed-uxp/uxp-devtools-helper': 1.6.3
       archiver: 7.0.1
       chalk: 5.6.2
       chokidar: 4.0.3
@@ -5914,7 +5964,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@adobe-fixed-uxp/uxp-devtools-helper@1.6.2':
+  '@adobe-fixed-uxp/uxp-devtools-helper@1.6.3':
     dependencies:
       node-gyp-build: 4.8.4
       tar: 7.5.7
