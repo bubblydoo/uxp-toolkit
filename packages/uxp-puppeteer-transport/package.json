@@ -1,7 +1,7 @@
 {
   "name": "@bubblydoo/uxp-puppeteer-transport",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -40,8 +40,12 @@
     "typescript": "^5.8.3"
   },
   "tsup": {
-    "entry": ["src/index.ts"],
-    "format": ["esm"],
+    "entry": [
+      "src/index.ts"
+    ],
+    "format": [
+      "esm"
+    ],
     "dts": true
   }
 }

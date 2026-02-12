@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-devtools-common
 
+## 0.0.6
+
+### Patch Changes
+
+- c378b02: Setup puppeteer transport package
+
 ## 0.0.5
 
 ### Patch Changes
