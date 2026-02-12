@@ -28,6 +28,12 @@ import type { GroupLayerCreateOptions, PixelLayerCreateOptions, TextLayerCreateO
 export interface SuspendHistoryContext extends ExecutionContext {
   document: Document;
 }
+
+export interface GenerativeUpscaleOptions {
+  /** @minVersion 27.4 */
+  scale: number;
+}
+
 /**
  * Represents a single Photoshop document that is currently open.
  *
@@ -930,4 +936,20 @@ export class Document {
    */
   get activeChannels(): Channel[];
   set activeChannels(channels: Channel[]);
+
+  /**
+   * Applies generative upscaling to the currently selected layer(s) using AI-powered upscaling technology.
+   * @example
+   * ```js
+   * // Upscale using Firefly model with default options (2x scale)
+   * await document.generativeUpscale(constants.GenerativeUpscaleModel.FIREFLY);
+   *
+   * // Upscale using Firefly model with 4x scale
+   * const doc4x = await document.generativeUpscale(constants.GenerativeUpscaleModel.FIREFLY, { scale: 4 });
+   * ```
+   * @minVersion 27.2
+   * @param model The model to use for upscaling.
+   * @param options The options for upscaling.
+   */
+  generativeUpscale(model: Constants.GenerativeUpscaleModel, options: GenerativeUpscaleOptions): Promise<void>;
 }

@@ -538,6 +538,10 @@ export enum LayerKind {
   VIDEO = 'video',
   GROUP = 'group',
   COLORLOOKUP = 'colorLookup',
+  /** @minVersion 27.4 */
+  CLARITY = 'clarity',
+  /** @minVersion 27.4 */
+  GRAIN = 'grain',
 }
 /**
  * Placement modes for Layer.move method
@@ -1541,6 +1545,18 @@ export enum Mojikumi {
   SET4 = 'Photoshop6MojiKumiSet4',
 }
 
+/** @minVersion 27.2 */
+export enum GenerativeUpscaleModel {
+  FIREFLY = 'firefly',
+}
+
+/** @minVersion 27.2 */
+export enum FlipAxis {
+  HORIZONTAL = 'horizontal',
+  VERTICAL = 'vertical',
+  BOTH = 'both',
+}
+
 /**
  * The different constants and enumerations that DOM APIs expect as certain parameters
  */
@@ -1581,6 +1597,7 @@ export const constants: {
   EliminateFields: typeof EliminateFields;
   FontSize: typeof FontSize;
   ForcedColors: typeof ForcedColors;
+  GenerativeUpscaleModel: typeof GenerativeUpscaleModel;
   Geometry: typeof Geometry;
   GridLineStyle: typeof GridLineStyle;
   GridSize: typeof GridSize;

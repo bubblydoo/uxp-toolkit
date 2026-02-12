@@ -4,11 +4,13 @@ import type { PreferencesGeneral } from './PreferencesGeneral';
 import type { PreferencesGuidesGridsAndSlices } from './PreferencesGuidesGridsAndSlices';
 import type { PreferencesHistory } from './PreferencesHistory';
 import type { PreferencesInterface } from './PreferencesInterface';
+import type { PreferencesNotifications } from './PreferencesNotifications';
 import type { PreferencesPerformance } from './PreferencesPerformance';
 import type { PreferencesTools } from './PreferencesTools';
 import type { PreferencesTransparencyAndGamut } from './PreferencesTransparencyAndGamut';
 import type { PreferencesType } from './PreferencesType';
 import type { PreferencesUnitsAndRulers } from './PreferencesUnitsAndRulers';
+
 /**
  * Contains Photoshop preferences grouped into several categories similar to preferences in user interface.
  *
@@ -116,6 +118,12 @@ export class Preferences {
    * @minVersion 24.0
    */
   get type(): PreferencesType;
+  /**
+   * Notifications preferences.  Note: Some notifications preferences will be locked when Quiet Mode is enabled. Attempts to modify locked preferences will throw errors while Quiet Mode is active.
+   *
+   * @minVersion 26.11
+   */
+  get notifications(): PreferencesNotifications;
 }
 /** @ignore */
 export const preferences: Preferences;

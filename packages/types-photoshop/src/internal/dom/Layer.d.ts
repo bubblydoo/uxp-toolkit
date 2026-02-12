@@ -932,7 +932,7 @@ export class Layer {
    * @async
    * @minVersion 23.0
    */
-  flip(axis: 'horizontal' | 'vertical' | 'both'): Promise<void>;
+  flip(axis: Constants.FlipAxis): Promise<void>;
   /**
    * Scales the layer.
    *
