@@ -1,8 +1,32 @@
+import type z from 'zod';
+import type { adjustmentSchema } from '../commands-library';
 import type { LayerDescriptor } from './getDocumentLayerDescriptors';
 
-type UTLayerKind = 'pixel' | 'adjustment-layer' | 'text' | 'curves' | 'smartObject' | 'video' | 'group' | 'threeD' | 'gradientFill' | 'pattern' | 'solidColor' | 'background';
+// todo: this is probably not complete, and the map neither
+type UTLayerKind = 'pixel' | 'adjustmentLayer' | 'text' | 'curves' | 'smartObject' | 'video' | 'group' | 'threeD' | 'gradientFill' | 'pattern' | 'solidColor' | 'background';
 
 type UTBlendMode = 'normal' | 'dissolve' | 'darken' | 'multiply' | 'colorBurn' | 'linearBurn' | 'darkerColor' | 'lighten' | 'screen' | 'colorDodge' | 'linearDodge' | 'lighterColor' | 'overlay' | 'softLight' | 'hardLight' | 'vividLight' | 'linearLight' | 'pinLight' | 'hardMix' | 'difference' | 'exclusion' | 'blendSubtraction' | 'blendDivide' | 'hue' | 'saturation' | 'color' | 'luminosity' | 'passThrough';
+
+type UTAdjustmentRaw = z.infer<typeof adjustmentSchema>;
+
+interface UTAdjustment<T extends UTAdjustmentRaw['_obj'] = UTAdjustmentRaw['_obj']> {
+  type: T;
+  raw: Extract<UTAdjustmentRaw, { _obj: T }>;
+}
+
+interface UTLayerMask {
+  enabled: boolean;
+  density: number;
+  feather: number;
+};
+
+interface UTLayerLock {
+  transparency: boolean;
+  composite: boolean;
+  position: boolean;
+  artboardAutonest: boolean;
+  all: boolean;
+}
 
 interface UTLayerBuilder {
   name: string;
@@ -14,6 +38,16 @@ interface UTLayerBuilder {
   effects: Record<string, boolean>;
   isClippingMask: boolean;
   background: boolean;
+  adjustment?: UTAdjustment;
+  linkedLayerIds?: number[];
+  opacity?: number;
+  fillOpacity?: number;
+  /** Also called `userMask` */
+  rasterMask?: UTLayerMask;
+  filterMask?: UTLayerMask;
+  vectorMask?: UTLayerMask;
+  lock?: UTLayerLock;
+
   layers?: UTLayerBuilder[];
 }
 
@@ -25,7 +59,7 @@ export type UTLayerMultiGetOnly = Omit<UTLayer, 'effects'>;
 
 const layerKindMap = new Map<number, UTLayerKind>([
   [1, 'pixel'],
-  [2, 'adjustment-layer'], // All adjustment layers
+  [2, 'adjustmentLayer'], // All adjustment layers, but not curves, gradientFill, pattern and solidColor
   [3, 'text'],
   [4, 'curves'],
   [5, 'smartObject'],
@@ -104,17 +138,7 @@ export function photoshopLayerDescriptorsToUTLayers(layers: LayerDescriptor[]): 
     }
 
     // Create the node
-    const node: UTLayerBuilder = {
-      name: layer.name,
-      docId: layer.docId,
-      id: layer.layerID,
-      visible: layer.visible,
-      kind: getLayerKind(layer),
-      blendMode: getBlendMode(layer),
-      isClippingMask: layer.group,
-      effects: getEffects(layer),
-      background: layer.background,
-    };
+    const node = buildLayerFromDescriptor(layer);
 
     // Add the node to the current level
     const current = stack[stack.length - 1];
@@ -151,4 +175,63 @@ function getEffects(layer: LayerDescriptor): Record<string, boolean> {
     }
   }
   return effects;
+}
+
+function getAdjustment(layer: LayerDescriptor): UTAdjustment | undefined {
+  const adjustment = layer.adjustment?.[0];
+  if (!adjustment) {
+    return undefined;
+  }
+  return {
+    type: adjustment._obj,
+    raw: adjustment,
+  };
+}
+
+function buildLayerFromDescriptor(layer: LayerDescriptor): UTLayerBuilder {
+  return {
+    name: layer.name,
+    docId: layer.docId,
+    id: layer.layerID,
+    visible: layer.visible,
+    kind: getLayerKind(layer),
+    blendMode: getBlendMode(layer),
+    isClippingMask: layer.group,
+    effects: getEffects(layer),
+    background: layer.background,
+    adjustment: getAdjustment(layer),
+    linkedLayerIds: layer.linkedLayerIDs,
+    opacity: layer.opacity,
+    fillOpacity: layer.fillOpacity,
+    rasterMask: layer.hasUserMask
+      ? {
+          enabled: layer.userMaskEnabled!,
+          density: layer.userMaskDensity!,
+          feather: layer.userMaskFeather!,
+        }
+      : undefined,
+    filterMask: layer.hasFilterMask
+      ? {
+          enabled: true,
+          density: layer.filterMaskDensity!,
+          feather: layer.filterMaskFeather!,
+        }
+      : undefined,
+    vectorMask: layer.hasVectorMask
+      ? {
+          enabled: layer.vectorMaskEnabled!,
+          density: layer.vectorMaskDensity!,
+          feather: layer.vectorMaskFeather!,
+        }
+      : undefined,
+    lock: Object.values(layer.layerLocking ?? {}).filter(v => v === true).length > 0
+      ? {
+          transparency: layer.layerLocking!.protectTransparency,
+          composite: layer.layerLocking!.protectComposite,
+          position: layer.layerLocking!.protectPosition,
+          artboardAutonest: layer.layerLocking!.protectArtboardAutonest,
+          all: layer.layerLocking!.protectAll,
+        }
+      : undefined,
+  };
 }

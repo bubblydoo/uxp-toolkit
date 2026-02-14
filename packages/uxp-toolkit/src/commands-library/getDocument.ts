@@ -13,6 +13,12 @@ export function createGetDocumentCommand(documentId: number) {
       documentID: z.number(),
       visible: z.boolean(),
       hasBackgroundLayer: z.boolean(),
+      /** Selected layer ids */
+      targetLayersIDs: z.array(z.object({
+        _ref: z.literal('layer'),
+        _id: z.number(),
+      })),
+      quickMask: z.boolean(),
     }),
   });
 }

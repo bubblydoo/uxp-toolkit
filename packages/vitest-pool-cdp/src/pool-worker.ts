@@ -123,7 +123,7 @@ export class CdpPoolWorker implements PoolWorker {
         arg.value !== undefined ? arg.value : arg.description,
       );
       if (args?.length) {
-        this.log(`[CDP console.${event.type}]`, ...args);
+        console.log(`[CDP console.${event.type}]`, ...args);
       }
     });
 

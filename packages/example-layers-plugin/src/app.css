@@ -9,3 +9,10 @@ body {
   overflow: auto;
   color: white;
 }
+
+.lucide {
+  width: 14px;
+  height: 14px;
+  fill: transparent;
+  stroke: currentColor;
+}

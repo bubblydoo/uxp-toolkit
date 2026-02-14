@@ -4,7 +4,7 @@ export {
   useOnDocumentLayersEdited,
   useOnDocumentLayersSelection,
 } from './useDocumentEventsHooks';
-export { useDocumentTreeQuery } from './useDocumentTreeQuery';
+export { documentQueries, useGetDocumentQuery as useDocumentGetQuery, useDocumentTreeQuery } from './useDocumentTreeQuery';
 export { useEventListenerSkippable } from './useEventListenerSkippable';
 export {
   useApplicationInfoQuery,
