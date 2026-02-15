@@ -1,0 +1,43 @@
+{
+  "name": "@bubblydoo/vitest-pool-uxp",
+  "type": "module",
+  "version": "0.0.6",
+  "description": "Vitest pool for running tests in Adobe UXP environments (Photoshop, etc.)",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "files": [
+    "dist",
+    "fake-plugin"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bubblydoo/uxp-devtools-common": "workspace:*",
+    "@bubblydoo/vitest-pool-cdp": "workspace:*"
+  },
+  "devDependencies": {
+    "@bubblydoo/tsconfig": "workspace:*",
+    "@types/node": "^20.8.7",
+    "tsup": "^8.3.5",
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.0"
+  }
+}

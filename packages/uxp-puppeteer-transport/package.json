@@ -1,0 +1,51 @@
+{
+  "name": "@bubblydoo/uxp-puppeteer-transport",
+  "type": "module",
+  "version": "0.0.2",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "puppeteer-core": ">=22.0.0"
+  },
+  "dependencies": {
+    "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "@bubblydoo/tsconfig": "workspace:*",
+    "@types/node": "^20.8.7",
+    "@types/ws": "^8.18.1",
+    "puppeteer-core": "^24.0.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.8.3"
+  },
+  "tsup": {
+    "entry": [
+      "src/index.ts"
+    ],
+    "format": [
+      "esm"
+    ],
+    "dts": true
+  }
+}

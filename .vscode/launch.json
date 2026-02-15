@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to websocket",
+      "type": "node",
+      "request": "attach",
+      // This works, but you have to copy the url from the console output and paste it here
+      "websocketAddress": "ws://127.0.0.1:14005/socket/cdt/d34e76c6-40b4-42ed-a33b-3a5c463822db"
+    }
+  ]
+}

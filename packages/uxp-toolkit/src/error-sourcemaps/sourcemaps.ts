@@ -1,61 +1,87 @@
-import ErrorStackParser from "error-stack-parser";
-import { SourceMapConsumer } from "source-map-js";
-import { storage } from "uxp";
-import { pathResolve } from "../node-compat/path/resolvePath";
-import { UTError } from "../errors/ut-error";
+/* eslint-disable vars-on-top */
+import type { File } from 'uxp';
+import { originalPositionFor, TraceMap } from '@jridgewell/trace-mapping';
+import ErrorStackParser from 'error-stack-parser';
+import { storage } from 'uxp';
+import { UTError } from '../errors/ut-error';
+import { pathResolve } from '../node-compat/path/resolvePath';
+
+declare global {
+  var EVAL_SOURCEMAP: string | undefined;
+}
 
 export type BasicStackFrame = Pick<
   ErrorStackParser.StackFrame,
-  "functionName" | "fileName" | "lineNumber" | "columnNumber"
+  'functionName' | 'fileName' | 'lineNumber' | 'columnNumber'
 >;
 
-export async function parseUxpErrorSourcemaps(error: Error, opts: { unsourcemappedHeaderLines?: number } = {}) {
-  const parsedError = parseErrorIntoBasicStackFrames(error);
+async function getEntryAssertFile(path: string): Promise<File> {
+  const fs = storage.localFileSystem;
+  const entry = await fs.getEntryWithUrl(path);
+  if (!entry.isFile) {
+    throw new Error(`Entry ${path} is not a file`);
+  }
+  return entry as File;
+}
+
+export async function parseUxpErrorSourcemaps(
+  error: Error,
+  opts: { unsourcemappedHeaderLines?: number; normalizeEvalAndAnonymous?: boolean; evalAndAnonymouseUnsourcemappedHeaderLines?: number } = {},
+) {
+  const parsedError = parseErrorIntoBasicStackFrames(error, {
+    normalizeEvalAndAnonymous: opts.normalizeEvalAndAnonymous ?? false,
+  });
 
   const unsourcemappedHeaderLines = opts.unsourcemappedHeaderLines ?? 0;
+  const evalAndAnonymouseUnsourcemappedHeaderLines = opts.evalAndAnonymouseUnsourcemappedHeaderLines ?? 0;
 
-  const loadedFilesCache: Record<string, storage.File> = {};
+  const loadedFilesCache: Record<string, File> = {};
 
-  const fs = (storage as any).localFileSystem;
   const parsedMappedError: BasicStackFrame[] = [];
   for (const frame of parsedError) {
     if (!frame.fileName || !frame.lineNumber || !frame.columnNumber) {
       parsedMappedError.push(frame);
       continue;
     }
-    const entryPath = "plugin:" + frame.fileName;
-    const file =
-      loadedFilesCache[entryPath] ??
-      ((await fs.getEntryWithUrl(entryPath)) as storage.File);
+    if (frame.fileName === 'eval-anonymous') {
+      parsedMappedError.push(parseEvalAnonymousFrame(frame, evalAndAnonymouseUnsourcemappedHeaderLines));
+      continue;
+    }
+    console.log('frame.fileName', frame.fileName);
+    const entryPath = frame.fileName.startsWith('/') ? `file:${frame.fileName}` : `plugin:${frame.fileName}`;
+    console.log('entryPath', entryPath);
+    const file = loadedFilesCache[entryPath] ?? await getEntryAssertFile(entryPath);
     loadedFilesCache[entryPath] = file;
     if (!file.isFile) {
       parsedMappedError.push(frame);
       continue;
     }
-    const sourcemapFileEntryPath = entryPath + ".map";
-    const sourcemapFile =
-      loadedFilesCache[sourcemapFileEntryPath] ??
-      ((await fs.getEntryWithUrl(sourcemapFileEntryPath)) as storage.File);
+    const sourcemapFileEntryPath = `${entryPath}.map`;
+    const sourcemapFile = loadedFilesCache[sourcemapFileEntryPath] ?? await getEntryAssertFile(sourcemapFileEntryPath);
     loadedFilesCache[sourcemapFileEntryPath] = sourcemapFile;
     if (!sourcemapFile.isFile) {
       parsedMappedError.push(frame);
       continue;
     }
-    const sourcemapContents = (await sourcemapFile.read({})) as string;
+    const sourcemapContents = await sourcemapFile.read();
+    if (typeof sourcemapContents !== 'string') {
+      throw new TypeError(`Read sourcemap ${sourcemapFileEntryPath} is not a string`);
+    }
     const sourcemap = JSON.parse(sourcemapContents);
-    const smc = new SourceMapConsumer(sourcemap);
-    const mappedFrame = smc.originalPositionFor({
+    const traceMap = new TraceMap(sourcemap);
+    const mappedFrame = originalPositionFor(traceMap, {
       line: frame.lineNumber - unsourcemappedHeaderLines,
       column: frame.columnNumber,
     });
-    if (mappedFrame.source && mappedFrame.line && mappedFrame.column) {
+    if (mappedFrame.source && mappedFrame.line != null && mappedFrame.column != null) {
       parsedMappedError.push({
         ...frame,
         fileName: mappedFrame.source,
         lineNumber: mappedFrame.line,
         columnNumber: mappedFrame.column,
-      } as ErrorStackParser.StackFrame);
-    } else {
+      });
+    }
+    else {
       parsedMappedError.push(frame);
     }
   }
@@ -63,9 +89,40 @@ export async function parseUxpErrorSourcemaps(error: Error, opts: { unsourcemapp
   return parsedMappedError;
 }
 
-function parseErrorIntoBasicStackFrames(error: Error): BasicStackFrame[] {
+function parseEvalAnonymousFrame(frame: BasicStackFrame, evalAndAnonymouseUnsourcemappedHeaderLines: number): BasicStackFrame {
+  if (typeof EVAL_SOURCEMAP === 'string') {
+    const sourcemap = JSON.parse(EVAL_SOURCEMAP);
+    const traceMap = new TraceMap(sourcemap);
+    const mappedFrame = originalPositionFor(traceMap, {
+      line: frame.lineNumber! - evalAndAnonymouseUnsourcemappedHeaderLines,
+      column: frame.columnNumber!,
+    });
+    if (mappedFrame.source && mappedFrame.line != null && mappedFrame.column != null) {
+      return {
+        ...frame,
+        fileName: mappedFrame.source,
+        lineNumber: mappedFrame.line,
+        columnNumber: mappedFrame.column,
+      };
+    }
+  }
+  return frame;
+}
+
+export function replaceEvalAndAnonymousStack(stack: string) {
+  return stack.replace(/eval at importFile \(:(\d+):(\d+)\), /g, '').replaceAll('<anonymous>', 'eval-anonymous');
+}
+
+export function parseErrorIntoBasicStackFrames(error: Error, options: { normalizeEvalAndAnonymous?: boolean } = {}): BasicStackFrame[] {
   try {
-    const frames = ErrorStackParser.parse(error);
+    const errorWithEvalTakenOut = options.normalizeEvalAndAnonymous
+      ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack ? replaceEvalAndAnonymousStack(error.stack) : undefined,
+        }
+      : error;
+    const frames = ErrorStackParser.parse(errorWithEvalTakenOut);
     return frames.map((frame) => {
       return {
         functionName: frame.functionName,
@@ -74,25 +131,24 @@ function parseErrorIntoBasicStackFrames(error: Error): BasicStackFrame[] {
         columnNumber: frame.columnNumber,
       };
     });
-  } catch (e) {
-    throw new UTStacktraceParsingError("Failed to parse error stack trace", { cause: e });
+  }
+  catch (e) {
+    throw new UTStacktraceParsingError('Failed to parse error stack trace', { cause: e });
   }
 }
 
 export async function getBasicStackFrameAbsoluteFilePath(frame: BasicStackFrame): Promise<string> {
-  const pluginFolder = await (
-    storage as any
-  ).localFileSystem.getPluginFolder();
+  const pluginFolder = await storage.localFileSystem.getPluginFolder();
   const absoluteFileName = pathResolve(
     pluginFolder.nativePath,
-    "index.js",
+    'index.js',
     frame.fileName!,
-  ).replace(/^plugin:/, "");
+  ).replace(/^plugin:/, '');
   return `${absoluteFileName}:${frame.lineNumber}:${frame.columnNumber}`;
 }
 
 export class UTStacktraceParsingError extends UTError {
-  public override readonly name = "UTStacktraceParsingError";
+  public override readonly name = 'UTStacktraceParsingError';
 
   constructor(message: string, opts: ErrorOptions = {}) {
     super(message, opts);

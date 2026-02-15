@@ -1,14 +1,14 @@
 {
   "name": "@bubblydoo/uxp-test-framework-plugin",
-  "version": "0.0.3",
   "type": "module",
-  "license": "MIT",
+  "version": "0.0.15",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-test-framework-plugin",
   "repository": {
     "type": "git",
     "url": "https://github.com/bubblydoo/uxp-toolkit.git"
   },
-  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-test-framework-plugin",
   "exports": {
     "./cli": {
       "types": "./dist-vite/cli.d.ts",
@@ -21,23 +21,25 @@
   },
   "files": [
     "dist-vite",
-    "src-plugin",
-    "index.html"
+    "index.html",
+    "src-plugin"
   ],
   "scripts": {
-    "build": "rm -rf dist-vite && pnpm exec rollup -c && cp cli.d.ts dist-vite/cli.d.ts"
+    "build": "rm -rf dist-vite && pnpm exec rollup -c && cp cli.d.ts dist-vite/cli.d.ts",
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "@bubblydoo/uxp-toolkit": "workspace:*"
   },
   "dependencies": {
     "chokidar": "^5.0.0",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.9.3",
-    "vite": "^6.4.1",
-    "tailwindcss": "^3.4.17"
+    "vite": "^6.4.1"
   },
   "devDependencies": {
-    "@adobe/cc-ext-uxp-types": "https://github.com/justintaylor-dev/cc-ext-uxp-types.git",
+    "@adobe-uxp-types/photoshop": "workspace:*",
+    "@adobe-uxp-types/uxp": "workspace:*",
     "@babel/preset-typescript": "^7.28.5",
     "@bubblydoo/tsconfig": "workspace:*",
     "@bubblydoo/uxp-polyfills": "workspace:*",
@@ -48,7 +50,6 @@
     "@rollup/plugin-typescript": "^12.1.2",
     "@tanstack/react-query": "^5.90.20",
     "@types/node": "^20.8.7",
-    "@types/photoshop": "^25.0.2",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
     "@types/ws": "^8.5.8",

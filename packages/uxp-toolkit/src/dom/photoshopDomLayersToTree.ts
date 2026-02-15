@@ -1,10 +1,10 @@
-import type { Layer as DomLayer } from "photoshop/dom/Layer";
-import type { Tree } from "../general-tree/treeTypes";
+import type { Layer as DomLayer } from 'photoshop';
+import type { Tree } from '../general-tree/treeTypes';
 
 // get layers recursively
-export const photoshopDomLayersToTree = (layers: DomLayer[]): Tree<DomLayer> => {
+export function photoshopDomLayersToTree(layers: DomLayer[]): Tree<DomLayer> {
   // Get top-level layers
-  const filteredLayers = layers.filter((layer) => layer.parent === null);
+  const filteredLayers = layers.filter(layer => layer.parent === null);
 
   const generateTree = (layers: DomLayer[]): Tree<DomLayer> => {
     return layers.map((layer: DomLayer) => ({
@@ -15,4 +15,4 @@ export const photoshopDomLayersToTree = (layers: DomLayer[]): Tree<DomLayer> => 
   };
 
   return generateTree(filteredLayers);
-};
+}

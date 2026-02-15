@@ -1,16 +1,16 @@
-import { UXP_Manifest, UXP_Config } from "vite-uxp-plugin";
+import type { UXP_Config, UXP_Manifest } from 'vite-uxp-plugin';
 
 const extraPrefs = {
-  copyZipAssets: ["public-zip/*"],
+  copyZipAssets: ['public-zip/*'],
   uniqueIds: true,
 };
 
-type CreateManifestOpts = {
+interface CreateManifestOpts {
   id: string;
   name: string;
   version: string;
   hotReloadPort: number;
-};
+}
 
 const createUxpManifest: (opts: CreateManifestOpts) => UXP_Manifest = ({
   id,
@@ -22,17 +22,17 @@ const createUxpManifest: (opts: CreateManifestOpts) => UXP_Manifest = ({
     id,
     name,
     version,
-    main: "index.html",
+    main: 'index.html',
     manifestVersion: 6,
     host: [
       {
-        app: "PS",
-        minVersion: "24.2.0",
+        app: 'PS',
+        minVersion: '24.2.0',
       },
     ],
     entrypoints: [
       {
-        type: "panel",
+        type: 'panel',
         id: `${id}.main`,
         label: {
           default: name,
@@ -45,16 +45,16 @@ const createUxpManifest: (opts: CreateManifestOpts) => UXP_Manifest = ({
           {
             width: 23,
             height: 23,
-            path: "icons/dark.png",
+            path: 'icons/dark.png',
             scale: [1, 2],
-            theme: ["darkest", "dark", "medium"],
+            theme: ['darkest', 'dark', 'medium'],
           },
           {
             width: 23,
             height: 23,
-            path: "icons/light.png",
+            path: 'icons/light.png',
             scale: [1, 2],
-            theme: ["lightest", "light"],
+            theme: ['lightest', 'light'],
           },
         ],
       },
@@ -63,22 +63,22 @@ const createUxpManifest: (opts: CreateManifestOpts) => UXP_Manifest = ({
       enableAlerts: true,
     },
     requiredPermissions: {
-      localFileSystem: "fullAccess",
+      localFileSystem: 'fullAccess',
       launchProcess: {
-        schemes: ["https", "slack", "file", "ws"],
-        extensions: [".xd", ".psd", ".bat", ".cmd", ""],
+        schemes: ['https', 'slack', 'file', 'ws'],
+        extensions: ['.xd', '.psd', '.bat', '.cmd', ''],
       },
       network: {
         domains: [
           `ws://localhost:${hotReloadPort}`, // Required for hot reload
         ],
       },
-      clipboard: "readAndWrite",
+      clipboard: 'readAndWrite',
       webview: {
-        allow: "yes",
-        allowLocalRendering: "yes",
-        domains: "all",
-        enableMessageBridge: "localAndRemote",
+        allow: 'yes',
+        allowLocalRendering: 'yes',
+        domains: 'all',
+        enableMessageBridge: 'localAndRemote',
       },
       ipc: {
         enablePluginCommunication: true,
@@ -89,10 +89,10 @@ const createUxpManifest: (opts: CreateManifestOpts) => UXP_Manifest = ({
       {
         width: 48,
         height: 48,
-        path: "icons/plugin-icon.png",
+        path: 'icons/plugin-icon.png',
         scale: [1, 2],
-        theme: ["darkest", "dark", "medium", "lightest", "light", "all"],
-        species: ["pluginList"],
+        theme: ['darkest', 'dark', 'medium', 'lightest', 'light', 'all'],
+        species: ['pluginList'],
       },
     ],
   };

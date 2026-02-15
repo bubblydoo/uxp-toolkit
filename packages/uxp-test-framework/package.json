@@ -1,19 +1,13 @@
 {
   "name": "@bubblydoo/uxp-test-framework",
-  "version": "0.0.3",
   "type": "module",
-  "license": "MIT",
+  "version": "0.0.15",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-test-framework",
   "repository": {
     "type": "git",
     "url": "https://github.com/bubblydoo/uxp-toolkit.git"
-  },
-  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-test-framework",
-  "bin": {
-    "uxp-test": "bin/cli.js"
-  },
-  "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --outDir dist"
   },
   "exports": {
     ".": {
@@ -23,9 +17,17 @@
     "./package.json": "./package.json",
     "./uxp-tests-json-schema.json": "./uxp-tests-json-schema.json"
   },
+  "bin": {
+    "uxp-test": "bin/cli.js"
+  },
   "files": [
     "dist"
   ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --outDir dist",
+    "typecheck": "tsc --noEmit",
+    "docs-json": "typedoc --json docs.json"
+  },
   "publishConfig": {
     "access": "public",
     "exports": {
@@ -41,10 +43,10 @@
     "@bubblydoo/uxp-test-framework-plugin": "workspace:*"
   },
   "devDependencies": {
-    "vite": "^6.4.1",
-    "tsup": "^8.5.1",
     "@bubblydoo/tsconfig": "workspace:^",
     "@types/node": "^20.8.7",
-    "typescript": "^5.8.3"
+    "tsup": "^8.5.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.4.1"
   }
 }

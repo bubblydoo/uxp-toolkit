@@ -1,9 +1,5 @@
-import { z } from "zod";
-import { batchPlayCommand, createCommand } from "../core/command";
-
-export async function photoshopGetApplicationInfo() {
-  return await batchPlayCommand(photoshopApplicationInfoCommand);
-}
+import { z } from 'zod';
+import { batchPlayCommand, createCommand } from '../core/command';
 
 const photoshopAppInfoSchema = z.object({
   active: z.boolean(),
@@ -32,24 +28,28 @@ const photoshopAppInfoSchema = z.object({
       name: z.string(),
       obscured: z.boolean(),
       visible: z.boolean(),
-    })
+    }),
   ),
 });
 
 const photoshopApplicationInfoCommand = createCommand({
   modifying: false,
   descriptor: {
-    _obj: "get",
+    _obj: 'get',
     _target: [
       {
-        _ref: "application",
-        _enum: "ordinal",
-        _value: "targetEnum",
+        _ref: 'application',
+        _enum: 'ordinal',
+        _value: 'targetEnum',
       },
     ],
   },
   schema: photoshopAppInfoSchema,
 });
+
+export async function photoshopGetApplicationInfo() {
+  return await batchPlayCommand(photoshopApplicationInfoCommand);
+}
 
 // $PnCK: {_enum: "cursorKind", _value: "brushSize"}
 // MRUColorList: (2) [{…}, {…}]

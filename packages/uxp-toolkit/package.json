@@ -1,25 +1,37 @@
 {
   "name": "@bubblydoo/uxp-toolkit",
-  "version": "0.0.3",
-  "license": "MIT",
   "type": "module",
+  "version": "0.0.15",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-toolkit",
   "repository": {
     "type": "git",
     "url": "https://github.com/bubblydoo/uxp-toolkit.git"
   },
-  "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-toolkit",
-  "scripts": {
-    "build": "tsup",
-    "uxp-test:build": "uxp-test build",
-    "uxp-test:dev": "uxp-test dev"
-  },
   "exports": {
     ".": {
+      "@bubblydoo/uxp-toolkit-repo-compiled": "./dist/index.js",
       "types": "./src/index.ts",
       "import": "./src/index.ts"
     },
+    "./commands": {
+      "@bubblydoo/uxp-toolkit-repo-compiled": "./dist/commands-library/index.js",
+      "types": "./src/commands-library/index.ts",
+      "import": "./src/commands-library/index.ts"
+    },
     "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test-base": "node --import tsx ./node_modules/vitest/vitest.mjs",
+    "test:unit": "pnpm test-base --project unit",
+    "test:uxp": "pnpm test-base --project uxp",
+    "test": "pnpm test:unit",
+    "uxp-test:build": "uxp-test build",
+    "uxp-test:dev": "uxp-test dev",
+    "typecheck": "tsc --noEmit",
+    "docs-json": "typedoc --json docs.json"
   },
   "publishConfig": {
     "access": "public",
@@ -28,6 +40,10 @@
         "types": "./dist/index.d.ts",
         "import": "./dist/index.js"
       },
+      "./commands": {
+        "types": "./dist/commands-library/index.d.ts",
+        "import": "./dist/commands-library/index.js"
+      },
       "./package.json": "./package.json"
     }
   },
@@ -35,21 +51,27 @@
     "zod": "^4.0.0"
   },
   "dependencies": {
+    "@jridgewell/trace-mapping": "^0.3.31",
     "error-stack-parser": "^2.1.4",
-    "source-map-js": "^1.2.1",
     "xmlbuilder2": "^4.0.3"
   },
   "devDependencies": {
-    "@adobe-uxp-types/uxp": "^0.0.9",
+    "@adobe-uxp-types/photoshop": "workspace:*",
+    "@adobe-uxp-types/uxp": "workspace:*",
     "@bubblydoo/tsconfig": "workspace:*",
     "@bubblydoo/uxp-test-framework": "workspace:*",
+    "@bubblydoo/vitest-pool-cdp": "workspace:*",
+    "@bubblydoo/vitest-pool-uxp": "workspace:*",
     "@types/chai": "^5.2.3",
     "@types/node": "^20.8.7",
-    "@types/photoshop": "^25.0.2",
     "chai": "^6.2.2",
+    "dedent": "^1.7.1",
     "rollup": "^4.57.0",
     "tsup": "^8.5.1",
+    "tsx": "^4.20.2",
     "typescript": "^5.8.3",
+    "url-shim": "^1.0.1",
+    "vitest": "^4.0.18",
     "zod": "^4.3.6"
   }
 }

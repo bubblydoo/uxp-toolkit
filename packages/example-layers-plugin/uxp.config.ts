@@ -1,30 +1,30 @@
-import type { UXP_Manifest, UXP_Config } from "vite-uxp-plugin";
-import { version } from "./package.json";
+import type { UXP_Config, UXP_Manifest } from 'vite-uxp-plugin';
+import { version } from './package.json';
 
 const extraPrefs = {
   hotReloadPort: 8081,
-  copyZipAssets: ["public-zip/*"],
+  copyZipAssets: ['public-zip/*'],
   uniqueIds: true,
 };
 
-export const id = "co.bubblydoo.example-layers-plugin";
-const name = "Example Layers Plugin";
+export const id = 'co.bubblydoo.example-layers-plugin';
+const name = 'Example Layers Plugin';
 
 const manifest: UXP_Manifest = {
   id,
   name,
   version,
-  main: "index.html",
+  main: 'index.html',
   manifestVersion: 6,
   host: [
     {
-      app: "PS",
-      minVersion: "24.2.0",
+      app: 'PS',
+      minVersion: '24.2.0',
     },
   ],
   entrypoints: [
     {
-      type: "panel",
+      type: 'panel',
       id: `${id}.main`,
       label: {
         default: name,
@@ -37,16 +37,16 @@ const manifest: UXP_Manifest = {
         {
           width: 23,
           height: 23,
-          path: "icons/dark.png",
+          path: 'icons/dark.png',
           scale: [1, 2],
-          theme: ["darkest", "dark", "medium"],
+          theme: ['darkest', 'dark', 'medium'],
         },
         {
           width: 23,
           height: 23,
-          path: "icons/light.png",
+          path: 'icons/light.png',
           scale: [1, 2],
-          theme: ["lightest", "light"],
+          theme: ['lightest', 'light'],
         },
       ],
     },
@@ -55,22 +55,22 @@ const manifest: UXP_Manifest = {
     enableAlerts: true,
   },
   requiredPermissions: {
-    localFileSystem: "fullAccess",
+    localFileSystem: 'fullAccess',
     launchProcess: {
-      schemes: ["https", "slack", "file", "ws"],
-      extensions: [".xd", ".psd", ".bat", ".cmd", ""],
+      schemes: ['https', 'slack', 'file', 'ws'],
+      extensions: ['.xd', '.psd', '.bat', '.cmd', ''],
     },
     network: {
       domains: [
         `ws://localhost:${extraPrefs.hotReloadPort}`, // Required for hot reload
       ],
     },
-    clipboard: "readAndWrite",
+    clipboard: 'readAndWrite',
     webview: {
-      allow: "yes",
-      allowLocalRendering: "yes",
-      domains: "all",
-      enableMessageBridge: "localAndRemote",
+      allow: 'yes',
+      allowLocalRendering: 'yes',
+      domains: 'all',
+      enableMessageBridge: 'localAndRemote',
     },
     ipc: {
       enablePluginCommunication: true,
@@ -81,10 +81,10 @@ const manifest: UXP_Manifest = {
     {
       width: 48,
       height: 48,
-      path: "icons/plugin-icon.png",
+      path: 'icons/plugin-icon.png',
       scale: [1, 2],
-      theme: ["darkest", "dark", "medium", "lightest", "light", "all"],
-      species: ["pluginList"],
+      theme: ['darkest', 'dark', 'medium', 'lightest', 'light', 'all'],
+      species: ['pluginList'],
     },
   ],
 };

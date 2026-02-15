@@ -1,0 +1,62 @@
+{
+  "name": "@bubblydoo/vitest-pool-cdp",
+  "type": "module",
+  "version": "0.0.6",
+  "description": "Custom Vitest pool that runs tests in CDP-connected environments (browsers, Photoshop UXP, Electron, etc.)",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test:chrome": "node --import tsx ./node_modules/vitest/vitest.mjs --config test/vitest-chrome.config.ts",
+    "test": "puppeteer browsers install chrome && pnpm test:chrome"
+  },
+  "peerDependencies": {
+    "vitest": ">=4"
+  },
+  "dependencies": {
+    "@bubblydoo/uxp-devtools-common": "workspace:*",
+    "@jridgewell/trace-mapping": "^0.3.31",
+    "@vitest/expect": "^4.0.18",
+    "@vitest/runner": "^4.0.18",
+    "@vitest/snapshot": "^4.0.18",
+    "@vitest/utils": "^4.0.18",
+    "birpc": "^4.0.0",
+    "chai": "^6.2.2",
+    "chrome-remote-interface": "^0.33.3",
+    "devalue": "^5.1.1",
+    "esbuild": "^0.24.0",
+    "flatted": "^3.3.3",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@bubblydoo/tsconfig": "workspace:*",
+    "@types/chai": "^5.2.3",
+    "@types/chrome-remote-interface": "^0.33.0",
+    "@types/node": "^20.8.7",
+    "puppeteer": "^24.36.1",
+    "tsup": "^8.3.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.0"
+  }
+}

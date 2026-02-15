@@ -1,13 +1,12 @@
-import { executeAsModal } from "../core/executeAsModal";
-import { openFileByPath } from "../filesystem/openFileByPath";
-import { getLayerProperties } from "../ut-tree/getLayerProperties";
-import type { Test } from "@bubblydoo/uxp-test-framework";
-import { expect } from "chai";
-import { app } from "photoshop";
-import { createRenameLayerCommand } from "./renameLayer";
+import { app } from 'photoshop';
+import { describe, expect, it } from 'vitest';
+import { openFixture } from '../../test/open-fixture';
+import { executeAsModal } from '../core/executeAsModal';
+import { getDocumentLayerDescriptors } from '../ut-tree/getDocumentLayerDescriptors';
+import { createRenameLayerCommand } from './renameLayer';
 
 async function getFirstLayer() {
-  const allLayers = await getLayerProperties(app.activeDocument.id);
+  const allLayers = await getDocumentLayerDescriptors(app.activeDocument.id);
   return {
     ref: {
       id: allLayers[0]!.layerID,
@@ -15,18 +14,17 @@ async function getFirstLayer() {
     },
     name: allLayers[0]!.name,
   };
-} 
+}
 
-export const renameLayerTest: Test = {
-  name: "Rename Layer",
-  async run() {
-    await openFileByPath("plugin:/fixtures/one-layer.psd");
+describe('renameLayer', () => {
+  it('should rename a layer', async (t) => {
+    await openFixture(t, 'one-layer.psd');
     const layer = await getFirstLayer();
-    expect(layer.name).to.equal("Layer 1");
-    await executeAsModal("Rename Layer", async (ctx) => {
-      await ctx.batchPlayCommand(createRenameLayerCommand(layer.ref, "New Name"));
+    expect(layer.name).toBe('Layer 1');
+    await executeAsModal('Rename Layer', async (ctx) => {
+      await ctx.batchPlayCommand(createRenameLayerCommand(layer.ref, 'New Name'));
     });
     const layer2 = await getFirstLayer();
-    expect(layer2.name).to.equal("New Name");
-  },
-};
+    expect(layer2.name).toBe('New Name');
+  });
+});

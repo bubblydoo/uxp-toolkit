@@ -1,5 +1,17 @@
 # @bubblydoo/uxp-polyfills
 
+## 0.0.5
+
+### Patch Changes
+
+- 11de737: Updated uxp types and docs
+
+## 0.0.4
+
+### Patch Changes
+
+- d0d1067: Setup changeset releases
+
 ## 0.0.3
 
 ### Patch Changes

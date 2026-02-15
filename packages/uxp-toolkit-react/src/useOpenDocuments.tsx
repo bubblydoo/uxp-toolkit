@@ -1,8 +1,8 @@
-import { action, app } from "photoshop";
-import { useSyncExternalStore } from "react";
-import type { Document } from "photoshop/dom/Document";
+import type { Document } from 'photoshop';
+import { action, app } from 'photoshop';
+import { useSyncExternalStore } from 'react';
 
-const OPEN_DOCUMENTS_EVENTS = ["open", "close"];
+const OPEN_DOCUMENTS_EVENTS = ['open', 'close'];
 
 // Cache to avoid infinite loops by returning stable references
 let cachedDocuments: Document[] | null = null;
@@ -20,8 +20,8 @@ const openDocumentsExternalStore = {
 
     // Create a simple snapshot string to compare if documents changed
     const currentSnapshot = currentDocuments
-      .map((doc) => doc.id || doc.name)
-      .join(",");
+      .map(doc => doc.id || doc.name)
+      .join(',');
 
     // Only update cache if the documents actually changed
     if (currentSnapshot !== cachedDocumentsSnapshot) {
@@ -36,6 +36,6 @@ const openDocumentsExternalStore = {
 export function useOpenDocuments() {
   return useSyncExternalStore(
     openDocumentsExternalStore.subscribe,
-    openDocumentsExternalStore.getSnapshot
+    openDocumentsExternalStore.getSnapshot,
   );
 }

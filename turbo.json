@@ -4,6 +4,18 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
+    },
+    "test": {
+      "dependsOn": ["^test"],
+      "outputs": ["test-results/**"],
+      "env": ["CI"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
+    "docs-json": {
+      "dependsOn": ["^docs-json"],
+      "outputs": ["docs.json"]
     }
   }
 }

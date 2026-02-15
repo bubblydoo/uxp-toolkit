@@ -1,4 +1,4 @@
-export type PsLayerRef = {
+export interface PsLayerRef {
   id: number;
   docId: number;
-};
+}

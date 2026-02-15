@@ -1,29 +1,26 @@
-import type { ActionDescriptor } from "photoshop/dom/CoreModules";
-import { z } from "zod";
-import { batchPlay } from "./batchPlay";
-import { executeAsModal } from "./executeAsModal";
-import type { CorrectExecutionContext } from "./executeAsModal";
-import { action } from "photoshop";
+import type { ActionDescriptor } from 'photoshop';
+import type { z } from 'zod';
+import { batchPlay } from './batchPlay';
 
-export interface UTCommandBase<T extends any> {
+export interface UTCommandBase<T> {
   descriptor: ActionDescriptor;
   schema: z.ZodSchema<T>;
 }
 
-export interface UTCommandModifying<T extends any> extends UTCommandBase<T> {
+export interface UTCommandModifying<T> extends UTCommandBase<T> {
   modifying: true;
 }
 
-export interface UTCommandNonModifying<T extends any> extends UTCommandBase<T> {
+export interface UTCommandNonModifying<T> extends UTCommandBase<T> {
   modifying: false;
 }
 
-export function createCommand<TReturn extends any, TModifying extends boolean>(
+export function createCommand<TReturn, TModifying extends boolean>(
   obj: {
-    descriptor: ActionDescriptor,
-    schema: z.ZodSchema<TReturn>,
-    modifying: TModifying,
-  }
+    descriptor: ActionDescriptor;
+    schema: z.ZodSchema<TReturn>;
+    modifying: TModifying;
+  },
 ): TModifying extends true ? UTCommandModifying<TReturn> : UTCommandNonModifying<TReturn> {
   return {
     modifying: obj.modifying,
@@ -36,28 +33,28 @@ export type UTCommandResult<C> = C extends UTCommandBase<infer T> ? T : never;
 
 type BatchPlayOptions = Parameters<typeof batchPlay>[1];
 
-async function batchPlayCommandBase<T extends any>(command: UTCommandBase<T>, options?: BatchPlayOptions) {
+async function batchPlayCommandBase<T>(command: UTCommandBase<T>, options?: BatchPlayOptions) {
   const [result] = await batchPlay([command.descriptor], options);
-  if (result?._obj === "error") {
-    throw new Error("Batch play command failed", { cause: result });
+  if (result?._obj === 'error') {
+    throw new Error('Batch play command failed', { cause: result });
   }
   return command.schema.parse(result);
 }
 
 async function batchPlayCommandsBase<TCommands extends Array<UTCommandBase<any>>>(
   commands: readonly [...TCommands],
-  options?: BatchPlayOptions
+  options?: BatchPlayOptions,
 ): Promise<{
   [K in keyof TCommands]: UTCommandResult<TCommands[K]>;
 }> {
   const results = await batchPlay(commands.map(command => command.descriptor), options);
-  if (results[0]?._obj === "error") {
-    throw new Error("Batch play command failed", { cause: results[0] });
+  if (results[0]?._obj === 'error') {
+    throw new Error('Batch play command failed', { cause: results[0] });
   }
   return commands.map((command, index) => command.schema.parse(results[index])) as any;
 }
 
-export function batchPlayCommand<T extends any>(command: UTCommandNonModifying<T>, options?: BatchPlayOptions) {
+export function batchPlayCommand<T>(command: UTCommandNonModifying<T>, options?: BatchPlayOptions) {
   return batchPlayCommandBase(command, options);
 }
 
@@ -69,7 +66,7 @@ export function createModifyingBatchPlayContext() {
   return {
     batchPlayCommand: batchPlayCommandBase,
     batchPlayCommands: batchPlayCommandsBase,
-  }
+  };
 }
 // some examples:
 

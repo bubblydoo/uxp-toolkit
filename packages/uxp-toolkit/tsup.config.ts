@@ -1,9 +1,9 @@
-import { defineConfig } from "tsup";
+import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ["src/index.ts"],
-  format: "esm",
+  entry: ['src/index.ts', 'src/commands-library/index.ts'],
+  format: 'esm',
   dts: true,
-  external: ["photoshop", "uxp"],
-  outDir: "dist",
+  external: ['photoshop', 'uxp'],
+  outDir: 'dist',
 });

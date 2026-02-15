@@ -1,44 +1,25 @@
+import type { PsLayerRef, Tree, UTLayer, UTLayerWithoutChildren } from '@bubblydoo/uxp-toolkit';
+import type { Document } from 'photoshop';
+import { createCommand, executeAsModal, mapTree, utLayersToTree } from '@bubblydoo/uxp-toolkit';
 import {
-  createCommand,
-  executeAsModal,
-  getFlattenedLayerDescriptorsList,
-  mapTree,
-  photoshopLayerDescriptorsToUTLayers,
-  utLayersToTree,
-  type PsLayerRef,
-  type Tree,
-  type UTLayer,
-  type UTLayerWithoutChildren,
-} from "@bubblydoo/uxp-toolkit";
-import {
+  documentQueries,
   useActiveDocument,
+  useDocumentGetQuery,
+  useDocumentTreeQuery,
   useOnDocumentEdited,
-  useOnEvent,
-} from "@bubblydoo/uxp-toolkit-react";
+} from '@bubblydoo/uxp-toolkit-react';
 import {
+  MutationCache,
+  QueryCache,
   QueryClient,
   QueryClientProvider as ReactQueryClientProvider,
   useMutation,
-  useQuery,
   useQueryClient,
-} from "@tanstack/react-query";
-import {
-  ArrowDown,
-  ArrowUp,
-  BlendIcon,
-  ChevronDown,
-  CornerLeftDown,
-  Eye,
-  EyeOff,
-  FlowerIcon,
-  Folder,
-  Lightbulb,
-} from "lucide-react";
-import { app } from "photoshop";
-import type { Document } from "photoshop/dom/Document";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { z } from "zod";
-import { cn } from "./lib/cn";
+} from '@tanstack/react-query';
+import * as icons from 'lucide-react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
+import { z } from 'zod';
+import { cn } from './lib/cn';
 
 export function App() {
   return (
@@ -57,7 +38,29 @@ function Router() {
 }
 
 function QueryClientProvider({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+          },
+          mutations: {
+            retry: false,
+          },
+        },
+        queryCache: new QueryCache({
+          onError: (error) => {
+            console.error(error);
+          },
+        }),
+        mutationCache: new MutationCache({
+          onError: (error) => {
+            console.error(error);
+          },
+        }),
+      }),
+  );
 
   return (
     <ReactQueryClientProvider client={queryClient}>
@@ -79,19 +82,10 @@ function LayersPanel({ document }: { document: Document }) {
   const queryClient = useQueryClient();
   const activeDocumentId = document.id;
 
-  const layersQuery = useQuery({
-    queryKey: ["layers", activeDocumentId],
-    queryFn: async () => {
-      const utLayers = await photoshopLayerDescriptorsToUTLayers(
-        await getFlattenedLayerDescriptorsList(activeDocumentId),
-      );
-
-      return utLayersToTree(utLayers);
-    },
-  });
+  const treeQuery = useDocumentTreeQuery(document, { select: utLayersToTree });
 
   const treeWithExtraData = useMemo(() => {
-    if (!layersQuery.data) return undefined;
+    if (!treeQuery.data) return undefined;
 
     function crawl(tree: Tree<UTLayerWithoutChildren>) {
       const newTree: Tree<NodeWithExtraData> = [];
@@ -111,40 +105,46 @@ function LayersPanel({ document }: { document: Document }) {
       return newTree;
     }
 
-    return crawl(layersQuery.data);
-  }, [layersQuery.data]);
+    return crawl(treeQuery.data);
+  }, [treeQuery.data]);
 
-  const activeLayerRefsQuery = useQuery({
-    queryKey: ["activeLayers", activeDocumentId],
-    queryFn: async (): Promise<PsLayerRef[]> => {
-      // return [];
-      const doc = app.documents.find((d) => d.id === activeDocumentId);
-      if (!doc)
-        throw new Error(`Document with id ${activeDocumentId} not found`);
-      return doc.activeLayers.map((l) => ({
-        id: l.id,
-        docId: l._docId,
-      }));
+  const documentQuery = useDocumentGetQuery(document, {
+    select(data) {
+      return {
+        activeLayerRefs: data.targetLayersIDs.map((id) => ({
+          id: id._id,
+          docId: data.documentID,
+        })),
+        quickMode: data.quickMask,
+      };
     },
   });
 
   useOnDocumentEdited(document, () => {
-    queryClient.invalidateQueries({ queryKey: ["layers", activeDocumentId] });
     queryClient.invalidateQueries({
-      queryKey: ["activeLayers", activeDocumentId],
+      queryKey: documentQueries.tree(activeDocumentId).queryKey,
+    });
+    queryClient.invalidateQueries({
+      queryKey: documentQueries.get(activeDocumentId).queryKey,
     });
   });
 
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState('');
   const [matchMode, setMatchMode] = useState<
-    "exact" | "contains" | "endsWith" | "startsWith"
-  >("contains");
+    'exact' | 'contains' | 'endsWith' | 'startsWith'
+  >('contains');
   const [filterCaseSensitive, setFilterCaseSensitive] = useState(false);
   const [filterOnlyModifiers, setFilterOnlyModifiers] = useState(false);
 
   const filteredTree = useMemo(() => {
     if (!treeWithExtraData) return undefined;
-    return createFilteredTree(treeWithExtraData, filter, matchMode, filterCaseSensitive, filterOnlyModifiers);
+    return createFilteredTree(
+      treeWithExtraData,
+      filter,
+      matchMode,
+      filterCaseSensitive,
+      filterOnlyModifiers,
+    );
   }, [treeWithExtraData, filter, matchMode, filterCaseSensitive, filterOnlyModifiers]);
 
   const [resultsIndex, setResultsIndex] = useState(0);
@@ -158,14 +158,10 @@ function LayersPanel({ document }: { document: Document }) {
   const scrollToResult = useCallback((layerId: number) => {
     const layer = window.document.querySelector(`[data-layer-id="${layerId}"]`);
     if (layer) {
-      console.log("scrollToResult", layerId);
       const bodyHeight = window.document.body.clientHeight;
       const top =
         layer.getBoundingClientRect().top + window.document.body.scrollTop;
-      console.log("top", top);
       window.document.body.scrollTo(0, top - bodyHeight / 2);
-    } else {
-      console.log("scrollToResult not found", layerId);
     }
   }, []);
 
@@ -200,8 +196,18 @@ function LayersPanel({ document }: { document: Document }) {
   }, [filterResults, scrollToResult]);
 
   const [filterMode, setFilterMode] = useState<"highlight" | "collapse">(
-    "highlight",
+    'highlight',
   );
+
+  if (treeQuery.error) {
+    return (
+      <div>
+        Error:
+        <div>{treeQuery.error.message}</div>
+        <ButtonDiv onMouseDown={() => treeQuery.refetch()}>Retry</ButtonDiv>
+      </div>
+    );
+  }
 
   if (!filteredTree) return <div>Loading...</div>;
 
@@ -216,9 +222,9 @@ function LayersPanel({ document }: { document: Document }) {
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "ArrowDown" || e.key === "Enter") {
+                if (e.key === 'ArrowDown' || e.key === 'Enter') {
                   nextResult();
-                } else if (e.key === "ArrowUp") {
+                } else if (e.key === 'ArrowUp') {
                   previousResult();
                 }
               }}
@@ -227,14 +233,14 @@ function LayersPanel({ document }: { document: Document }) {
               {resultsIndex + 1}/{resultsCount} results
             </div>
             <ButtonDiv className="border border-psDark rounded-md mr-1">
-              <ArrowUp
+              <icons.ArrowUp
                 size={20}
                 style={{ fill: "transparent", stroke: "currentColor" }}
                 onMouseDown={previousResult}
               />
             </ButtonDiv>
             <ButtonDiv className="border border-psDark rounded-md">
-              <ArrowDown
+              <icons.ArrowDown
                 size={20}
                 style={{ fill: "transparent", stroke: "currentColor" }}
                 onMouseDown={nextResult}
@@ -247,7 +253,7 @@ function LayersPanel({ document }: { document: Document }) {
                 type="checkbox"
                 checked={filterMode === "collapse"}
                 onChange={(e) =>
-                  setFilterMode(e.target.checked ? "collapse" : "highlight")
+                  setFilterMode(e.target.checked ? 'collapse' : 'highlight')
                 }
               />
               Collapse
@@ -266,10 +272,10 @@ function LayersPanel({ document }: { document: Document }) {
                 onChange={(e) =>
                   setMatchMode(
                     e.target.value as
-                      | "exact"
-                      | "contains"
-                      | "endsWith"
-                      | "startsWith",
+                      | 'exact'
+                      | 'contains'
+                      | 'endsWith'
+                      | 'startsWith',
                   )
                 }
               >
@@ -292,8 +298,9 @@ function LayersPanel({ document }: { document: Document }) {
       </div>
       <TreeNode
         tree={filteredTree}
-        activeLayerRefs={activeLayerRefsQuery.data}
-        filterMode={filter.length > 0 || filterOnlyModifiers ? filterMode : "none"}
+        activeLayerRefs={documentQuery.data?.activeLayerRefs ?? null}
+        quickMode={documentQuery.data?.quickMode ?? null}
+        filterMode={filter.length > 0 || filterOnlyModifiers ? filterMode : 'none'}
         currentResultLayer={filterResults[resultsIndex]}
       />
     </>
@@ -303,25 +310,35 @@ function LayersPanel({ document }: { document: Document }) {
 function createFilteredTree(
   tree: Tree<NodeWithExtraData>,
   filter: string,
-  filterMatchMode: "exact" | "contains" | "endsWith" | "startsWith",
+  filterMatchMode: 'exact' | 'contains' | 'endsWith' | 'startsWith',
   filterCaseSensitive: boolean,
   filterOnlyModifiers: boolean,
 ): Tree<NodeWithExtraDataAndFiltered> {
   return mapTree(tree, (node) => {
-    const processedName = filterCaseSensitive ? node.layer.name : node.layer.name.toLowerCase(); 
+    const processedName = filterCaseSensitive
+      ? node.layer.name
+      : node.layer.name.toLowerCase();
     const processedFilter = filterCaseSensitive ? filter : filter.toLowerCase();
-    const doesNameMatch = !filter ||
-      (filterMatchMode === "exact"
+    const doesNameMatch =
+      !filter ||
+      (filterMatchMode === 'exact'
         ? processedName === processedFilter
-        : filterMatchMode === "contains"
+        : filterMatchMode === 'contains'
           ? processedName.includes(processedFilter)
-          : filterMatchMode === "endsWith"
+          : filterMatchMode === 'endsWith'
             ? processedName.endsWith(processedFilter)
-            : filterMatchMode === "startsWith"
+            : filterMatchMode === 'startsWith'
               ? processedName.startsWith(processedFilter)
               : false);
-    const isSpecialBlendMode = node.layer.kind === "group" ? node.layer.blendMode !== "passThrough" : node.layer.blendMode !== "normal";
-    const doModifiersMatch = !filterOnlyModifiers || node.layer.opacity < 255 || Object.keys(node.layer.effects).length > 0 || isSpecialBlendMode;
+    const isSpecialBlendMode =
+      node.layer.kind === 'group'
+        ? node.layer.blendMode !== 'passThrough'
+        : node.layer.blendMode !== 'normal';
+    const doModifiersMatch =
+      !filterOnlyModifiers ||
+      (typeof node.layer.opacity === 'number' && node.layer.opacity < 255) ||
+      Object.keys(node.layer.effects).length > 0 ||
+      isSpecialBlendMode;
     return {
       ...node,
       filtered: doesNameMatch && doModifiersMatch,
@@ -345,6 +362,21 @@ function getAllResults(tree: Tree<NodeWithExtraDataAndFiltered>) {
   return results;
 }
 
+const layerIcons: Record<UTLayer['kind'], React.ReactNode> = {
+  adjustmentLayer: <icons.Eclipse />,
+  curves: <icons.Eclipse />,
+  gradientFill: <icons.Eclipse />,
+  pattern: <icons.Eclipse />,
+  solidColor: <icons.Eclipse />,
+  smartObject: <icons.FileScan />,
+  threeD: <icons.Box />,
+  video: <icons.Video />,
+  text: <icons.Type />,
+  background: null,
+  pixel: null,
+  group: null,
+};
+
 function createSetLayerVisibilityCommand(
   layerRef: PsLayerRef,
   visible: boolean,
@@ -366,20 +398,22 @@ function TreeNode({
   tree,
   depth = 0,
   activeLayerRefs,
+  quickMode,
   filterMode,
   currentResultLayer,
 }: {
   tree: Tree<NodeWithExtraDataAndFiltered>;
   depth?: number;
-  activeLayerRefs: PsLayerRef[] | undefined;
-  filterMode: "collapse" | "highlight" | "none";
+  activeLayerRefs: PsLayerRef[] | null;
+  quickMode: boolean | null;
+  filterMode: 'collapse' | 'highlight' | 'none';
   currentResultLayer: NodeWithExtraDataAndFiltered | undefined;
 }) {
   const queryClient = useQueryClient();
 
   const changeLayerVisibilityMutation = useMutation({
     mutationFn: async (options: { layerRef: PsLayerRef; visible: boolean }) => {
-      await executeAsModal("Change Layer Visibility", async (ctx) => {
+      await executeAsModal('Change Layer Visibility', async (ctx) => {
         await ctx.batchPlayCommand(
           createSetLayerVisibilityCommand(options.layerRef, options.visible),
         );
@@ -387,22 +421,26 @@ function TreeNode({
     },
     onSuccess: (_data, variables) => {
       const docId = variables.layerRef.docId;
-      queryClient.invalidateQueries({ queryKey: ["layers", docId] });
-      queryClient.invalidateQueries({ queryKey: ["activeLayers", docId] });
+      queryClient.invalidateQueries({
+        queryKey: documentQueries.tree(docId).queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: documentQueries.get(docId).queryKey,
+      });
     },
   });
 
   const selectLayerMutation = useMutation({
     mutationFn: async (options: { layerRef: PsLayerRef }) => {
-      await executeAsModal("Select Layer", async (ctx) => {
+      await executeAsModal('Select Layer', async (ctx) => {
         await ctx.batchPlayCommand(
           createCommand({
             modifying: true,
             descriptor: {
-              _obj: "select",
+              _obj: 'select',
               _target: [
-                { _ref: "layer", _id: options.layerRef.id },
-                { _ref: "document", _id: options.layerRef.docId },
+                { _ref: 'layer', _id: options.layerRef.id },
+                { _ref: 'document', _id: options.layerRef.docId },
               ],
             },
             schema: z.unknown(),
@@ -412,7 +450,9 @@ function TreeNode({
     },
     onSuccess: (_data, variables) => {
       const docId = variables.layerRef.docId;
-      queryClient.invalidateQueries({ queryKey: ["activeLayers", docId] });
+      queryClient.invalidateQueries({
+        queryKey: documentQueries.get(docId).queryKey,
+      });
     },
   });
 
@@ -423,40 +463,51 @@ function TreeNode({
   }
 
   function isNonDefaultBlendMode(ref: NodeWithExtraData) {
-    if (ref.layer.kind === "group") {
-      return ref.layer.blendMode !== "passThrough";
+    if (ref.layer.kind === 'group') {
+      return ref.layer.blendMode !== 'passThrough';
     }
-    return ref.layer.blendMode !== "normal";
+    return ref.layer.blendMode !== 'normal';
   }
 
-  // const collapse = !node.ref.filtered && filterMode === "collapse";
+  function getLayerLock(ref: NodeWithExtraData) {
+    return ref.layer.background || ref.layer.lock?.all
+      ? 'full'
+      : ref.layer.lock
+        ? 'partial'
+        : 'none';
+  }
+
   function shouldCollapse(node: NodeWithExtraDataAndFiltered) {
-    return !node.filtered && filterMode === "collapse";
+    return !node.filtered && filterMode === 'collapse';
   }
 
   function shouldHighlight(node: NodeWithExtraDataAndFiltered) {
-    return node.filtered && filterMode === "highlight";
+    return node.filtered && filterMode === 'highlight';
   }
 
   function shouldCurrentHighlight(node: NodeWithExtraDataAndFiltered) {
     return (
-      currentResultLayer?.layer.id === node.layer.id && filterMode !== "none"
+      currentResultLayer?.layer.id === node.layer.id && filterMode !== 'none'
     );
   }
 
   return (
     <>
-      {tree.map((node, idx) => (
-        <Fragment key={idx}>
+      {tree.map((node) => {
+        const lock = getLayerLock(node.ref);
+        const isActive = isActiveLayer(node.ref);
+
+        return (
+          <Fragment key={node.ref.layer.id}>
           <div
-            key={idx}
             data-layer-id={node.ref.layer.id}
             className={cn(
-              "border-b border-psDark bg-psNeutral hover:bg-psHover flex flex-row items-stretch h-6",
-              isActiveLayer(node.ref) && "bg-psActive hover:bg-psActive",
-              shouldCollapse(node.ref) && "h-auto",
-              shouldHighlight(node.ref) && "bg-[#9a916c]",
-              shouldCurrentHighlight(node.ref) && "bg-[#b3a052]",
+              'border-b border-psDark bg-psNeutral hover:bg-psHover flex flex-row items-stretch h-6',
+              isActive && 'bg-psActive hover:bg-psActive',
+              isActive && quickMode && 'bg-[#8e615d] hover:bg-[#8e615d]',
+              shouldCollapse(node.ref) && 'h-auto',
+              shouldHighlight(node.ref) && 'bg-[#9a916c]',
+              shouldCurrentHighlight(node.ref) && 'bg-[#b3a052]',
             )}
           >
             {!shouldCollapse(node.ref) ? (
@@ -475,19 +526,18 @@ function TreeNode({
                 >
                   <ButtonDiv className="text-white">
                     {node.ref.layer.visible ? (
-                      <Eye
+                      <icons.Eye
                         size={14}
-                        style={{ fill: "transparent", stroke: "currentColor" }}
+                        style={{ fill: 'transparent', stroke: 'currentColor' }}
                       />
                     ) : (
-                      <EyeOff
+                      <icons.EyeOff
                         size={14}
-                        style={{ fill: "transparent", stroke: "currentColor" }}
+                        style={{ fill: 'transparent', stroke: 'currentColor' }}
                       />
                     )}
                   </ButtonDiv>
                 </div>
-                {/* {node.ref.filtered ? "f" : "n"} */}
                 <ButtonDiv
                   onMouseDown={() => {
                     selectLayerMutation.mutate({
@@ -502,61 +552,90 @@ function TreeNode({
                 >
                   {node.ref.layer.isClippingMask && (
                     <div className="mr-2 ml-1 flex items-center">
-                      <CornerLeftDown
+                      <icons.CornerLeftDown
                         size={14}
-                        style={{ fill: "transparent", stroke: "currentColor" }}
+                        style={{ fill: 'transparent', stroke: 'currentColor' }}
                       />
                     </div>
                   )}
-                  {node.ref.layer.kind === "group" && (
+                  {node.ref.layer.kind === 'group' && (
                     <div className="mr-2 flex items-center">
-                      <ChevronDown
+                      <icons.ChevronDown
                         size={14}
-                        style={{ fill: "transparent", stroke: "currentColor" }}
+                        style={{ fill: 'transparent', stroke: 'currentColor' }}
                         className="mr-[2px] ml-[-2px]"
                       />
-                      <Folder
+                      <icons.Folder
                         size={14}
-                        style={{ fill: "transparent", stroke: "currentColor" }}
+                        style={{ fill: 'transparent', stroke: 'currentColor' }}
                       />
                     </div>
                   )}
-                  <div className={cn("flex-1 flex items-center")}>
+                  {layerIcons[node.ref.layer.kind] && (
+                    <span className="mr-1">{layerIcons[node.ref.layer.kind]}</span>
+                  )}
+                  <div className={cn('flex-1 flex items-center')}>
                     <span
                       className={cn(
-                        node.ref.isClipped && "border-b border-white",
+                        node.ref.isClipped && 'border-b border-white',
                       )}
                     >
                       {node.name}
                     </span>
+                    {node.ref.layer.rasterMask && (
+                      <span className="ml-1">
+                        <icons.VenetianMask
+                          style={{
+                            stroke: node.ref.layer.rasterMask.enabled
+                              ? undefined
+                              : 'red',
+                          }}
+                        />
+                      </span>
+                    )}
                   </div>
                   {isNonDefaultBlendMode(node.ref) && (
                     <div className="ml-2 flex items-center">
-                      <BlendIcon
+                      <icons.BlendIcon
                         size={14}
-                        style={{ fill: "transparent", stroke: "currentColor" }}
+                        style={{ fill: 'transparent', stroke: 'currentColor' }}
                       />
                       <span className="text-xs ml-1">
                         {node.ref.layer.blendMode}
                       </span>
                     </div>
                   )}
-                  {node.ref.layer.opacity < 255 && (
+                  {typeof node.ref.layer.opacity === 'number' &&
+                    node.ref.layer.opacity < 255 && (
                     <div className="ml-2 flex items-center">
-                      <Lightbulb
+                      <icons.Lightbulb
                         size={14}
-                        style={{ fill: "transparent", stroke: "currentColor" }}
+                        style={{ fill: 'transparent', stroke: 'currentColor' }}
                       />
                       <span className="text-xs ml-1">
                         {Math.round(node.ref.layer.opacity / 2.55)}%
                       </span>
                     </div>
                   )}
+                  {!!node.ref.layer.linkedLayerIds?.length && (
+                    <div className="ml-2 flex items-center">
+                      <icons.Link />
+                    </div>
+                  )}
+                  {lock !== 'none' && (
+                    <div className="ml-2 flex items-center">
+                      {lock === 'full' ? (
+                        <icons.LockKeyhole />
+                      ) : (
+                        <icons.LockKeyholeOpen />
+                      )}
+                    </div>
+                  )}
                   {Object.keys(node.ref.layer.effects).length > 0 && (
                     <div className="ml-2 flex items-center">
-                      <FlowerIcon
+                      <icons.Flower
                         size={14}
-                        style={{ fill: "transparent", stroke: "currentColor" }}
+                        style={{ fill: 'transparent', stroke: 'currentColor' }}
                       />
                     </div>
                   )}
@@ -579,16 +658,18 @@ function TreeNode({
               tree={node.children}
               depth={depth + 1}
               activeLayerRefs={activeLayerRefs}
+              quickMode={quickMode}
               filterMode={filterMode}
               currentResultLayer={currentResultLayer}
             />
           )}
-        </Fragment>
-      ))}
+          </Fragment>
+        );
+      })}
     </>
   );
 }
 
 function ButtonDiv(props: React.ButtonHTMLAttributes<HTMLDivElement>) {
-  return <div {...props} className={cn("cursor-pointer", props.className)} />;
+  return <div {...props} className={cn('cursor-pointer', props.className)} />;
 }

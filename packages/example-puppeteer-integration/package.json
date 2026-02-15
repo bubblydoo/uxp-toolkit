@@ -1,0 +1,21 @@
+{
+  "name": "@bubblydoo/example-puppeteer-integration",
+  "type": "module",
+  "version": "0.0.3",
+  "private": true,
+  "scripts": {
+    "run-script": "tsx src/run.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bubblydoo/uxp-devtools-common": "workspace:^",
+    "@bubblydoo/uxp-puppeteer-transport": "workspace:^",
+    "puppeteer-core": "^24.0.0"
+  },
+  "devDependencies": {
+    "@bubblydoo/tsconfig": "workspace:*",
+    "@types/node": "^20.8.7",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.3"
+  }
+}

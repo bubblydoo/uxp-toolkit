@@ -7,3 +7,16 @@ build
 tsconfig.tsbuildinfo
 .pnpm-store
 *.tgz
+test-results
+
+# TypeDoc generated files
+docs
+docs.json
+
+# for eslint ignore
+dist-vite
+dist-runtime
+dist-schemas
+dist-readmes
+chrome
+uxp-tests-plugin

@@ -5,14 +5,17 @@
 This is a toolkit for building UXP extensions for Adobe Photoshop. It has been created because the experience building extensions for Adobe Photoshop is pretty terrible: nothing works as expected and the documentation is lacking.
 
 With the code in this repo, we fix a few things:
-- A large amount of functions, including automated tests, for common actions in Photoshop, like interacting with layers and files. 
+- A large amount of functions, including automated tests, for common actions in Photoshop, like interacting with layers and files.
 - A way to interact with batchPlay in a typesafe way, with Zod schemas for the output.
 - A unified way to represent layers in your code, without using document.layers (which gets very slow, see below)
 - A testing framework for UXP, which you can also use for your own tests.
-
+- Vitest integration for running unit tests without Photoshop, with CI/CD support.
+- Typescript types for the `uxp` and `photoshop` modules.
+- A fixed CLI for UXP.
 
 ```bash
 pnpm add @bubblydoo/uxp-toolkit
+pnpm add -D @adobe-uxp-types/uxp @adobe-uxp-types/photoshop
 ```
 
 ## What is wrong with UXP?
@@ -29,7 +32,7 @@ There are a lot of issues with the API:
 
 ## What we did
 
-We made functions for building typesafe UXP projects. Instead of just running `batchPlay`, and trusting what the output is, we verify what the output is:
+We made functions for building typesafe UXP projects. Instead of just running `batchPlay`, and trusting what the output is, we verify what the output is.
 
 ### Core Functions
 
@@ -108,7 +111,7 @@ For better ergonomics, we put the document first, then the name, and then the fu
 
 ```ts
 await suspendHistory(document, "Action that suspends history", async (ctx) => {
-  
+  await ctx.batchPlayCommand(createRenameLayerCommand({ id: 123, docId: document.id }, "New Name"));
 });
 ```
 
@@ -127,16 +130,72 @@ await executeAsModalAndSuspendHistory("Combined action", document, async (ctx, s
 As `document.layers` can get slow, we provide a parser for a layer tree, built on `batchPlay` commands.
 
 ```ts
+//    LayerDescriptor[]
+//    ^
+const descriptors = await getDocumentLayerDescriptors(document.id);
+
 //    UTLayer[]
 //    ^
-const tree = await photoshopLayerDescriptorsToTree(await getFlattenedLayerDescriptorsList(document));
+const layers = photoshopLayerDescriptorsToUTLayers(descriptors);
+```
+
+### `utLayersToText`
+
+Convert a `UTLayer` tree to a human-readable text representation. This is useful for debugging, logging, and AI/LLM use cases where you need to represent the layer structure as text.
+
+```ts
+import { utLayersToText } from '@bubblydoo/uxp-toolkit';
+
+const text = utLayersToText(layers);
+console.log(text);
+```
+
+Output:
+```
+◯ Background
+◯ ▾ Header Group
+◯   Logo ƒ
+◯   ⬐ Title
+⊘   Subtitle ⁕
+◯ ▾ Content
+◯   Image
+```
+
+Icons:
+- `◯` visible / `⊘` hidden
+- `▾` group
+- `⬐` clipping mask
+- `ƒ` has layer effects
+- `⁕` non-default blend mode
+
+### Types packages
+
+We publish our own types for the `uxp` and `photoshop` modules, which are based on other community efforts but adapted to be more accurate:
+
+```bash
+pnpm add -D @adobe-uxp-types/uxp @adobe-uxp-types/photoshop
+```
+
+`tsconfig.json`:
+```json
+{
+  "compilerOptions": {
+    "types": ["photoshop", "uxp"],
+    "typeRoots": [
+      "./node_modules/@adobe-uxp-types",
+      "./node_modules/@types"
+    ]
+  }
+}
 ```
 
 ### Commands library
 
-We have a library of commands for common actions in Photoshop.
+We have a library of commands for common actions in Photoshop, which you can import from `@bubblydoo/uxp-toolkit/commands`.
 
-- `getRenameLayerCommand` to rename layers
+Examples are `createRenameLayerCommand` and `createSelectLayerCommand`.
+
+See the [commands library](./packages/uxp-toolkit/src/commands-library/index.ts) index file for a complete list.
 
 ### Error sourcemaps
 
@@ -162,13 +221,30 @@ try {
 }
 ```
 
-### Testing framework and plugin
+### Testing
+
+#### Vitest Integration
+
+We now support Vitest for unit testing TypeScript code without Photoshop:
+
+```bash
+pnpm test
+```
+
+The test suite includes:
+- Unit tests (`.test.ts`) for pure TypeScript functions
+- Type tests (`.test-d.ts`) for compile-time type checking
+- Photoshop builtin module aliases for testing code that imports `photoshop` or `uxp` modules
+
+Tests run in CI via GitHub Actions with JUnit reporting.
+
+#### UXP Testing Framework and Plugin
 
 ```bash
 pnpm add @bubblydoo/uxp-test-framework
 ```
 
-We have developed a plugin specifically for testing UXP plugins. It allows you to run tests inside of Photoshop, and see the results in a panel.
+For integration tests that require Photoshop, we have developed a plugin specifically for testing UXP plugins. It allows you to run tests inside of Photoshop, and see the results in a panel.
 
 <img src="res/screenshot-test-plugin.png" alt="Screenshot of the test plugin" width="400" />
 
@@ -196,12 +272,20 @@ import { app } from "photoshop";
 const renameLayerTest: Test = {
   name: "Should rename layer",
   async run() {
-    await openFileByPath("plugin:/fixtures/one-layer.psd");
-    expect(app.activeDocument.layers[0].name).to.equal("Layer 1");
+    const doc = await openFileByPath("plugin:/fixtures/one-layer.psd");
+    const descriptors = await getDocumentLayerDescriptors(doc.id);
+    const firstLayer = descriptors[0];
+
+    expect(firstLayer.name).to.equal("Layer 1");
+
     await executeAsModal("Rename Layer", async (ctx) => {
-      await ctx.batchPlayCommand(createRenameLayerCommand(layer.ref, "New Name"));
+      await ctx.batchPlayCommand(
+        createRenameLayerCommand({ id: firstLayer.layerID, docId: firstLayer.docId }, "New Name")
+      );
     });
-    expect(app.activeDocument.layers[0].name)).to.equal("New Name");
+
+    const updatedDescriptors = await getDocumentLayerDescriptors(doc.id);
+    expect(updatedDescriptors[0].name).to.equal("New Name");
   },
 };
 
@@ -261,3 +345,39 @@ This package provides the following hooks:
 - `useIsPluginPanelVisible` and `useIsAnyPluginPanelVisible` – Whether a plugin panel is visible
 - `useApplicationInfoQuery` – React Query for Photoshop application info (e.g. panel list)
 - `useEventListenerSkippable` - Generic hook to subscribe to events with optional skip/filter so triggers can be queued or ignored
+
+### CLI
+
+We fixed the [official devtools package](https://github.com/adobe-uxp/devtools-cli), which had a lot of issues. You can find the fixed repo [here](https://github.com/bubblydoo/adobe-fixed-uxp-devtools).
+
+Based on this, we created our own CLI. You can run this without installing anything, just `pnpm`.
+
+This can replace UXP Developer Tools.
+
+Open devtools with a "fake" plugin (doesn't have any functionality)
+
+```bash
+pnpm --allow-build=@adobe-fixed-uxp/uxp-devtools-helper dlx @bubblydoo/uxp-cli open-devtools
+```
+
+Open devtools with a custom plugin
+
+```bash
+pnpm --allow-build=@adobe-fixed-uxp/uxp-devtools-helper dlx @bubblydoo/uxp-cli open-devtools --plugin-path ./my-plugin
+```
+
+You can also just install it:
+
+```bash
+pnpm add -D @bubblydoo/uxp-cli
+```
+
+If you're using approved builds in pnpm, make sure to add `@adobe-fixed-uxp/uxp-devtools-helper` to the `onlyBuiltDependencies` in your `pnpm-workspace.yaml`. The postinstall script just unzips some binary proprietary Adobe files.
+
+### Photoshop MCP
+
+We have a MCP server for Photoshop automation via Chrome DevTools Protocol. It allows AI assistants to execute JavaScript code directly in Adobe Photoshop's UXP environment, but it also has access to UXP Toolkit and its commands, to the TypeScript schemas and these readmes.
+
+```bash
+pnpm --allow-build=@adobe-fixed-uxp/uxp-devtools-helper dlx @bubblydoo/photoshop-mcp
+```

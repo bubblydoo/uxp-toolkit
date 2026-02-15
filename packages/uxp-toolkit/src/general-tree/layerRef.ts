@@ -1,4 +1,4 @@
-export type LayerRef = {
+export interface LayerRef {
   id: number;
   docId: number;
-};
+}

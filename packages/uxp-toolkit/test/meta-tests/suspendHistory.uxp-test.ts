@@ -1,27 +1,22 @@
-import { app } from "photoshop";
-import type { Test } from "@bubblydoo/uxp-test-framework";
-import { expect } from "chai";
+import { describe, expect, it } from 'vitest';
+import { openFixture } from '../../test/open-fixture';
 
-export const suspendHistoryErrorTest: Test = {
-  name: "meta: suspendHistory should throw correctly",
-  async run() {
-    const document = app.activeDocument;
-    if (!document) {
-      throw new Error("No active document");
-    }
+describe('meta: suspendHistory', () => {
+  it('should throw correctly', async (t) => {
+    const document = await openFixture(t, 'one-layer.psd');
 
     let threw = false;
     try {
       await document.suspendHistory(
-        async (context) => {
-          throw new Error("Uncaught error");
+        async () => {
+          throw new Error('Uncaught error');
         },
-        "Test"
+        'Test',
       );
-    } catch (e) {
+    }
+    catch {
       threw = true;
     }
-    expect(threw).to.be.true;
-  },
-};
-
+    expect(threw).toBe(true);
+  });
+});
