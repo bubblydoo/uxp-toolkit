@@ -1,9 +1,7 @@
-import type { PhotoshopConnection } from './connection';
+import type { UxpConnection } from '@bubblydoo/uxp-devtools-common';
+import { evaluateInUxp } from '@bubblydoo/uxp-devtools-common';
 import { z } from 'zod';
-import { evaluateInPhotoshop } from './connection';
 import { wrapCodeWithRuntime } from './runtime-wrapper';
-
-const __dirname = new URL('.', import.meta.url).pathname;
 
 /**
  * Schema for the execute tool input
@@ -18,7 +16,7 @@ export type ExecuteToolInput = z.infer<z.ZodObject<typeof executeToolSchema>>;
 /**
  * Execute JavaScript code in Photoshop and return the result.
  */
-export async function executeInPhotoshop(connection: PhotoshopConnection, input: ExecuteToolInput): Promise<{
+export async function executeInPhotoshop(connection: UxpConnection, input: ExecuteToolInput): Promise<{
   success: true;
   result: {
     objectId: string;
@@ -48,7 +46,7 @@ export async function executeInPhotoshop(connection: PhotoshopConnection, input:
     // await fs.writeFile(wrappedCodePath, wrappedCode);
 
     // Evaluate the code
-    const result = await evaluateInPhotoshop(
+    const result = await evaluateInUxp(
       connection,
       wrappedCode,
       true,

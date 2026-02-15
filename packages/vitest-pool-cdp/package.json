@@ -27,7 +27,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "test:chrome": "node --import tsx ./node_modules/vitest/vitest.mjs run --config test/vitest-chrome.config.ts",
+    "test:chrome": "node --import tsx ./node_modules/vitest/vitest.mjs --config test/vitest-chrome.config.ts",
     "test": "puppeteer browsers install chrome && pnpm test:chrome"
   },
   "peerDependencies": {
@@ -38,6 +38,7 @@
     "@jridgewell/trace-mapping": "^0.3.31",
     "@vitest/expect": "^4.0.18",
     "@vitest/runner": "^4.0.18",
+    "@vitest/snapshot": "^4.0.18",
     "@vitest/utils": "^4.0.18",
     "birpc": "^4.0.0",
     "chai": "^6.2.2",

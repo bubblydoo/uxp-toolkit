@@ -11,16 +11,27 @@
 
 import type {
   File,
+  Suite,
+  Test,
   VitestRunner,
   VitestRunnerConfig,
 } from '@vitest/runner';
+import type { SnapshotStateOptions } from '@vitest/snapshot';
 import type { BirpcReturn } from 'birpc';
 import type * as vitestApi from 'vitest';
-import type { PoolFunctions, WorkerFunctions } from './rpc-types';
+import type { PoolFunctions, SnapshotRuntimeConfig, WorkerFunctions } from '../rpc-types';
 import * as vitestRunner from '@vitest/runner';
 import { createBirpc } from 'birpc';
 import * as devalue from 'devalue';
-import { createVitestApi } from './worker-runtime-vitest-api';
+import {
+  configureSnapshotIO,
+  configureSnapshotOptions,
+  createVitestApi,
+  onAfterRunFiles as onSnapshotAfterRunFiles,
+  onAfterRunSuite as onSnapshotAfterRunSuite,
+  onBeforeRunSuite as onSnapshotBeforeRunSuite,
+  onBeforeTryTask as onSnapshotBeforeTryTask,
+} from './vitest-api';
 
 declare global {
   var require: NodeJS.Require;
@@ -45,33 +56,69 @@ globalThis.__vitest_api__ = createVitestApi();
 /**
  * Current config from the pool.
  */
-let currentProjectConfig: { root: string; projectName?: string } = {
+let currentProjectConfig: {
+  root: string;
+  projectName?: string;
+  allowOnly?: VitestRunnerConfig['allowOnly'];
+  testNamePattern?: VitestRunnerConfig['testNamePattern'];
+  passWithNoTests?: VitestRunnerConfig['passWithNoTests'];
+  testTimeout?: VitestRunnerConfig['testTimeout'];
+  hookTimeout?: VitestRunnerConfig['hookTimeout'];
+  retry?: VitestRunnerConfig['retry'];
+  maxConcurrency?: VitestRunnerConfig['maxConcurrency'];
+  includeTaskLocation?: VitestRunnerConfig['includeTaskLocation'];
+  sequence?: VitestRunnerConfig['sequence'];
+  chaiConfig?: VitestRunnerConfig['chaiConfig'];
+  diffOptions?: VitestRunnerConfig['diffOptions'];
+  snapshotOptions?: {
+    updateSnapshot: 'all' | 'new' | 'none';
+    expand?: boolean;
+    snapshotFormat?: unknown;
+  };
+} = {
   root: '/',
   projectName: undefined,
+  allowOnly: undefined,
+  testNamePattern: undefined,
+  passWithNoTests: undefined,
+  testTimeout: undefined,
+  hookTimeout: undefined,
+  retry: undefined,
+  maxConcurrency: undefined,
+  includeTaskLocation: undefined,
+  sequence: undefined,
+  chaiConfig: undefined,
+  diffOptions: undefined,
+  snapshotOptions: undefined,
 };
 
 /**
  * Get the runner configuration.
  */
 function getRunnerConfig(): VitestRunnerConfig {
-  return {
+  const config = {
     root: currentProjectConfig.root,
     name: currentProjectConfig.projectName,
     setupFiles: [],
-    passWithNoTests: false,
-    sequence: {
+    passWithNoTests: currentProjectConfig.passWithNoTests ?? false,
+    allowOnly: currentProjectConfig.allowOnly ?? false,
+    testNamePattern: currentProjectConfig.testNamePattern,
+    sequence: currentProjectConfig.sequence ?? {
       shuffle: false,
       concurrent: false,
       seed: Date.now(),
       hooks: 'stack',
       setupFiles: 'list',
     },
-    maxConcurrency: 1,
-    testTimeout: 30000,
-    hookTimeout: 30000,
-    retry: 0,
-    includeTaskLocation: true,
+    maxConcurrency: currentProjectConfig.maxConcurrency ?? 1,
+    testTimeout: currentProjectConfig.testTimeout ?? 30000,
+    hookTimeout: currentProjectConfig.hookTimeout ?? 30000,
+    retry: currentProjectConfig.retry ?? 0,
+    includeTaskLocation: currentProjectConfig.includeTaskLocation ?? true,
+    chaiConfig: currentProjectConfig.chaiConfig,
+    diffOptions: currentProjectConfig.diffOptions,
   };
+  return config as VitestRunnerConfig;
 }
 
 /**
@@ -119,6 +166,22 @@ class CdpVitestRunner implements VitestRunner {
       await rpc.onTaskUpdate(packs);
     }
   }
+
+  async onBeforeRunSuite(suite: Suite): Promise<void> {
+    await onSnapshotBeforeRunSuite(suite);
+  }
+
+  async onAfterRunSuite(suite: Suite): Promise<void> {
+    await onSnapshotAfterRunSuite(suite);
+  }
+
+  onBeforeTryTask(test: Test): void {
+    onSnapshotBeforeTryTask(test);
+  }
+
+  onAfterRunFiles(): void {
+    onSnapshotAfterRunFiles();
+  }
 }
 
 /**
@@ -137,8 +200,28 @@ const workerFunctions: WorkerFunctions = {
   /**
    * Configure the runner with project settings.
    */
-  setConfig(config: { root: string; projectName?: string }) {
+  setConfig(config: {
+    root: string;
+    projectName?: string;
+    allowOnly?: VitestRunnerConfig['allowOnly'];
+    testNamePattern?: VitestRunnerConfig['testNamePattern'];
+    passWithNoTests?: VitestRunnerConfig['passWithNoTests'];
+    testTimeout?: VitestRunnerConfig['testTimeout'];
+    hookTimeout?: VitestRunnerConfig['hookTimeout'];
+    retry?: VitestRunnerConfig['retry'];
+    maxConcurrency?: VitestRunnerConfig['maxConcurrency'];
+    includeTaskLocation?: VitestRunnerConfig['includeTaskLocation'];
+    sequence?: VitestRunnerConfig['sequence'];
+    chaiConfig?: VitestRunnerConfig['chaiConfig'];
+    diffOptions?: VitestRunnerConfig['diffOptions'];
+  } & SnapshotRuntimeConfig) {
     currentProjectConfig = config;
+    if (config.snapshotOptions) {
+      configureSnapshotOptions({
+        ...config.snapshotOptions,
+        snapshotFormat: config.snapshotOptions.snapshotFormat as SnapshotStateOptions['snapshotFormat'],
+      });
+    }
     // Reset runner so it picks up the new config
     runner = null;
   },
@@ -203,6 +286,12 @@ const rpc = createBirpc<PoolFunctions, WorkerFunctions>(
     deserialize: v => devalue.parse(v as string),
   },
 );
+
+configureSnapshotIO({
+  readFileIfExists: path => rpc.readFileIfExists(path),
+  writeFile: (path, content) => rpc.writeFile(path, content),
+  removeFile: path => rpc.removeFile(path),
+});
 
 /**
  * Global function exposed for the pool to send messages via Runtime.evaluate.

@@ -3,7 +3,7 @@ import type { File, TaskEventPack, TaskResultPack } from '@vitest/runner';
 import type { BirpcReturn } from 'birpc';
 import type { RuntimeRPC } from 'vitest';
 import type { PoolOptions, PoolWorker, WorkerRequest } from 'vitest/node';
-import type { PoolFunctions, WorkerFunctions } from './rpc-types';
+import type { PoolFunctions, RunnerRuntimeConfig, SnapshotRuntimeConfig, WorkerFunctions } from './rpc-types';
 import type { CdpConnection, EventCallback, RawCdpPoolOptions } from './types';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
@@ -90,6 +90,11 @@ export class CdpPoolWorker implements PoolWorker {
    * Receives messages from Vitest's pool runner.
    */
   private vitestRpcMessageHandler: ((data: unknown) => void) | null = null;
+  /**
+   * Subset of serialized Vitest config captured from the "start" request.
+   * These values are required by @vitest/runner in the CDP runtime.
+   */
+  private runnerConfig: RunnerRuntimeConfig & SnapshotRuntimeConfig = {};
 
   constructor(poolOptions: PoolOptions, rawCdpOptions: RawCdpPoolOptions) {
     this.poolOptions = poolOptions;
@@ -180,6 +185,34 @@ export class CdpPoolWorker implements PoolWorker {
 
       readFile: async (filePath: string) => {
         return fsp.readFile(filePath, 'utf-8');
+      },
+
+      readFileIfExists: async (filePath: string) => {
+        try {
+          return await fsp.readFile(filePath, 'utf-8');
+        }
+        catch (error) {
+          if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            return null;
+          }
+          throw error;
+        }
+      },
+
+      writeFile: async (filePath: string, content: string) => {
+        await fsp.mkdir(path.dirname(filePath), { recursive: true });
+        await fsp.writeFile(filePath, content, 'utf-8');
+      },
+
+      removeFile: async (filePath: string) => {
+        try {
+          await fsp.unlink(filePath);
+        }
+        catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+            throw error;
+          }
+        }
       },
 
       onCollected: async (files: File[]) => {
@@ -445,10 +478,39 @@ export class CdpPoolWorker implements PoolWorker {
   /**
    * Handle Vitest worker requests using the hybrid approach.
    */
-  private async handleVitestRequest(message: WorkerRequest): Promise<void> {
-    const msg = message as Record<string, unknown>;
-
+  private async handleVitestRequest(msg: WorkerRequest): Promise<void> {
     if (msg.type === 'start') {
+      const startContext = msg.context;
+      const setupFiles = startContext?.config?.setupFiles ?? [];
+      if (setupFiles.length > 0) {
+        throw new Error(
+          '[vitest-pool-cdp] setupFiles are not implemented yet for the CDP pool. '
+          + 'Please remove `test.setupFiles` for this project.',
+        );
+      }
+      const diff = startContext?.config?.diff;
+      const diffOptions = typeof diff === 'object' && diff ? diff : undefined;
+      this.runnerConfig = {
+        allowOnly: startContext?.config?.allowOnly,
+        testNamePattern: startContext?.config?.testNamePattern,
+        passWithNoTests: startContext?.config?.passWithNoTests,
+        testTimeout: startContext?.config?.testTimeout,
+        hookTimeout: startContext?.config?.hookTimeout,
+        retry: startContext?.config?.retry,
+        maxConcurrency: startContext?.config?.maxConcurrency,
+        includeTaskLocation: startContext?.config?.includeTaskLocation,
+        sequence: startContext?.config?.sequence,
+        chaiConfig: startContext?.config?.chaiConfig,
+        diffOptions: diffOptions as RunnerRuntimeConfig['diffOptions'],
+        snapshotOptions: startContext?.config?.snapshotOptions
+          ? {
+              updateSnapshot: startContext.config.snapshotOptions.updateSnapshot,
+              expand: startContext.config.snapshotOptions.expand,
+              snapshotFormat: startContext.config.snapshotOptions.snapshotFormat,
+            }
+          : undefined,
+      };
+      this.log('Captured runner config from start request:', this.runnerConfig);
       // Worker started - send "started" acknowledgment
       this.emit('message', {
         type: 'started',
@@ -509,8 +571,28 @@ export class CdpPoolWorker implements PoolWorker {
     // Configure the worker with project settings
     const projectRoot = this.poolOptions.project.config?.root || process.cwd();
     const projectName = this.poolOptions.project.config?.name;
-    this.log(`Setting config: root=${projectRoot}, projectName=${projectName}`);
-    this.rpc.setConfig({ root: projectRoot, projectName });
+    const runnerConfig: RunnerRuntimeConfig & SnapshotRuntimeConfig = {
+      allowOnly: this.runnerConfig.allowOnly ?? this.poolOptions.project.config?.allowOnly,
+      testNamePattern: this.runnerConfig.testNamePattern ?? this.poolOptions.project.config?.testNamePattern,
+      passWithNoTests: this.runnerConfig.passWithNoTests ?? this.poolOptions.project.config?.passWithNoTests,
+      testTimeout: this.runnerConfig.testTimeout ?? this.poolOptions.project.config?.testTimeout,
+      hookTimeout: this.runnerConfig.hookTimeout ?? this.poolOptions.project.config?.hookTimeout,
+      retry: this.runnerConfig.retry ?? this.poolOptions.project.config?.retry,
+      maxConcurrency: this.runnerConfig.maxConcurrency ?? this.poolOptions.project.config?.maxConcurrency,
+      includeTaskLocation: this.runnerConfig.includeTaskLocation ?? this.poolOptions.project.config?.includeTaskLocation,
+      sequence: this.runnerConfig.sequence ?? this.poolOptions.project.config?.sequence,
+      chaiConfig: this.runnerConfig.chaiConfig ?? this.poolOptions.project.config?.chaiConfig,
+      diffOptions: this.runnerConfig.diffOptions,
+      snapshotOptions: this.runnerConfig.snapshotOptions ?? (this.poolOptions.project.config?.snapshotOptions
+        ? {
+            updateSnapshot: this.poolOptions.project.config.snapshotOptions.updateSnapshot,
+            expand: this.poolOptions.project.config.snapshotOptions.expand,
+            snapshotFormat: this.poolOptions.project.config.snapshotOptions.snapshotFormat,
+          }
+        : undefined),
+    };
+    this.log(`Setting config: root=${projectRoot}, projectName=${projectName}`, runnerConfig);
+    this.rpc.setConfig({ root: projectRoot, projectName, ...runnerConfig });
 
     // Bundle and send each test file to the worker
     for (const filePath of filePaths) {

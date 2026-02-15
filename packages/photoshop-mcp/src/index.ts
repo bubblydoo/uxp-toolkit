@@ -8,7 +8,7 @@ import { glob } from 'glob';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import z from 'zod';
-import { disconnectFromPhotoshop, getOrReusePhotoshopConnection } from './connection';
+import { disconnectFromPhotoshop, getOrReuseUxpConnection } from './connection';
 
 import { executeInPhotoshop, executeToolSchema } from './execute-tool';
 
@@ -48,7 +48,7 @@ mcpServer.registerTool(
     inputSchema: executeToolSchema,
   },
   async (input) => {
-    const connection = await getOrReusePhotoshopConnection();
+    const connection = await getOrReuseUxpConnection();
 
     const result = await executeInPhotoshop(connection, input);
 

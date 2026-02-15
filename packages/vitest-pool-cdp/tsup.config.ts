@@ -17,7 +17,7 @@ export default defineConfig([
   // vitest/worker is NOT bundled because it has Node.js dependencies
   // that don't work in UXP/browser environments.
   {
-    entry: ['src/worker-runtime.ts'],
+    entry: ['src/worker-runtime/worker-runtime.ts'],
     format: ['iife'],
     outDir: 'dist',
     globalName: '__vitestCdpWorker',

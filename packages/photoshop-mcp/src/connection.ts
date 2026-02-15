@@ -1,36 +1,17 @@
-import type CDP from 'chrome-remote-interface';
+import type { UxpConnection } from '@bubblydoo/uxp-devtools-common';
+import { createRequire } from 'node:module';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import {
-  setupCdpSession,
-  setupCdpSessionWithUxpDefaults,
-  setupDevtoolsConnection,
-  waitForExecutionContextCreated,
-} from '@bubblydoo/uxp-devtools-common';
+import { createUxpConnection } from '@bubblydoo/uxp-devtools-common';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-interface ExecutionContextDescription {
-  id: number;
-  origin: string;
-  name: string;
-  uniqueId: string;
-}
-
-export interface PhotoshopConnection {
-  cdp: CDP.Client;
-  executionContext: ExecutionContextDescription;
-  disconnect: () => Promise<void>;
-}
-
-let currentConnection: PhotoshopConnection | null = null;
+const requireResolve = createRequire(import.meta.url).resolve;
 
 /**
  * Get the fake plugin path from uxp-devtools-common
  */
 function getFakePluginPath(): string {
+  const uxpDevtoolsCommonDir = path.dirname(requireResolve('@bubblydoo/uxp-devtools-common/package.json'));
   // Navigate from dist/connection.js to uxp-devtools-common/fake-plugin
-  return path.resolve(__dirname, '../../uxp-devtools-common/fake-plugin');
+  return path.resolve(uxpDevtoolsCommonDir, 'fake-plugin');
 }
 
 /**
@@ -42,6 +23,8 @@ function getPluginConfig(): { pluginPath: string; pluginId: string } {
   return { pluginPath, pluginId };
 }
 
+let currentConnection: UxpConnection | null = null;
+
 /**
  * Establishes a connection to Photoshop via CDP.
  * Uses the fake-plugin from uxp-devtools-common by default.
@@ -52,7 +35,7 @@ function getPluginConfig(): { pluginPath: string; pluginId: string } {
  *
  * The connection is cached and reused for subsequent calls.
  */
-export async function getOrReusePhotoshopConnection(): Promise<PhotoshopConnection> {
+export async function getOrReuseUxpConnection(): Promise<UxpConnection> {
   // Return existing connection if available
   if (currentConnection) {
     return currentConnection;
@@ -60,145 +43,19 @@ export async function getOrReusePhotoshopConnection(): Promise<PhotoshopConnecti
 
   const { pluginPath } = getPluginConfig();
 
-  console.error('[photoshop-mcp] Setting up devtools URL...');
-  const devtoolsConnection = await setupDevtoolsConnection(pluginPath);
-  console.error(`[photoshop-mcp] DevTools URL: ${devtoolsConnection.url}`);
+  const connectionOrig = await createUxpConnection(pluginPath);
 
-  console.error('[photoshop-mcp] Setting up CDP session...');
-  const cdp = await setupCdpSession(devtoolsConnection.url);
-
-  console.error('[photoshop-mcp] Waiting for execution context...');
-  const executionContext = await waitForExecutionContextCreated(cdp, async () => {
-    console.error('[photoshop-mcp] Setting up CDP session with UXP defaults...');
-    await setupCdpSessionWithUxpDefaults(cdp);
-  });
-  console.error('[photoshop-mcp] Execution context ready');
-
-  const connection: PhotoshopConnection = {
-    cdp,
-    executionContext,
+  const connection: UxpConnection = {
+    cdp: connectionOrig.cdp,
+    executionContext: connectionOrig.executionContext,
     disconnect: async () => {
-      try {
-        await cdp.close();
-        await devtoolsConnection.teardown();
-      }
-      catch {
-        // Ignore close errors
-      }
+      await connectionOrig.disconnect();
       currentConnection = null;
     },
   };
 
   currentConnection = connection;
   return connection;
-}
-
-/**
- * Evaluate JavaScript code in the Photoshop UXP context.
- */
-export async function evaluateInPhotoshop(
-  connection: PhotoshopConnection,
-  expression: string,
-  awaitPromise: boolean,
-): Promise<{
-  success: true;
-  result: {
-    value: unknown;
-    objectId: string;
-  };
-} | {
-  success: false;
-  error: string;
-  errorStep: string;
-}> {
-  try {
-    const result = await connection.cdp.Runtime.evaluate({
-      expression,
-      uniqueContextId: connection.executionContext.uniqueId,
-      awaitPromise: true, // unfortunately this is not supported
-      // returnByValue: true, // if you do this you get almost nothing at all
-      // generatePreview: true,
-    });
-
-    console.error('result inside CDP.Runtime.evaluate', result);
-
-    if (result.exceptionDetails) {
-      const error = result.exceptionDetails.exception?.description
-        || result.exceptionDetails.text
-        || 'Unknown error';
-      console.error('error inside CDP.Runtime.evaluate', result.exceptionDetails);
-      return {
-        success: false,
-        error,
-        errorStep: 'inside CDP.Runtime.evaluate',
-      };
-    }
-
-    if (result.result.type !== 'object') {
-      return {
-        success: true,
-        result: {
-          value: result.result.value!,
-          objectId: result.result.objectId!,
-        },
-      };
-    }
-
-    let awaitedResult = result.result;
-
-    if (result.result.subtype === 'promise' && awaitPromise) {
-      // let attempts = 0;
-      while (true) {
-        // attempts++;
-        const promiseProperties = await connection.cdp.Runtime.getProperties({
-          objectId: result.result.objectId!,
-        });
-        const promiseState = promiseProperties.internalProperties!.find((property: any) => property.name === '[[PromiseState]]')!.value!;
-        if (promiseState.value !== 'pending') {
-          const promiseResult = promiseProperties.internalProperties!.find((property: any) => property.name === '[[PromiseResult]]')!.value;
-          awaitedResult = promiseResult!;
-          break;
-        }
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
-    }
-
-    if (awaitedResult.type !== 'object') {
-      return {
-        success: true,
-        result: {
-          value: awaitedResult.value!,
-          objectId: awaitedResult.objectId!,
-        },
-      };
-    }
-
-    const objectResult = await connection.cdp.Runtime.getProperties({
-      objectId: awaitedResult.objectId!,
-      ownProperties: true,
-    });
-
-    const objectResultValue: any = {};
-    for (const property of objectResult.result) {
-      objectResultValue[property.name] = property.value;
-    }
-
-    return {
-      success: true,
-      result: {
-        objectId: awaitedResult.objectId!,
-        value: objectResultValue,
-      },
-    };
-  }
-  catch (error) {
-    console.error('Error evaluating in Photoshop', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : String(error),
-      errorStep: 'calling CDP.Runtime.evaluate',
-    };
-  }
 }
 
 /**

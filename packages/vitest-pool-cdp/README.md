@@ -1,15 +1,21 @@
 # @bubblydoo/vitest-pool-cdp
 
-Custom Vitest pool that runs tests in CDP-connected environments (browsers, Photoshop UXP, Electron, etc.).
+Custom Vitest pool that runs tests inside CDP-connected runtimes (Chrome, Photoshop UXP, Electron, and similar environments).
 
 ## Overview
 
-This package provides a custom Vitest v4+ pool that executes tests in any environment that supports the Chrome DevTools Protocol (CDP). This enables running Vitest tests inside:
+`@bubblydoo/vitest-pool-cdp` runs Vitest tests in a remote JavaScript runtime by:
 
-- Browsers (Chrome, Edge, etc.)
-- Adobe Photoshop UXP plugins
-- Electron applications
-- Any other CDP-enabled runtime
+- opening a CDP connection from Node.js
+- injecting a lightweight worker runtime into the target
+- forwarding Vitest RPC traffic between Node and the target
+- bundling test files with esbuild before evaluating them in the target
+
+Supported by design:
+
+- Vitest projects and `allowOnly` / `testNamePattern` propagation
+- snapshot testing, including inline snapshots
+- sourcemap-based error stack remapping (enabled by default)
 
 ## Installation
 
@@ -17,107 +23,126 @@ This package provides a custom Vitest v4+ pool that executes tests in any enviro
 pnpm add -D @bubblydoo/vitest-pool-cdp vitest
 ```
 
-## Usage
+## Quick Start
 
-### Basic Usage
-
-```typescript
+```ts
 // vitest.config.ts
-import { defineConfig } from "vitest/config";
-import { cdpPool } from "@bubblydoo/vitest-pool-cdp";
+import { defineConfig } from 'vitest/config';
+import { cdpPool } from '@bubblydoo/vitest-pool-cdp';
 
 export default defineConfig({
   test: {
     pool: cdpPool({
-      cdpUrl: "ws://localhost:9222/devtools/page/ABC123",
+      cdp: 'ws://localhost:9222/devtools/page/ABC123',
     }),
   },
 });
 ```
 
-### Dynamic URL (e.g., Photoshop UXP)
+## Configuration
 
-For environments where the CDP URL is determined at runtime:
+### `cdp` (required)
 
-```typescript
-// vitest.config.ts
-import { defineConfig } from "vitest/config";
-import { cdpPool } from "@bubblydoo/vitest-pool-cdp";
-import { setupDevtoolsUrl } from "@bubblydoo/uxp-devtools-common";
+`cdp` is the connection source. It supports:
 
-const pluginPath = "./my-uxp-plugin";
-const pluginId = "com.example.myplugin";
+- a static websocket URL (`string`)
+- an async function returning a URL
+- an async function returning `{ url, teardown }`
+
+```ts
+cdp: async () => ({ url: await getUrl(), teardown: async () => stopTarget() })
+```
+
+### Select execution context or session
+
+By default the pool enables auto-attach and runs in the attached target session.
+Use `executionContextOrSession` if you need to explicitly choose:
+
+- `{ sessionId: string }`
+- `{ uniqueId: string }` (execution context unique id)
+- `{ id: number }` (execution context id)
+
+```ts
+executionContextOrSession: async (cdp) => {
+  const desc = await waitForExecutionContextCreated(cdp);
+  return { uniqueId: desc.uniqueId };
+}
+```
+
+## Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `cdp` | `string \| (() => Promise<string>) \| (() => Promise<{ url: string; teardown: () => Promise<void> }>)` | required | CDP target source |
+| `executionContextOrSession` | `(cdp) => Promise<{ sessionId } \| { uniqueId } \| { id }>` | auto-attach session | Select execution context/session |
+| `debug` | `boolean` | `false` | Verbose pool logging |
+| `connectionTimeout` | `number` | `30000` | CDP connection timeout (ms) |
+| `rpcTimeout` | `number` | `30000` | RPC call timeout (ms) |
+| `esbuildOptions` | `{ define?, external?, alias?, plugins? }` | `undefined` | Extra esbuild config for test bundling |
+| `embedSourcemap` | `boolean` | `false` | Expose bundled sourcemap as a `EVAL_SOURCEMAP` variable in target |
+| `enableErrorSourcemapping` | `boolean` | `true` | Remap stacks/task locations/error frames to original sources |
+| `showBundledStackTrace` | `boolean` | `false` | Preserve raw bundled stack as `error.bundledStack` (with remapped stack still shown) |
+| `runBeforeTests` | `(cdp) => Promise<void>` | `undefined` | Hook run after CDP connection and before test execution |
+
+## Example (dynamic CDP + teardown)
+
+```ts
+import { defineConfig } from 'vitest/config';
+import { cdpPool } from '@bubblydoo/vitest-pool-cdp';
+import { setupDevtoolsUrl } from '@bubblydoo/uxp-devtools-common';
 
 export default defineConfig({
   test: {
     pool: cdpPool({
-      cdpUrl: () => setupDevtoolsUrl(pluginPath, pluginId),
+      cdp: () => setupDevtoolsUrl('./plugin', 'com.example.plugin'),
       debug: true,
     }),
   },
 });
 ```
 
-### With Execution Context Filter
-
-If the CDP target has multiple execution contexts, you can filter to select a specific one:
-
-```typescript
-export default defineConfig({
-  test: {
-    pool: cdpPool({
-      cdpUrl: "ws://localhost:9222/devtools/page/ABC123",
-      contextFilter: (context) => context.origin.includes("my-app"),
-    }),
-  },
-});
-```
-
-## Configuration Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `cdpUrl` | `string \| () => Promise<string>` | *required* | WebSocket URL for CDP connection, or async function returning one |
-| `contextFilter` | `(context: ExecutionContextDescription) => boolean` | `undefined` | Filter function to select a specific execution context |
-| `debug` | `boolean` | `false` | Enable debug logging |
-| `connectionTimeout` | `number` | `30000` | Timeout in milliseconds for establishing the CDP connection |
-
-## How It Works
+## Runtime Model
 
 ```
-┌─────────────────────┐                    ┌─────────────────────┐
-│   Vitest (Node.js)  │                    │   CDP Target        │
-│                     │                    │   (Browser/UXP/etc) │
-├─────────────────────┤                    ├─────────────────────┤
-│   CdpPoolWorker     │                    │   Worker Runtime    │
-│                     │                    │   (injected)        │
-│   ┌─────────────┐   │   CDP WebSocket    │   ┌─────────────┐   │
-│   │ send()      │───┼──Runtime.evaluate──┼──►│ receive()   │   │
-│   └─────────────┘   │                    │   └─────────────┘   │
-│                     │                    │                     │
-│   ┌─────────────┐   │  bindingCalled     │   ┌─────────────┐   │
-│   │ on('msg')   │◄──┼────────────────────┼───│ post()      │   │
-│   └─────────────┘   │                    │   └─────────────┘   │
-└─────────────────────┘                    └─────────────────────┘
+┌──────────────────────────────┐                  ┌──────────────────────────────┐
+│ Vitest process (Node.js)     │                  │ CDP target runtime           │
+│                              │                  │ (Browser / UXP / Electron)   │
+├──────────────────────────────┤                  ├──────────────────────────────┤
+│ CdpPoolWorker                │                  │ Injected worker runtime      │
+│                              │                  │                              │
+│  ┌───────────────┐           │                  │  ┌───────────────┐           │
+│  │ send()        │───────────┼─────────────────►│  │ receive()     │           │
+│  └───────────────┘           │ Runtime.evaluate │  └───────────────┘           │
+│                              │                  │                              │
+│  ┌───────────────┐           │                  │  ┌───────────────┐           │
+│  │ on('msg')     │◄──────────┼───────────────── │  │ post()        │           │
+│  └───────────────┘           │ bindingCalled    │  └───────────────┘           │
+└──────────────────────────────┘                  └──────────────────────────────┘
 ```
 
-1. **Pool to Worker**: Messages are sent via `Runtime.evaluate()` calling a global function
-2. **Worker to Pool**: Responses are sent via a `Runtime.addBinding` channel (`bindingCalled` events), which is immune to other debugger clients (e.g. Chrome DevTools) connecting to the same target
-3. **Serialization**: Uses `devalue` for structured cloneable data (same as Vitest internally)
+`send() -> receive()` uses `Runtime.evaluate`.
+`post() -> on('msg')` uses `Runtime.addBinding` / `Runtime.bindingCalled`.
 
-## Requirements
+- Pool -> target messages are evaluated in the chosen CDP context/session.
+- Target -> pool messages use `Runtime.addBinding` (not console transport), which avoids conflicts with extra debugger clients.
+- Serialization uses `devalue`.
 
-- Vitest v4 or later
-- A CDP-enabled target environment
-- The target environment must support:
-  - `Runtime.addBinding` / `Runtime.bindingCalled` for sending messages
-  - Global function assignment for receiving messages
+## Snapshot Support
 
-## Limitations
+The worker runtime includes a Chai snapshot plugin built on `@vitest/snapshot`:
 
-- Tests run in a single CDP execution context (no parallel test isolation within the same context)
-- The target environment must have a JavaScript runtime that supports ES2022+
-- Some Vitest features that rely on Node.js-specific APIs may not work in all CDP environments
+- `toMatchSnapshot`
+- `toMatchInlineSnapshot`
+- `toThrowErrorMatchingSnapshot`
+- `toThrowErrorMatchingInlineSnapshot`
+- `expect.addSnapshotSerializer(...)`
+
+## Current Limitations
+
+- `test.setupFiles` is currently **not implemented** for this pool and throws an explicit error.
+- Tests run in one remote runtime context/session at a time (no in-target worker isolation).
+- Node-specific test behavior may not work in non-Node CDP targets.
+- Target runtime should support modern JS (ES2022+).
 
 ## License
 
