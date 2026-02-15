@@ -5,28 +5,28 @@
 
 import type { File, VitestRunnerConfig } from '@vitest/runner';
 
-type RunnerConfigKeys =
-  | 'allowOnly'
-  | 'testNamePattern'
-  | 'passWithNoTests'
-  | 'testTimeout'
-  | 'hookTimeout'
-  | 'retry'
-  | 'maxConcurrency'
-  | 'includeTaskLocation'
-  | 'sequence'
-  | 'chaiConfig'
-  | 'diffOptions';
+type RunnerConfigKeys
+  = | 'allowOnly'
+    | 'testNamePattern'
+    | 'passWithNoTests'
+    | 'testTimeout'
+    | 'hookTimeout'
+    | 'retry'
+    | 'maxConcurrency'
+    | 'includeTaskLocation'
+    | 'sequence'
+    | 'chaiConfig'
+    | 'diffOptions';
 
 export type RunnerRuntimeConfig = Partial<Pick<VitestRunnerConfig, RunnerConfigKeys>>;
 
-export type SnapshotRuntimeConfig = {
+export interface SnapshotRuntimeConfig {
   snapshotOptions?: {
     updateSnapshot: 'all' | 'new' | 'none';
     expand?: boolean;
     snapshotFormat?: unknown;
   };
-};
+}
 
 /**
  * Functions exposed by the worker (CDP context) that the pool can call.
