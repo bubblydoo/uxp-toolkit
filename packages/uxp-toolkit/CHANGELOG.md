@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.15
+
+### Patch Changes
+
+- a5ba336: Add snapshot support to vitest pool, add uxp connection to devtools common
+
 ## 0.0.14
 
 ### Patch Changes

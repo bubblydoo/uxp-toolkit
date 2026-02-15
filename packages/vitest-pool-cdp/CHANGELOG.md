@@ -1,5 +1,13 @@
 # @bubblydoo/vitest-pool-cdp
 
+## 0.0.6
+
+### Patch Changes
+
+- a5ba336: Add snapshot support to vitest pool, add uxp connection to devtools common
+- Updated dependencies [a5ba336]
+  - @bubblydoo/uxp-devtools-common@0.0.7
+
 ## 0.0.5
 
 ### Patch Changes
