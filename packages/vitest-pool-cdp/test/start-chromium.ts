@@ -12,7 +12,7 @@ const TEST_VIEWER_URL = new URL(`file://${TEST_VIEWER_PATH}`).toString();
 
 export async function startChromium(options: LaunchOptions = {}) {
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     debuggingPort: 9293,
     // [2423:2423:0205/142910.232787:FATAL:content/browser/zygote_host/zygote_host_impl_linux.cc:128] No usable sandbox!
     // If you are running on Ubuntu 23.10+ or another Linux distro that has disabled unprivileged user namespaces with AppArmor,

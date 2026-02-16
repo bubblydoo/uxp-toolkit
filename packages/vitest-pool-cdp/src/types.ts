@@ -83,11 +83,12 @@ export interface BaseCdpPoolOptions {
 
   /**
    * Whether to reuse the CDP connection between tests, which is useful in watch mode.
-   * It relies on detection of `--run` or `run` in process.argv, or if process.env.CI is set.
+   * It relies on explicit Vitest run/watch flags/commands (`--run`, `run`, `--watch`, `watch`)
+   * and falls back to `process.env.CI`.
    *
    * It uses `signal-exit` to detect when the process is exiting and disconnect the connection.
    *
-   * @default process.argv.includes('--run') || process.argv.includes('run') || !!process.env.CI
+   * @default detect from explicit run/watch args, else !!process.env.CI
    */
   reuseConnection?: boolean;
 

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import type { PoolRunnerInitializer } from 'vitest/node';
-import type { CdpConnection, CdpPoolOptions, ExecutionContextDescription } from './types';
+import type { CdpPoolOptions, ExecutionContextDescription } from './types';
 import { setupCdpConnection } from './cdp-bridge';
 import { CdpPoolWorker } from './pool-worker';
 
