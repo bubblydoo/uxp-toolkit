@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import type { PoolRunnerInitializer } from 'vitest/node';
-import type { CdpPoolOptions, ExecutionContextDescription } from './types';
+import type { CdpConnection, CdpPoolOptions, ExecutionContextDescription } from './types';
 import { setupCdpConnection } from './cdp-bridge';
 import { CdpPoolWorker } from './pool-worker';
 
@@ -57,10 +57,10 @@ export type { CdpPoolOptions, ExecutionContextDescription };
  *   },
  * });
  */
-export function cdpPool(options: CdpPoolOptions): PoolRunnerInitializer {
+export function cdpPool<T extends CdpConnection>(options: CdpPoolOptions): PoolRunnerInitializer {
   return {
     name: 'cdp-pool',
-    createPoolWorker: poolOptions => new CdpPoolWorker(poolOptions, {
+    createPoolWorker: poolOptions => new CdpPoolWorker<T>(poolOptions, {
       connection: async () => {
         // Get the CDP URL (may be a function)
         const cdpReturn = typeof options.cdp === 'function'
@@ -78,7 +78,7 @@ export function cdpPool(options: CdpPoolOptions): PoolRunnerInitializer {
           teardown: teardownFn,
         });
 
-        return connection;
+        return connection as T;
       },
       debug: options.debug,
       connectionTimeout: options.connectionTimeout,
@@ -88,6 +88,7 @@ export function cdpPool(options: CdpPoolOptions): PoolRunnerInitializer {
       enableErrorSourcemapping: options.enableErrorSourcemapping,
       showBundledStackTrace: options.showBundledStackTrace,
       runBeforeTests: options.runBeforeTests,
+      reuseConnection: options.reuseConnection,
     }),
   };
 }

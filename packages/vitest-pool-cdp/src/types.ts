@@ -29,7 +29,7 @@ export interface BaseCdpPoolOptions {
 
   /**
    * Timeout in milliseconds for establishing the CDP connection.
-   * @default 30000
+   * @default 5000
    */
   connectionTimeout?: number;
 
@@ -80,6 +80,16 @@ export interface BaseCdpPoolOptions {
    * Useful for waiting for debugger or something.
    */
   runBeforeTests?: (cdp: CDP.Client) => Promise<void>;
+
+  /**
+   * Whether to reuse the CDP connection between tests, which is useful in watch mode.
+   * It relies on detection of `--run` or `run` in process.argv, or if process.env.CI is set.
+   *
+   * It uses `signal-exit` to detect when the process is exiting and disconnect the connection.
+   *
+   * @default process.argv.includes('--run') || process.argv.includes('run') || !!process.env.CI
+   */
+  reuseConnection?: boolean;
 }
 
 /**

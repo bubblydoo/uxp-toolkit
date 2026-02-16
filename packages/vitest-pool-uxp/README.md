@@ -45,9 +45,9 @@ vitest run --config vitest.uxp.config.ts
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `pluginPath` | `string` | Built-in fake plugin | Path to a UXP plugin directory. The plugin will be loaded into Photoshop to establish the debugging connection. |
+| `pluginPath` | `string` | Built-in plugin | Path to a UXP plugin directory. The plugin will be loaded into Photoshop to establish the debugging connection. |
 | `debug` | `boolean` | `false` | Enable debug logging |
-| `connectionTimeout` | `number` | `60000` | Timeout in milliseconds for establishing the CDP connection |
+| `connectionTimeout` | `number` | `10000` | Timeout in milliseconds for establishing the CDP connection |
 | `rpcTimeout` | `number` | `10000` | Timeout in milliseconds for RPC calls |
 
 ### Using a Custom Plugin
@@ -94,10 +94,10 @@ To prevent multiple Vulcan connections, you **must** configure vitest to run tes
     // Disable VM isolation - prevents vitest from creating
     // separate V8 contexts that don't share module state
     isolate: false,
-    
+
     // Run test files sequentially, not in parallel
     fileParallelism: false,
-    
+
     // Use only one worker
     maxWorkers: 1,
   }

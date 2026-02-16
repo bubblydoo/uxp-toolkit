@@ -17,13 +17,13 @@ type CdpPoolOptions = Parameters<typeof cdpPool>[0];
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Get the path to the built-in fake plugin for vitest-pool-uxp.
- * This plugin displays "Vitest UXP Test Runner" in the panel.
+ * Get the path to the built-in plugin for vitest-pool-uxp.
+ * This plugin displays live test execution status in the panel.
  */
 export function getDefaultPluginPath(): string {
-  // In development: src/index.ts -> ../fake-plugin
-  // In dist: dist/index.js -> ../fake-plugin
-  return path.resolve(__dirname, '../fake-plugin');
+  // In development: src/index.ts -> ../plugin
+  // In dist: dist/index.js -> ../plugin
+  return path.resolve(__dirname, '../plugin');
 }
 
 /**
@@ -48,19 +48,7 @@ export interface UxpPoolOptions extends Omit<CdpPoolOptions, 'cdp'> {
    * @default process.cwd()
    */
   mainDirectory?: string;
-
-  /**
-   * Whether to force the teardown of the UXP connection, which will break watch mode.
-   * Defaults to `false`.
-   */
-  forceConnectionTeardown?: boolean;
 }
-
-// Cached connection - with isolate: false and fileParallelism: false,
-// there's only one worker so we just need simple caching.
-// The cache is cleared when teardown runs to ensure subsequent pool
-// initializations don't reuse a stale connection.
-let cachedConnection: DevtoolsConnection | null = null;
 
 /**
  * Create a Vitest pool that runs tests in Adobe UXP environments (Photoshop, etc.).
@@ -115,7 +103,6 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
     mainDirectory = process.cwd(),
     embedSourcemap = true,
     enableErrorSourcemapping = true,
-    forceConnectionTeardown = false,
   } = options;
 
   if (debug) {
@@ -132,45 +119,17 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
 
   const enableInspect = inspect || ['1', 'true'].includes(process.env.UXP_INSPECT ?? '');
 
-  // This is a bit tricky and ugly: we cannot start a connection twice in the same process,
-  // so we need to reuse the connection in watch mode.
-  // However, in single run mode, we need to tear down the connection, otherwise Vitest will
-  // complain about a "hanging process".
-  // I don't know if there is a better way to know if Vitest is running in "run" or "watch" mode,
-  // but there is nothing in poolOptions afaik.
-  const isSingleRunMode = process.argv.includes('--run') || process.argv.includes('run');
+  let cachedDevtoolsConnection: DevtoolsConnection | null = null;
 
   return cdpPool({
     cdp: async () => {
-      // Reuse existing connection if available
-      if (cachedConnection) {
-        log('Reusing existing UXP connection');
-        return cachedConnection;
-      }
-
       log('Creating new UXP connection...');
-      const connection = await setupDevtoolsConnection(resolvedPluginPath);
-      log(`UXP connection established: ${connection.url}`);
+      const devtoolsConnection = await setupDevtoolsConnection(resolvedPluginPath);
+      log(`UXP connection established: ${devtoolsConnection.url}`);
 
-      // Wrap teardown to clear the cache when the connection is closed
-      const originalTeardown = connection.teardown;
-      cachedConnection = {
-        ...connection,
-        teardown: async () => {
-          if (!isSingleRunMode && !forceConnectionTeardown) {
-            log('Ignoring teardown');
-            return;
-          }
-          log('Tearing down UXP connection...');
-          cachedConnection = null;
-          // This will tear down the Vulcan connection, and will make it so the process
-          // cannot be reused to make a new connection.
-          await originalTeardown();
-          log('UXP connection teardown complete');
-        },
-      };
+      cachedDevtoolsConnection = devtoolsConnection;
 
-      return cachedConnection;
+      return devtoolsConnection;
     },
     executionContextOrSession: async (cdp) => {
       const desc = await waitForExecutionContextCreated(cdp, async () => {
@@ -180,7 +139,7 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
     },
     runBeforeTests: enableInspect
       ? async () => {
-        const websocketUrl = cachedConnection!.url;
+        const websocketUrl = cachedDevtoolsConnection!.url;
         console.log('To continue, attach a debugger to the websocket or open the devtools URL in Chrome:');
         console.log('Websocket URL:', websocketUrl);
         const openDevtoolsUrl = new URL('devtools://devtools/bundled/inspector.html');
@@ -188,7 +147,7 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
         console.log('Chrome devtools URL:', openDevtoolsUrl.toString());
 
         await new Promise<void>((resolve) => {
-          cachedConnection!.events.on('connection', () => {
+          cachedDevtoolsConnection!.events.on('connection', () => {
             resolve();
           });
         });

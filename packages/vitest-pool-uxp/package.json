@@ -22,7 +22,7 @@
   },
   "files": [
     "dist",
-    "fake-plugin"
+    "plugin"
   ],
   "scripts": {
     "build": "tsup",

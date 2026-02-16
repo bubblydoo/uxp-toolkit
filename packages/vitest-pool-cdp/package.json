@@ -21,7 +21,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "test-viewer"
   ],
   "scripts": {
     "build": "tsup",
@@ -46,6 +47,7 @@
     "devalue": "^5.1.1",
     "esbuild": "^0.24.0",
     "flatted": "^3.3.3",
+    "signal-exit": "^4.1.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
