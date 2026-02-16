@@ -70,7 +70,6 @@ export function cdpPool(options: CdpPoolOptions): PoolRunnerInitializer {
         const cdpUrl = typeof cdpReturn === 'object' && 'url' in cdpReturn ? cdpReturn.url : cdpReturn;
 
         const teardownFn = typeof cdpReturn === 'object' && 'teardown' in cdpReturn ? cdpReturn.teardown : undefined;
-
         // Establish CDP connection
         const connection = await setupCdpConnection(cdpUrl, {
           executionContextOrSession: options.executionContextOrSession,
@@ -88,9 +87,13 @@ export function cdpPool(options: CdpPoolOptions): PoolRunnerInitializer {
       enableErrorSourcemapping: options.enableErrorSourcemapping,
       showBundledStackTrace: options.showBundledStackTrace,
       runBeforeTests: options.runBeforeTests,
+      reuseConnection: options.reuseConnection,
+      hotkeys: options.hotkeys,
     }),
   };
 }
+
+export { openDevtoolsSessionInChrome } from './open-devtools-session';
 
 // Re-export the pool worker class for advanced use cases
 export { CdpPoolWorker } from './pool-worker';

@@ -53,6 +53,7 @@ export async function setupCdpConnection(
   await cdp.Runtime.addBinding({ name: CDP_BINDING_NAME }, sessionId);
 
   return {
+    url: cdpUrl,
     cdp,
     executionContextOrSession,
     disconnect: async () => {

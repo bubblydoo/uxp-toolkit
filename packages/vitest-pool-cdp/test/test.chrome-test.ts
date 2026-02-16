@@ -20,4 +20,9 @@ describe('Chrome', () => {
   }
 `);
   });
+
+  it('can take a while', async () => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    expect(true).toEqual(true);
+  });
 });

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Arial, sans-serif;
+        height: 100%;
+        color: #f5f5f5;
+        background: #1f1f1f;
+        overflow: auto;
+      }
+
+      body {
+        margin: 0;
+        padding: 12px;
+      }
+
+      .title {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+      }
+
+      .summary {
+        margin-bottom: 12px;
+        font-size: 12px;
+        color: #d2d2d2;
+      }
+
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      li {
+        font-size: 12px;
+        line-height: 1.3;
+        border: 1px solid #3a3a3a;
+        border-radius: 6px;
+        padding: 6px 8px;
+        margin-bottom: 6px;
+      }
+
+      li:last-child {
+        margin-bottom: 0;
+      }
+
+      .status-pass {
+        border-color: #2e7d32;
+      }
+
+      .status-fail {
+        border-color: #c62828;
+      }
+
+      .status-run {
+        border-color: #ef6c00;
+      }
+
+      .muted {
+        color: #a8a8a8;
+      }
+
+      .main {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 2px;
+        padding: 1px 6px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        margin-right: 4px;
+      }
+
+      .badge-pass {
+        background: #1b5e20;
+      }
+
+      .badge-fail {
+        background: #8e2424;
+      }
+
+      .badge-run {
+        background: #a35200;
+      }
+
+      .badge-skip {
+        background: #4e4e4e;
+      }
+
+      .badge-todo {
+        background: #4a3f14;
+      }
+
+      .badge-collected,
+      .badge-unknown {
+        background: #3b3b3b;
+      }
+
+      .name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .duration {
+        color: #c9c9c9;
+        font-size: 11px;
+        margin-right: 4px;
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="title">Vitest CDP Test Viewer</h1>
+    <div id="summary" class="summary">Waiting for test collection...</div>
+    <ul id="task-list"></ul>
+    <script>
+      const maxVisibleTasks = 30;
+      const state = {
+        tasks: new Map(),
+      };
+
+      function statusLabel(status) {
+        if (status === 'pass') return 'PASS';
+        if (status === 'fail') return 'FAIL';
+        if (status === 'run') return 'RUN';
+        if (status === 'skip') return 'SKIP';
+        if (status === 'todo') return 'TODO';
+        if (status === 'collected') return 'WAIT';
+        return '...';
+      }
+
+      function formatDuration(durationMs) {
+        if (typeof durationMs !== 'number' || !Number.isFinite(durationMs)) return '';
+        if (durationMs < 1000) return `${Math.round(durationMs)}ms`;
+        return `${(durationMs / 1000).toFixed(2)}s`;
+      }
+
+      function setSummary(summary) {
+        const summaryEl = document.getElementById('summary');
+        if (!summaryEl || !summary) return;
+        summaryEl.textContent = `total ${summary.total}, running ${summary.running}, passed ${summary.passed}, failed ${summary.failed}, skipped ${summary.skipped}, todo ${summary.todo}`;
+      }
+
+      function render() {
+        const list = document.getElementById('task-list');
+        if (!list) return;
+
+        const tests = [...state.tasks.values()]
+          .filter((task) => task.type === 'test')
+          .sort((a, b) => a.filePath.localeCompare(b.filePath) || a.name.localeCompare(b.name));
+
+        list.innerHTML = '';
+        for (const task of tests.slice(0, maxVisibleTasks)) {
+          const li = document.createElement('li');
+          li.className = `status-${task.status}`;
+
+          const row = document.createElement('div');
+          row.className = 'row';
+
+          const main = document.createElement('div');
+          main.className = 'main';
+
+          const badge = document.createElement('span');
+          badge.className = `badge badge-${task.status}`;
+          badge.textContent = statusLabel(task.status);
+          main.appendChild(badge);
+
+          const label = document.createElement('span');
+          label.className = 'name';
+          label.textContent = task.name;
+          main.appendChild(label);
+          row.appendChild(main);
+
+          const duration = document.createElement('span');
+          duration.className = 'duration';
+          duration.textContent = formatDuration(task.durationMs);
+          row.appendChild(duration);
+
+          li.appendChild(row);
+
+          const file = document.createElement('div');
+          file.className = 'muted';
+          file.textContent = task.filePath;
+          li.appendChild(file);
+          list.appendChild(li);
+        }
+
+        if (tests.length > maxVisibleTasks) {
+          const li = document.createElement('li');
+          li.className = 'muted';
+          li.textContent = `... and ${tests.length - maxVisibleTasks} more tests`;
+          list.appendChild(li);
+        }
+      }
+
+      function handleRunnerEvent(event) {
+        if (!event || !Array.isArray(event.tasks)) return;
+
+        for (const task of event.tasks) {
+          if (!task || typeof task.id !== 'string') continue;
+          state.tasks.set(task.id, task);
+        }
+
+        setSummary(event.summary);
+        render();
+      }
+
+      globalThis.__vitestUiUpdate = handleRunnerEvent;
+      if (globalThis.__vitestUiState) {
+        handleRunnerEvent(globalThis.__vitestUiState);
+      }
+    </script>
+  </body>
+</html>

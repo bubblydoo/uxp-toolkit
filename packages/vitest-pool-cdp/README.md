@@ -76,13 +76,14 @@ executionContextOrSession: async (cdp) => {
 | `cdp` | `string \| (() => Promise<string>) \| (() => Promise<{ url: string; teardown: () => Promise<void> }>)` | required | CDP target source |
 | `executionContextOrSession` | `(cdp) => Promise<{ sessionId } \| { uniqueId } \| { id }>` | auto-attach session | Select execution context/session |
 | `debug` | `boolean` | `false` | Verbose pool logging |
-| `connectionTimeout` | `number` | `30000` | CDP connection timeout (ms) |
+| `connectionTimeout` | `number` | `5000` | CDP connection timeout (ms) |
 | `rpcTimeout` | `number` | `30000` | RPC call timeout (ms) |
 | `esbuildOptions` | `{ define?, external?, alias?, plugins? }` | `undefined` | Extra esbuild config for test bundling |
 | `embedSourcemap` | `boolean` | `false` | Expose bundled sourcemap as a `EVAL_SOURCEMAP` variable in target |
 | `enableErrorSourcemapping` | `boolean` | `true` | Remap stacks/task locations/error frames to original sources |
 | `showBundledStackTrace` | `boolean` | `false` | Preserve raw bundled stack as `error.bundledStack` (with remapped stack still shown) |
 | `runBeforeTests` | `(cdp) => Promise<void>` | `undefined` | Hook run after CDP connection and before test execution |
+| `hotkeys` | `{ enabled?: boolean; openDevtools?: (connection) => Promise<void> }` | `{ enabled: true, openDevtools: openDevtoolsSessionInChrome }` | Configure terminal hotkeys (`d` opens the current CDP devtools session in Chrome) |
 
 ## Example (dynamic CDP + teardown)
 
@@ -136,6 +137,20 @@ The worker runtime includes a Chai snapshot plugin built on `@vitest/snapshot`:
 - `toThrowErrorMatchingSnapshot`
 - `toThrowErrorMatchingInlineSnapshot`
 - `expect.addSnapshotSerializer(...)`
+
+## Local Chrome Test Viewer (package tests)
+
+For `packages/vitest-pool-cdp/test` development, the Puppeteer launcher opens a local viewer page:
+
+- `test-viewer/index.html`
+
+When running:
+
+```bash
+pnpm --filter @bubblydoo/vitest-pool-cdp test:chrome
+```
+
+the browser navigates to that page and shows live test results from `__vitestUiUpdate` / `__vitestUiState` (summary + per-test status, duration, and file path).
 
 ## Current Limitations
 

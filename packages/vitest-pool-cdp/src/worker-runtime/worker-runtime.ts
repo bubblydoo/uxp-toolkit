@@ -20,9 +20,11 @@ import type { SnapshotStateOptions } from '@vitest/snapshot';
 import type { BirpcReturn } from 'birpc';
 import type * as vitestApi from 'vitest';
 import type { PoolFunctions, SnapshotRuntimeConfig, WorkerFunctions } from '../rpc-types';
+import type { VitestUiState } from './ui';
 import * as vitestRunner from '@vitest/runner';
 import { createBirpc } from 'birpc';
 import * as devalue from 'devalue';
+import { createUiBridge } from './ui';
 import {
   configureSnapshotIO,
   configureSnapshotOptions,
@@ -41,6 +43,8 @@ declare global {
   /** Binding created by Runtime.addBinding on the pool side for worker→pool RPC. */
   var __vitest_cdp_send__: (payload: string) => void;
   var __vitest_api__: typeof vitestApi;
+  var __vitestUiUpdate: ((event: VitestUiState) => void) | undefined;
+  var __vitestUiState: VitestUiState | undefined;
 }
 
 // Message handler callback registered by birpc
@@ -48,6 +52,8 @@ let messageHandler: ((data: string) => void) | null = null;
 
 // Store for pre-bundled test code that will be "imported" by the runner
 const bundledTestCode: Map<string, string> = new Map();
+
+const ui = createUiBridge();
 
 // expose vitest api as global object, which will be used when doing
 // `import { expect } from 'vitest'` in test files
@@ -151,6 +157,8 @@ class CdpVitestRunner implements VitestRunner {
    * This notifies Vitest about the test structure.
    */
   async onCollected(files: File[]): Promise<void> {
+    ui.onCollected(files);
+
     // Forward collected files to the pool via RPC
     if (rpc) {
       await rpc.onCollected(files);
@@ -160,10 +168,12 @@ class CdpVitestRunner implements VitestRunner {
   /**
    * Called when tasks are updated (test results).
    */
-  async onTaskUpdate(packs: unknown[]): Promise<void> {
+  async onTaskUpdate(packs: unknown[], events: unknown[]): Promise<void> {
+    ui.onTaskUpdate(packs);
+
     // Forward task updates to the pool via RPC
     if (rpc) {
-      await rpc.onTaskUpdate(packs);
+      await rpc.onTaskUpdate(packs, events);
     }
   }
 
@@ -216,6 +226,7 @@ const workerFunctions: WorkerFunctions = {
     diffOptions?: VitestRunnerConfig['diffOptions'];
   } & SnapshotRuntimeConfig) {
     currentProjectConfig = config;
+    ui.setProjectRoot(config.root);
     if (config.snapshotOptions) {
       configureSnapshotOptions({
         ...config.snapshotOptions,
@@ -276,7 +287,13 @@ const rpc = createBirpc<PoolFunctions, WorkerFunctions>(
     post: (data: string) => {
       // Send via the dedicated CDP binding (created by Runtime.addBinding on the pool side).
       // Unlike console.debug, this channel is not affected by Chrome DevTools connecting.
-      globalThis.__vitest_cdp_send__(data);
+      try {
+        globalThis.__vitest_cdp_send__(data);
+      }
+      catch (error) {
+        console.error('[vitest-cdp-worker] Runtime transport failed while sending payload', error);
+        throw error;
+      }
     },
     on: (fn) => {
       messageHandler = fn;

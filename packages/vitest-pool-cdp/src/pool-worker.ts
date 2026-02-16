@@ -12,8 +12,11 @@ import { fileURLToPath } from 'node:url';
 import { createBirpc } from 'birpc';
 import * as devalue from 'devalue';
 import * as esbuild from 'esbuild';
+import { onExit } from 'signal-exit';
 import { injectWorkerRuntime } from './cdp-bridge';
 import { evaluateInCdp } from './cdp-util';
+import { setupCdpPoolHotkeys } from './hotkeys';
+import { withPromiseTimeout } from './promise-timeout';
 import { StackRemapper } from './stack-remapper';
 import { CDP_BINDING_NAME, CDP_RECEIVE_FUNCTION } from './types';
 
@@ -47,6 +50,56 @@ const vitestApiKeys = [
   'vi',
   'vitest',
 ];
+
+interface CachedConnectionState {
+  connection: CdpConnection;
+  workerInjected: boolean;
+}
+
+/** Global reusable connection state */
+let cachedConnectionState: CachedConnectionState | null = null;
+
+interface CdpConsoleApiCalledEvent {
+  args?: Array<{ value?: unknown; description?: string }>;
+  type: string;
+}
+
+interface CdpBindingCalledEvent {
+  name: string;
+  payload: string;
+}
+
+interface ConnectionListenerState {
+  currentWorker: CdpPoolWorker | null;
+  consoleListener: (event: CdpConsoleApiCalledEvent) => void;
+  bindingListener: (event: CdpBindingCalledEvent) => void;
+}
+
+const connectionListenerStates = new WeakMap<CdpConnection, ConnectionListenerState>();
+
+function detectSingleRunMode(): boolean {
+  const argv = process.argv.slice(2);
+  const isCi = !!process.env.CI;
+
+  const hasWatchFlag = argv.includes('--watch') || argv.includes('--watchAll') || argv.includes('-w');
+  if (hasWatchFlag) {
+    return false;
+  }
+
+  if (argv.includes('--run')) {
+    return true;
+  }
+
+  const command = argv.find(arg => !arg.startsWith('-'));
+  if (command === 'watch') {
+    return false;
+  }
+  if (command === 'run') {
+    return true;
+  }
+
+  return isCi;
+}
 
 /**
  * Custom Vitest pool worker that communicates over CDP using birpc.
@@ -96,6 +149,10 @@ export class CdpPoolWorker implements PoolWorker {
    */
   private runnerConfig: RunnerRuntimeConfig & SnapshotRuntimeConfig = {};
 
+  private reuseConnection: boolean;
+  private isSingleRunMode: boolean;
+  private cleanupHotkeys: (() => void) | null = null;
+
   constructor(poolOptions: PoolOptions, rawCdpOptions: RawCdpPoolOptions) {
     this.poolOptions = poolOptions;
     this.rawCdpOptions = rawCdpOptions;
@@ -103,6 +160,11 @@ export class CdpPoolWorker implements PoolWorker {
     this.log = rawCdpOptions.debug
       ? (...args: unknown[]) => console.log('[vitest-pool-cdp]', ...args)
       : () => {};
+    this.reuseConnection = rawCdpOptions.reuseConnection ?? true;
+
+    // We need to reuse a single connection in watch mode, but disconnect in single-run mode
+    // so Vitest does not report a hanging process.
+    this.isSingleRunMode = detectSingleRunMode();
 
     // Error sourcemapping is on by default
     const enableErrorSourcemapping = rawCdpOptions.enableErrorSourcemapping ?? true;
@@ -114,48 +176,77 @@ export class CdpPoolWorker implements PoolWorker {
     }
   }
 
+  private async createConnectionWithTimeoutAndExitListener() {
+    const connection = await withPromiseTimeout(
+      this.rawCdpOptions.connection(),
+      {
+        timeout: this.rawCdpOptions.connectionTimeout ?? 5000,
+        timeoutMessage: 'CDP connection timeout',
+        onLateResolve: (lateConnection) => {
+          return lateConnection.disconnect().then(() => {
+            this.log('Disconnected late CDP connection after timeout');
+          }).catch((disconnectError) => {
+            this.log('Error disconnecting late CDP connection:', disconnectError);
+          });
+        },
+        onLateReject: (lateError) => {
+          this.log('Late CDP connection rejected after timeout:', lateError);
+        },
+      },
+    );
+
+    onExit(() => {
+      if (connection) {
+        connection.disconnect().then(() => {
+          this.log('CDP connection disconnected');
+          this.cleanupHotkeys?.();
+        }).catch((error) => {
+          this.log('Error disconnecting CDP connection:', error);
+        });
+      }
+    });
+
+    return connection;
+  }
+
   /**
    * Start the worker by establishing the CDP connection and injecting the runtime.
    */
   async start(): Promise<void> {
     this.log('Starting CDP pool worker...');
 
-    this.connection = await this.rawCdpOptions.connection();
+    const reusableState = this.reuseConnection ? cachedConnectionState : null;
+    if (reusableState) {
+      this.log('Reusing existing CDP connection');
+    }
+    this.connection = reusableState?.connection ?? await this.createConnectionWithTimeoutAndExitListener();
+    this.workerInjected = reusableState?.workerInjected ?? false;
 
-    // Forward console output from the CDP context to the terminal
-    this.connection.cdp.Runtime.on('consoleAPICalled', (event) => {
-      const args = event.args?.map((arg: { value?: unknown; description?: string }) =>
-        arg.value !== undefined ? arg.value : arg.description,
-      );
-      if (args?.length) {
-        console.log(`[CDP console.${event.type}]`, ...args);
+    if (this.reuseConnection && !reusableState) {
+      if (cachedConnectionState) {
+        throw new Error('Detected multiple CDP connections in reusable mode, this is not supported. Make sure to limit the amount of workers to 1.');
       }
-    });
+      cachedConnectionState = {
+        connection: this.connection,
+        workerInjected: this.workerInjected,
+      };
+    }
+
+    this.attachConnectionListeners();
 
     if (this.rawCdpOptions.runBeforeTests) {
       this.log('Running "runBeforeTests" function...');
-      await this.rawCdpOptions.runBeforeTests(this.connection.cdp);
+      await this.rawCdpOptions.runBeforeTests(this.connection!);
     }
-
-    // Listen for RPC messages via the dedicated binding channel.
-    // Unlike consoleAPICalled, bindingCalled events are tied to the client
-    // that created the binding, so they won't be stolen by Chrome DevTools.
-    this.connection.cdp.Runtime.on('bindingCalled', (event) => {
-      if (event.name !== CDP_BINDING_NAME) {
-        return;
-      }
-
-      if (this.rpcMessageHandler) {
-        this.log('Received birpc message from CDP binding');
-        this.rpcMessageHandler(event.payload);
-      }
-    });
 
     // Inject the worker runtime if not already done
     if (!this.workerInjected) {
       const workerCode = await this.loadWorkerRuntime();
-      await injectWorkerRuntime(this.connection, workerCode, this.log);
+      await injectWorkerRuntime(this.connection!, workerCode, this.log);
       this.workerInjected = true;
+      if (this.reuseConnection && cachedConnectionState?.connection === this.connection) {
+        cachedConnectionState.workerInjected = true;
+      }
     }
 
     // Create the birpc instance for CDP worker communication
@@ -169,6 +260,8 @@ export class CdpPoolWorker implements PoolWorker {
     if (pingResult !== 'pong') {
       throw new Error('Worker runtime did not respond correctly to ping');
     }
+
+    this.setupHotkeys();
 
     this.log('CDP pool worker started and verified with birpc');
   }
@@ -221,10 +314,10 @@ export class CdpPoolWorker implements PoolWorker {
         await this.forwardCollectedFiles(files);
       },
 
-      onTaskUpdate: async (packs: unknown[]) => {
+      onTaskUpdate: async (packs: unknown[], events: unknown[]) => {
         this.log('Task update received:', packs);
         // Forward task updates to Vitest via the Vitest RPC channel
-        await this.forwardTaskUpdates(packs as TaskResultPack[]);
+        await this.forwardTaskUpdates(packs as TaskResultPack[], events as TaskEventPack[]);
       },
     };
 
@@ -356,7 +449,7 @@ export class CdpPoolWorker implements PoolWorker {
   /**
    * Forward task updates from the CDP worker to Vitest via the RPC channel.
    */
-  private async forwardTaskUpdates(packs: TaskResultPack[]): Promise<void> {
+  private async forwardTaskUpdates(packs: TaskResultPack[], events: TaskEventPack[]): Promise<void> {
     if (!this.vitestRpc) {
       this.log('Warning: vitestRpc not initialized, cannot forward task updates');
       return;
@@ -369,9 +462,6 @@ export class CdpPoolWorker implements PoolWorker {
         this.stackRemapper.remapErrorStacks(result);
       }
     }
-
-    // Convert packs to events - each pack gets a corresponding event
-    const events: TaskEventPack[] = [];
 
     // Call Vitest's onTaskUpdate RPC method
     await this.vitestRpc.onTaskUpdate(packs, events);
@@ -399,6 +489,77 @@ export class CdpPoolWorker implements PoolWorker {
     await evaluateInCdp(this.connection, expression, { awaitPromise: false, returnByValue: false });
   }
 
+  private setupHotkeys(): void {
+    if (this.cleanupHotkeys) {
+      return;
+    }
+
+    this.cleanupHotkeys = setupCdpPoolHotkeys({
+      hotkeys: this.rawCdpOptions.hotkeys,
+      getConnection: () => this.connection ?? cachedConnectionState?.connection ?? null,
+      log: this.log,
+    });
+  }
+
+  private attachConnectionListeners(): void {
+    if (!this.connection) {
+      return;
+    }
+
+    const existingState = connectionListenerStates.get(this.connection);
+    if (existingState) {
+      existingState.currentWorker = this;
+      return;
+    }
+
+    const state: ConnectionListenerState = {
+      currentWorker: this,
+      consoleListener: (event) => {
+        state.currentWorker?.handleConsoleApiCalled(event);
+      },
+      // Unlike consoleAPICalled, bindingCalled events are tied to the client
+      // that created the binding, so they won't be stolen by Chrome DevTools.
+      bindingListener: (event) => {
+        state.currentWorker?.handleBindingCalled(event);
+      },
+    };
+
+    this.connection.cdp.Runtime.on('consoleAPICalled', state.consoleListener);
+    this.connection.cdp.Runtime.on('bindingCalled', state.bindingListener);
+    connectionListenerStates.set(this.connection, state);
+  }
+
+  private detachConnectionListeners(): void {
+    if (!this.connection) {
+      return;
+    }
+
+    const state = connectionListenerStates.get(this.connection);
+    if (state?.currentWorker === this) {
+      state.currentWorker = null;
+    }
+  }
+
+  private handleConsoleApiCalled(event: CdpConsoleApiCalledEvent): void {
+    const args = event.args?.map(arg =>
+      arg.value !== undefined ? arg.value : arg.description,
+    );
+    if (args?.length) {
+      console.log(`[CDP console.${event.type}]`, ...args);
+    }
+  }
+
+  private handleBindingCalled(event: CdpBindingCalledEvent): void {
+    if (event.name !== CDP_BINDING_NAME) {
+      return;
+    }
+
+    if (this.rpcMessageHandler) {
+      this.log('Received birpc message from CDP binding');
+      this.rpcMessageHandler(event.payload);
+    }
+  }
+
   /**
    * Stop the worker by closing the CDP connection.
    */
@@ -411,8 +572,21 @@ export class CdpPoolWorker implements PoolWorker {
     this.vitestRpcMessageHandler = null;
 
     if (this.connection) {
-      await this.connection.disconnect();
-      this.connection = null;
+      this.detachConnectionListeners();
+
+      if (this.isSingleRunMode || !this.reuseConnection) {
+        this.log('Disconnecting CDP connection...');
+        await this.connection.disconnect();
+        this.connection = null;
+        cachedConnectionState = null;
+        this.cleanupHotkeys?.();
+      }
+      else {
+        this.log('Keeping existing CDP connection for reuse');
+        if (cachedConnectionState?.connection === this.connection) {
+          cachedConnectionState.workerInjected = this.workerInjected;
+        }
+      }
     }
 
     // Emit stopped response BEFORE clearing listeners so Vitest receives it

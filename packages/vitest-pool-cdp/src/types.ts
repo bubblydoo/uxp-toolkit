@@ -29,7 +29,7 @@ export interface BaseCdpPoolOptions {
 
   /**
    * Timeout in milliseconds for establishing the CDP connection.
-   * @default 30000
+   * @default 5000
    */
   connectionTimeout?: number;
 
@@ -79,7 +79,42 @@ export interface BaseCdpPoolOptions {
    * Optional function to run after the CDP connection is established.
    * Useful for waiting for debugger or something.
    */
-  runBeforeTests?: (cdp: CDP.Client) => Promise<void>;
+  runBeforeTests?: (connection: CdpConnection) => Promise<void>;
+
+  /**
+   * Whether to reuse the CDP connection between tests, which is useful in watch mode.
+   * It relies on explicit Vitest run/watch flags/commands (`--run`, `run`, `--watch`, `watch`)
+   * and falls back to `process.env.CI`.
+   *
+   * It uses `signal-exit` to detect when the process is exiting and disconnect the connection.
+   *
+   * @default detect from explicit run/watch args, else !!process.env.CI
+   */
+  reuseConnection?: boolean;
+
+  /**
+   * Enable interactive hotkeys in the terminal.
+   *
+   * Currently supports:
+   * - `d`: open the current CDP devtools session in Google Chrome.
+   *
+   * @default { enabled: true, openDevtools: openDevtoolsSessionInChrome }
+   */
+  hotkeys?: {
+    /**
+     * Whether to enable the hotkeys.
+     *
+     * @default true
+     */
+    enabled?: boolean;
+
+    /**
+     * Function to open the devtools session (e.g. in Google Chrome).
+     *
+     * @default openDevtoolsSessionInChrome
+     */
+    openDevtools?: (connection: CdpConnection) => Promise<void>;
+  };
 }
 
 /**
@@ -126,6 +161,7 @@ export const CDP_RECEIVE_FUNCTION = '__vitest_cdp_receive__';
  * Internal CDP connection state.
  */
 export interface CdpConnection {
+  url: string;
   cdp: CDP.Client;
   executionContextOrSession: ExecutionContextOrSession;
   disconnect: () => Promise<void>;

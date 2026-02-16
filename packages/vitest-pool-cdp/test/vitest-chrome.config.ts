@@ -7,7 +7,7 @@ export default defineConfig({
     include: ['./**/*.chrome-test.ts'],
     pool: cdpPool({
       cdp: () => startChromium(),
-      // debug: true,
+      debug: true,
     }),
     allowOnly: true,
   },
