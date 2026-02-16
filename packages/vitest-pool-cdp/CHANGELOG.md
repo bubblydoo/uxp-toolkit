@@ -1,5 +1,12 @@
 # @bubblydoo/vitest-pool-cdp
 
+## 0.0.7
+
+### Patch Changes
+
+- db4cf94: Add ui bridge to vitest pool
+- 29972e4: Add a hotkey to open devtools
+
 ## 0.0.6
 
 ### Patch Changes
