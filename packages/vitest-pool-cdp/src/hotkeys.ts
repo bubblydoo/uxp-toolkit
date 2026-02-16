@@ -21,7 +21,10 @@ export function setupCdpPoolHotkeys(options: {
 
   const stdin = process.stdin;
   readline.emitKeypressEvents(stdin);
-  stdin.resume();
+  const resumedStdin = stdin.isPaused();
+  if (resumedStdin) {
+    stdin.resume();
+  }
 
   const hadRawMode = !!stdin.isRaw;
   if (!hadRawMode && typeof stdin.setRawMode === 'function') {
@@ -78,6 +81,9 @@ export function setupCdpPoolHotkeys(options: {
   return () => {
     stdin.off('keypress', onKeypress);
     stdin.off('data', onData);
+    if (resumedStdin) {
+      stdin.pause();
+    }
     if (!hadRawMode && stdin.isTTY && typeof stdin.setRawMode === 'function') {
       stdin.setRawMode(false);
     }
