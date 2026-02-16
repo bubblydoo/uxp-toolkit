@@ -1,0 +1,54 @@
+{
+  "name": "@bubblydoo/vite-uxp-plugin",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Minimal Vite plugin for Adobe UXP manifest generation and dist bundling",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.js"
+    },
+    "./runtime": {
+      "types": "./src/empty-runtime.ts",
+      "import": "./dist/empty-runtime.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./runtime": {
+        "types": "./dist/empty-runtime.d.ts",
+        "import": "./dist/empty-runtime.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "vite": ">=6"
+  },
+  "dependencies": {
+    "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "@adobe-uxp-types/photoshop": "workspace:*",
+    "@adobe-uxp-types/uxp": "workspace:*",
+    "@bubblydoo/tsconfig": "workspace:*",
+    "@types/node": "^20.8.7",
+    "@types/ws": "^8.18.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  }
+}

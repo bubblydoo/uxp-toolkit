@@ -3,6 +3,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "jsx": "react-jsx",
+    "baseUrl": ".",
     "module": "ESNext",
     "typeRoots": ["./node_modules/@adobe-uxp-types", "./node_modules/@types"],
     "types": ["photoshop", "uxp", "node", "react", "react-dom"],

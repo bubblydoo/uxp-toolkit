@@ -381,5 +381,23 @@ interface Entrypoints {
    * @param entrypoints Describes your plugin's entrypoint functions and properties.
    */
   setup: (entrypoints: Entrypoints) => void;
+
+  _pluginInfo: {
+    id: string;
+    manifest: unknown;
+    version: string;
+
+    _pluginInfo: {
+      developerPlugin: boolean;
+      id: string;
+      name: string;
+      pluginPath: string;
+      pluginType: number;
+      privileged: boolean;
+      source: string;
+      uid: string;
+      version: string;
+    };
+  };
 }
 export const entrypoints: Entrypoints;

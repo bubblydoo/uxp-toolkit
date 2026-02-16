@@ -1,16 +1,10 @@
-import type { UXP_Config, UXP_Manifest } from 'vite-uxp-plugin';
+import type { UxpManifest } from '@bubblydoo/vite-uxp-plugin';
 import { version } from './package.json';
-
-const extraPrefs = {
-  hotReloadPort: 8081,
-  copyZipAssets: ['public-zip/*'],
-  uniqueIds: true,
-};
 
 export const id = 'co.bubblydoo.example-layers-plugin';
 const name = 'Example Layers Plugin';
 
-const manifest: UXP_Manifest = {
+export const manifest: UxpManifest = {
   id,
   name,
   version,
@@ -61,9 +55,7 @@ const manifest: UXP_Manifest = {
       extensions: ['.xd', '.psd', '.bat', '.cmd', ''],
     },
     network: {
-      domains: [
-        `ws://localhost:${extraPrefs.hotReloadPort}`, // Required for hot reload
-      ],
+      domains: 'all',
     },
     clipboard: 'readAndWrite',
     webview: {
@@ -87,9 +79,4 @@ const manifest: UXP_Manifest = {
       species: ['pluginList'],
     },
   ],
-};
-
-export const config: UXP_Config = {
-  manifest,
-  ...extraPrefs,
 };

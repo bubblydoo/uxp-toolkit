@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 
 import { App } from './main';
 import '@bubblydoo/uxp-polyfills';
-import './bolt-uxp-ws-listener';
+import '@bubblydoo/vite-uxp-plugin/runtime';
 
 import './index.css';
 

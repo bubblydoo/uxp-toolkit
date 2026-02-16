@@ -4,10 +4,8 @@
   "version": "0.0.15",
   "private": true,
   "scripts": {
-    "dev": "cross-env MODE=dev vite build --watch",
-    "build": "cross-env MODE=build vite build",
-    "ccx": "cross-env MODE=package vite build",
-    "zip": "cross-env MODE=zip vite build",
+    "dev": "vite build --watch --mode development",
+    "build": "vite build",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -25,6 +23,7 @@
     "@adobe-uxp-types/photoshop": "workspace:*",
     "@adobe-uxp-types/uxp": "workspace:*",
     "@bubblydoo/tsconfig": "workspace:*",
+    "@bubblydoo/vite-uxp-plugin": "workspace:*",
     "@types/node": "^20.8.7",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
@@ -40,7 +39,6 @@
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
     "vite-tsconfig-paths": "^6.0.5",
-    "vite-uxp-plugin": "^1.2.5",
     "ws": "^8.14.2"
   }
 }

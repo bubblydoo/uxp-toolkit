@@ -1,23 +1,14 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { uxp } from '@bubblydoo/vite-uxp-plugin';
 import react from '@vitejs/plugin-react';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { uxp } from 'vite-uxp-plugin';
 import z from 'zod';
-import { createUxpConfig } from '../uxp.config';
-
-const uxpBuiltinModules = [
-  'photoshop',
-  'uxp',
-  'fs',
-  'os',
-  'path',
-  'process',
-];
+import { createUxpConfig } from './uxp.config';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
@@ -56,8 +47,6 @@ type ResolvedConfig = z.infer<typeof resolvedConfigSchema>;
 export function createViteConfig(config: ResolvedConfig, mode: 'dev' | 'build') {
   resolvedConfigSchema.parse(config);
 
-  console.log({ config });
-
   const uxpConfig = createUxpConfig({
     id: config.plugin.id,
     name: `${config.plugin.name} - UXP Test Framework Plugin`,
@@ -67,11 +56,8 @@ export function createViteConfig(config: ResolvedConfig, mode: 'dev' | 'build') 
 
   return defineConfig({
     root,
-    define: {
-      BOLT_UXP_HOT_RELOAD_PORT: uxpConfig.hotReloadPort,
-    },
     plugins: [
-      uxp(uxpConfig, mode, { disablePolyfills: true }) as any,
+      uxp(uxpConfig.manifest, uxpConfig.pluginConfig) as any,
       react(),
       ...(config.vite.enableTsconfigPathsPlugin ? [tsconfigPaths()] : []),
       // copy the test fixtures to the dist directory
@@ -119,16 +105,7 @@ export function createViteConfig(config: ResolvedConfig, mode: 'dev' | 'build') 
       watch: mode === 'dev' ? {} : undefined,
       minify: false,
       emptyOutDir: true,
-      rollupOptions: {
-        external: uxpBuiltinModules.map(module => new RegExp(`^${module}\\b`)),
-        output: {
-          format: 'cjs',
-        },
-      },
     },
     publicDir: 'public',
-    optimizeDeps: {
-      exclude: uxpBuiltinModules,
-    },
   });
 }
