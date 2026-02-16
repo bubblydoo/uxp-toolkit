@@ -267,10 +267,10 @@ export class CdpPoolWorker<T extends CdpConnection> implements PoolWorker {
         await this.forwardCollectedFiles(files);
       },
 
-      onTaskUpdate: async (packs: unknown[]) => {
+      onTaskUpdate: async (packs: unknown[], events: unknown[]) => {
         this.log('Task update received:', packs);
         // Forward task updates to Vitest via the Vitest RPC channel
-        await this.forwardTaskUpdates(packs as TaskResultPack[]);
+        await this.forwardTaskUpdates(packs as TaskResultPack[], events as TaskEventPack[]);
       },
     };
 
@@ -402,7 +402,7 @@ export class CdpPoolWorker<T extends CdpConnection> implements PoolWorker {
   /**
    * Forward task updates from the CDP worker to Vitest via the RPC channel.
    */
-  private async forwardTaskUpdates(packs: TaskResultPack[]): Promise<void> {
+  private async forwardTaskUpdates(packs: TaskResultPack[], events: TaskEventPack[]): Promise<void> {
     if (!this.vitestRpc) {
       this.log('Warning: vitestRpc not initialized, cannot forward task updates');
       return;
@@ -415,9 +415,6 @@ export class CdpPoolWorker<T extends CdpConnection> implements PoolWorker {
         this.stackRemapper.remapErrorStacks(result);
       }
     }
-
-    // Convert packs to events - each pack gets a corresponding event
-    const events: TaskEventPack[] = [];
 
     // Call Vitest's onTaskUpdate RPC method
     await this.vitestRpc.onTaskUpdate(packs, events);

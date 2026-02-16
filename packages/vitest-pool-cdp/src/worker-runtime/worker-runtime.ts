@@ -168,12 +168,12 @@ class CdpVitestRunner implements VitestRunner {
   /**
    * Called when tasks are updated (test results).
    */
-  async onTaskUpdate(packs: unknown[]): Promise<void> {
+  async onTaskUpdate(packs: unknown[], events: unknown[]): Promise<void> {
     ui.onTaskUpdate(packs);
 
     // Forward task updates to the pool via RPC
     if (rpc) {
-      await rpc.onTaskUpdate(packs);
+      await rpc.onTaskUpdate(packs, events);
     }
   }
 

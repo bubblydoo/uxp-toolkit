@@ -109,5 +109,5 @@ export interface PoolFunctions {
    * Called when test tasks are updated (results, state changes).
    * This allows the worker to report progress back to the pool.
    */
-  onTaskUpdate: (packs: unknown[]) => Promise<void>;
+  onTaskUpdate: (packs: unknown[], events: unknown[]) => Promise<void>;
 }
