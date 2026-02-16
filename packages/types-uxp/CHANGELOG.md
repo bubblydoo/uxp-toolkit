@@ -1,5 +1,11 @@
 # @adobe-uxp-types/uxp
 
+## 0.1.2
+
+### Patch Changes
+
+- 7d7f193: Setup uxp vite plugin
+
 ## 0.1.1
 
 ### Patch Changes

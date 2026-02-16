@@ -1,5 +1,12 @@
 # @bubblydoo/uxp-test-framework-plugin
 
+## 0.0.16
+
+### Patch Changes
+
+- 7d7f193: Setup uxp vite plugin
+  - @bubblydoo/uxp-toolkit@0.0.15
+
 ## 0.0.15
 
 ### Patch Changes
