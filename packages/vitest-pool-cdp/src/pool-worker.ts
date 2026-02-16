@@ -15,6 +15,7 @@ import * as esbuild from 'esbuild';
 import { onExit } from 'signal-exit';
 import { injectWorkerRuntime } from './cdp-bridge';
 import { evaluateInCdp } from './cdp-util';
+import { setupCdpPoolHotkeys } from './hotkeys';
 import { StackRemapper } from './stack-remapper';
 import { CDP_BINDING_NAME, CDP_RECEIVE_FUNCTION } from './types';
 
@@ -50,18 +51,18 @@ const vitestApiKeys = [
 ];
 
 /** Global connection state */
-let cachedConnection: any | null = null;
+let cachedConnection: CdpConnection | null = null;
 
 /**
  * Custom Vitest pool worker that communicates over CDP using birpc.
  * Uses @vitest/runner in the CDP context for full Vitest compatibility.
  */
-export class CdpPoolWorker<T extends CdpConnection> implements PoolWorker {
+export class CdpPoolWorker implements PoolWorker {
   name = 'cdp-pool';
 
   private poolOptions: PoolOptions;
   private rawCdpOptions: RawCdpPoolOptions;
-  private connection: T | null = null;
+  private connection: CdpConnection | null = null;
   private eventListeners: Map<string, Set<EventCallback>> = new Map();
   private workerInjected = false;
   private log: (...args: unknown[]) => void;
@@ -102,6 +103,7 @@ export class CdpPoolWorker<T extends CdpConnection> implements PoolWorker {
 
   private reuseConnection: boolean;
   private isSingleRunMode: boolean;
+  private cleanupHotkeys: (() => void) | null = null;
 
   constructor(poolOptions: PoolOptions, rawCdpOptions: RawCdpPoolOptions) {
     this.poolOptions = poolOptions;
@@ -144,6 +146,7 @@ export class CdpPoolWorker<T extends CdpConnection> implements PoolWorker {
       if (connection) {
         connection.disconnect().then(() => {
           this.log('CDP connection disconnected');
+          this.cleanupHotkeys?.();
         }).catch((error) => {
           this.log('Error disconnecting CDP connection:', error);
         });
@@ -180,7 +183,7 @@ export class CdpPoolWorker<T extends CdpConnection> implements PoolWorker {
 
     if (this.rawCdpOptions.runBeforeTests) {
       this.log('Running "runBeforeTests" function...');
-      await this.rawCdpOptions.runBeforeTests(this.connection!.cdp);
+      await this.rawCdpOptions.runBeforeTests(this.connection!);
     }
 
     // Listen for RPC messages via the dedicated binding channel.
@@ -215,6 +218,8 @@ export class CdpPoolWorker<T extends CdpConnection> implements PoolWorker {
     if (pingResult !== 'pong') {
       throw new Error('Worker runtime did not respond correctly to ping');
     }
+
+    this.setupHotkeys();
 
     this.log('CDP pool worker started and verified with birpc');
   }
@@ -442,6 +447,18 @@ export class CdpPoolWorker<T extends CdpConnection> implements PoolWorker {
     await evaluateInCdp(this.connection, expression, { awaitPromise: false, returnByValue: false });
   }
 
+  private setupHotkeys(): void {
+    if (this.cleanupHotkeys) {
+      return;
+    }
+
+    this.cleanupHotkeys = setupCdpPoolHotkeys({
+      hotkeys: this.rawCdpOptions.hotkeys,
+      getConnection: () => this.connection ?? cachedConnection,
+      log: this.log,
+    });
+  }
+
   /**
    * Stop the worker by closing the CDP connection.
    */
@@ -459,6 +476,7 @@ export class CdpPoolWorker<T extends CdpConnection> implements PoolWorker {
         await this.connection.disconnect();
         this.connection = null;
         cachedConnection = null;
+        this.cleanupHotkeys?.();
       }
       else {
         this.log('Keeping existing CDP connection for reuse');

@@ -83,6 +83,7 @@ executionContextOrSession: async (cdp) => {
 | `enableErrorSourcemapping` | `boolean` | `true` | Remap stacks/task locations/error frames to original sources |
 | `showBundledStackTrace` | `boolean` | `false` | Preserve raw bundled stack as `error.bundledStack` (with remapped stack still shown) |
 | `runBeforeTests` | `(cdp) => Promise<void>` | `undefined` | Hook run after CDP connection and before test execution |
+| `hotkeys` | `{ enabled?: boolean; openDevtools?: (connection) => Promise<void> }` | `{ enabled: true, openDevtools: openDevtoolsSessionInChrome }` | Configure terminal hotkeys (`d` opens the current CDP devtools session in Chrome) |
 
 ## Example (dynamic CDP + teardown)
 

@@ -57,10 +57,10 @@ export type { CdpPoolOptions, ExecutionContextDescription };
  *   },
  * });
  */
-export function cdpPool<T extends CdpConnection>(options: CdpPoolOptions): PoolRunnerInitializer {
+export function cdpPool(options: CdpPoolOptions): PoolRunnerInitializer {
   return {
     name: 'cdp-pool',
-    createPoolWorker: poolOptions => new CdpPoolWorker<T>(poolOptions, {
+    createPoolWorker: poolOptions => new CdpPoolWorker(poolOptions, {
       connection: async () => {
         // Get the CDP URL (may be a function)
         const cdpReturn = typeof options.cdp === 'function'
@@ -70,7 +70,6 @@ export function cdpPool<T extends CdpConnection>(options: CdpPoolOptions): PoolR
         const cdpUrl = typeof cdpReturn === 'object' && 'url' in cdpReturn ? cdpReturn.url : cdpReturn;
 
         const teardownFn = typeof cdpReturn === 'object' && 'teardown' in cdpReturn ? cdpReturn.teardown : undefined;
-
         // Establish CDP connection
         const connection = await setupCdpConnection(cdpUrl, {
           executionContextOrSession: options.executionContextOrSession,
@@ -78,7 +77,7 @@ export function cdpPool<T extends CdpConnection>(options: CdpPoolOptions): PoolR
           teardown: teardownFn,
         });
 
-        return connection as T;
+        return connection;
       },
       debug: options.debug,
       connectionTimeout: options.connectionTimeout,
@@ -89,9 +88,12 @@ export function cdpPool<T extends CdpConnection>(options: CdpPoolOptions): PoolR
       showBundledStackTrace: options.showBundledStackTrace,
       runBeforeTests: options.runBeforeTests,
       reuseConnection: options.reuseConnection,
+      hotkeys: options.hotkeys,
     }),
   };
 }
+
+export { openDevtoolsSessionInChrome } from './open-devtools-session';
 
 // Re-export the pool worker class for advanced use cases
 export { CdpPoolWorker } from './pool-worker';

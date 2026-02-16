@@ -79,7 +79,7 @@ export interface BaseCdpPoolOptions {
    * Optional function to run after the CDP connection is established.
    * Useful for waiting for debugger or something.
    */
-  runBeforeTests?: (cdp: CDP.Client) => Promise<void>;
+  runBeforeTests?: (connection: CdpConnection) => Promise<void>;
 
   /**
    * Whether to reuse the CDP connection between tests, which is useful in watch mode.
@@ -90,6 +90,30 @@ export interface BaseCdpPoolOptions {
    * @default process.argv.includes('--run') || process.argv.includes('run') || !!process.env.CI
    */
   reuseConnection?: boolean;
+
+  /**
+   * Enable interactive hotkeys in the terminal.
+   *
+   * Currently supports:
+   * - `d`: open the current CDP devtools session in Google Chrome.
+   *
+   * @default { enabled: true, openDevtools: openDevtoolsSessionInChrome }
+   */
+  hotkeys?: {
+    /**
+     * Whether to enable the hotkeys.
+     *
+     * @default true
+     */
+    enabled?: boolean;
+
+    /**
+     * Function to open the devtools session (e.g. in Google Chrome).
+     *
+     * @default openDevtoolsSessionInChrome
+     */
+    openDevtools?: (connection: CdpConnection) => Promise<void>;
+  };
 }
 
 /**
@@ -136,6 +160,7 @@ export const CDP_RECEIVE_FUNCTION = '__vitest_cdp_receive__';
  * Internal CDP connection state.
  */
 export interface CdpConnection {
+  url: string;
   cdp: CDP.Client;
   executionContextOrSession: ExecutionContextOrSession;
   disconnect: () => Promise<void>;

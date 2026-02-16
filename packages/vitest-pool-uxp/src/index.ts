@@ -138,8 +138,8 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
       return { uniqueId: desc.uniqueId };
     },
     runBeforeTests: enableInspect
-      ? async () => {
-        const websocketUrl = cachedDevtoolsConnection!.url;
+      ? async (connection) => {
+        const websocketUrl = connection.url;
         console.log('To continue, attach a debugger to the websocket or open the devtools URL in Chrome:');
         console.log('Websocket URL:', websocketUrl);
         const openDevtoolsUrl = new URL('devtools://devtools/bundled/inspector.html');
