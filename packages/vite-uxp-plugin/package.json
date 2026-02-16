@@ -1,7 +1,7 @@
 {
   "name": "@bubblydoo/vite-uxp-plugin",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Minimal Vite plugin for Adobe UXP manifest generation and dist bundling",
   "exports": {
     ".": {
