@@ -1,7 +1,7 @@
 {
   "name": "@bubblydoo/uxp-toolkit",
   "type": "module",
-  "version": "0.0.16",
+  "version": "0.0.15",
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/bubblydoo/uxp-toolkit/tree/main/packages/uxp-toolkit",
@@ -22,6 +22,9 @@
     },
     "./package.json": "./package.json"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "test-base": "node --import tsx ./node_modules/vitest/vitest.mjs",
