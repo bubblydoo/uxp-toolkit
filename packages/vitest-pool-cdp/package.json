@@ -1,7 +1,7 @@
 {
   "name": "@bubblydoo/vitest-pool-cdp",
   "type": "module",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Custom Vitest pool that runs tests in CDP-connected environments (browsers, Photoshop UXP, Electron, etc.)",
   "exports": {
     ".": {

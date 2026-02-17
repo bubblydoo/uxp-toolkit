@@ -1,5 +1,11 @@
 # @adobe-uxp-types/uxp
 
+## 0.1.3
+
+### Patch Changes
+
+- 7de7d7a: Add adobe protocol
+
 ## 0.1.2
 
 ### Patch Changes

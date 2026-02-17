@@ -1,5 +1,13 @@
 # @bubblydoo/uxp-toolkit-react
 
+## 0.0.16
+
+### Patch Changes
+
+- 7de7d7a: Add adobe protocol
+- Updated dependencies [7de7d7a]
+  - @bubblydoo/uxp-toolkit@0.0.16
+
 ## 0.0.15
 
 ### Patch Changes

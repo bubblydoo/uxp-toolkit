@@ -1,5 +1,14 @@
 # @bubblydoo/vitest-pool-cdp
 
+## 0.0.8
+
+### Patch Changes
+
+- 7de7d7a: Add adobe protocol
+- Updated dependencies [7de7d7a]
+  - @bubblydoo/esbuild-adobe-protocol-plugin@0.0.2
+  - @bubblydoo/uxp-devtools-common@0.0.8
+
 ## 0.0.7
 
 ### Patch Changes

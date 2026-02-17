@@ -1,7 +1,7 @@
 {
   "name": "@bubblydoo/esbuild-adobe-protocol-plugin",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Reusable esbuild plugin to strip adobe: protocol from module specifiers",
   "exports": {
     ".": {

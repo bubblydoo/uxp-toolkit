@@ -1,5 +1,13 @@
 # @adobe-uxp-types/photoshop
 
+## 0.1.7
+
+### Patch Changes
+
+- 7de7d7a: Add adobe protocol
+- Updated dependencies [7de7d7a]
+  - @adobe-uxp-types/uxp@0.1.3
+
 ## 0.1.6
 
 ### Patch Changes

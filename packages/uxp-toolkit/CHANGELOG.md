@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.16
+
+### Patch Changes
+
+- 7de7d7a: Add adobe protocol
+
 ## 0.0.15
 
 ### Patch Changes
