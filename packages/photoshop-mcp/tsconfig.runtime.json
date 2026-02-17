@@ -3,8 +3,7 @@
   "extends": "@bubblydoo/tsconfig/tsconfig.base.json",
   "compilerOptions": {
     "customConditions": ["@bubblydoo/uxp-toolkit-repo-compiled"],
-    "typeRoots": ["./node_modules/@adobe-uxp-types", "./node_modules/@types"],
-    "types": ["uxp", "photoshop", "node"],
+    "types": ["@adobe-uxp-types/uxp/with-protocol", "@adobe-uxp-types/photoshop/with-protocol", "node"],
     "noImplicitAny": false,
     "noEmit": true
   },

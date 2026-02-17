@@ -23,7 +23,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docs-json": "typedoc --json docs.json"
   },
   "peerDependencies": {
     "puppeteer-core": ">=22.0.0"

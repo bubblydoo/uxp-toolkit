@@ -1,5 +1,5 @@
-import type { Document } from 'photoshop';
-import { action, app } from 'photoshop';
+import type { Document } from 'adobe:photoshop';
+import { action, app } from 'adobe:photoshop';
 import { useSyncExternalStore } from 'react';
 
 const OPEN_DOCUMENTS_EVENTS = ['open', 'close'];

@@ -1,6 +1,6 @@
 import type { Test } from '@bubblydoo/uxp-test-framework';
+import { app } from 'adobe:photoshop';
 import { expect } from 'chai';
-import { app } from 'photoshop';
 import { openFileByPath } from '../filesystem/openFileByPath';
 import {
   readDocumentMetadata,

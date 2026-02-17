@@ -27,7 +27,8 @@
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "docs-json": "typedoc --json docs.json"
   },
   "dependencies": {
     "@bubblydoo/uxp-devtools-common": "workspace:*",

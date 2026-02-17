@@ -1,4 +1,4 @@
-import { core } from 'photoshop';
+import { core } from 'adobe:photoshop';
 import { describe, expect, it } from 'vitest';
 
 describe('meta: executeAsModal', () => {

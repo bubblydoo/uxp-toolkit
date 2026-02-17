@@ -1,4 +1,4 @@
-import { action } from 'photoshop';
+import { action } from 'adobe:photoshop';
 
 type P = Parameters<typeof action.batchPlay>;
 export async function batchPlay(actions: P[0], options?: P[1]) {

@@ -58,6 +58,7 @@
   "devDependencies": {
     "@adobe-uxp-types/photoshop": "workspace:*",
     "@adobe-uxp-types/uxp": "workspace:*",
+    "@bubblydoo/esbuild-adobe-protocol-plugin": "workspace:*",
     "@bubblydoo/tsconfig": "workspace:*",
     "@bubblydoo/uxp-test-framework": "workspace:*",
     "@bubblydoo/vitest-pool-cdp": "workspace:*",

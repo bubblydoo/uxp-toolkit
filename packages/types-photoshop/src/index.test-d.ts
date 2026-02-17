@@ -1,12 +1,12 @@
-import { describe, expectTypeOf, test } from 'vitest';
+import { action, app, constants, core, imaging, SaveOptions } from 'adobe:photoshop';
 
-import { action, app, constants, core, imaging, SaveOptions } from './index';
+import { describe, expectTypeOf, test } from 'vitest';
 
 describe('Photoshop module declarations', () => {
   test('type exports exist', () => {
-    type Document = import('./index').Document;
-    type Layer = import('./index').Layer;
-    type ActionDescriptor = import('./index').ActionDescriptor;
+    type Document = import('photoshop').Document;
+    type Layer = import('photoshop').Layer;
+    type ActionDescriptor = import('photoshop').ActionDescriptor;
   });
 });
 

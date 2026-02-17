@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import * as http from 'http';
+import * as http from 'node:http';
 import { WebSocket, WebSocketServer } from 'ws';
 
 const prefix = '[⚡ Uxp Vite Hot Reload]';

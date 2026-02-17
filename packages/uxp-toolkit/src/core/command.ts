@@ -1,4 +1,4 @@
-import type { ActionDescriptor } from 'photoshop';
+import type { ActionDescriptor } from 'adobe:photoshop';
 import type { z } from 'zod';
 import { batchPlay } from './batchPlay';
 

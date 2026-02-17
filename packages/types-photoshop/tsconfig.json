@@ -3,7 +3,7 @@
   "compilerOptions": {
     "moduleDetection": "force",
     "rootDir": ".",
-    "typeRoots": ["./node_modules/@adobe-uxp-types", "./node_modules/@types"]
+    "types": ["@adobe-uxp-types/uxp"]
   },
   "include": ["src"]
 }

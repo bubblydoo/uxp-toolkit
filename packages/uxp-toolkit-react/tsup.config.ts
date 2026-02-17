@@ -1,3 +1,4 @@
+import { stripAdobeProtocolPlugin } from '@bubblydoo/esbuild-adobe-protocol-plugin';
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
@@ -15,4 +16,5 @@ export default defineConfig({
   ],
   clean: true,
   outDir: 'dist',
+  esbuildPlugins: [stripAdobeProtocolPlugin()],
 });

@@ -189,11 +189,16 @@ pnpm add -D @adobe-uxp-types/uxp @adobe-uxp-types/photoshop
 ```json
 {
   "compilerOptions": {
-    "types": ["photoshop", "uxp"],
-    "typeRoots": [
-      "./node_modules/@adobe-uxp-types",
-      "./node_modules/@types"
-    ]
+    "types": ["@adobe-uxp-types/photoshop", "@adobe-uxp-types/uxp"],
+  }
+}
+```
+If you're using the `adobe:` protocol, you will need to configure your bundler to strip the protocol.
+
+```json
+{
+  "compilerOptions": {
+    "types": ["@adobe-uxp-types/photoshop/with-protocol", "@adobe-uxp-types/uxp/with-protocol"],
   }
 }
 ```
@@ -361,4 +366,18 @@ import { createUxpPuppeteerTransport } from '@bubblydoo/uxp-puppeteer-transport'
 
 const transport = await createUxpPuppeteerTransport(cdpUrl, executionContextId);
 const browser = await puppeteer.connect({ transport, defaultViewport: null });
+```
+
+## About this repo
+
+This is a monorepo using pnpm and Turborepo.
+
+In the projects in this repo, we import from `adobe:photoshop` and `adobe:uxp` instead of `photoshop` and `uxp`. I believe this "adobe:" protocol should be natively supported (just like "node:" or "cloudflare:"), because it makes it clear this is not an npm module. In the vite-uxp-plugin and in the tsup configs, we remove this "adobe:" prefix when generating the final code.
+
+We use a shared package for this: [`@bubblydoo/esbuild-adobe-protocol-plugin`](./packages/esbuild-adobe-protocol-plugin).
+
+```js
+import { app } from 'adobe:photoshop';
+// this turns into:
+const { app } = require('photoshop');
 ```

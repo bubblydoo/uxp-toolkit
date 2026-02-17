@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { entrypoints } from 'uxp';
+import { entrypoints } from 'adobe:uxp';
 
 const manifestId = entrypoints._pluginInfo.id;
 

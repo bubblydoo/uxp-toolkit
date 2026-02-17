@@ -1,7 +1,7 @@
 import { photoshopGetApplicationInfo, uxpEntrypointsSchema } from '@bubblydoo/uxp-toolkit';
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 import { useQuery } from '@tanstack/react-query';
-import { entrypoints } from 'uxp';
+import { entrypoints } from 'adobe:uxp';
 
 const applicationQueries = createQueryKeys('application', {
   info: () => ({

@@ -26,7 +26,8 @@
   ],
   "scripts": {
     "build": "rm -rf dist-vite && pnpm exec rollup -c && cp cli.d.ts dist-vite/cli.d.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docs-json": "typedoc --json docs.json"
   },
   "peerDependencies": {
     "@bubblydoo/uxp-toolkit": "workspace:*"

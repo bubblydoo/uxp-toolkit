@@ -6,8 +6,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "typeRoots": ["./node_modules/@adobe-uxp-types", "./node_modules/@types"],
-    "types": ["photoshop", "uxp", "node", "react", "react-dom"],
+    "types": ["@adobe-uxp-types/photoshop/with-protocol", "@adobe-uxp-types/uxp/with-protocol", "node", "react", "react-dom"],
     "allowJs": true,
     "noUncheckedIndexedAccess": true,
     "verbatimModuleSyntax": true

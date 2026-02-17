@@ -1,5 +1,4 @@
-// eslint-disable-next-line unicorn/prefer-node-protocol
-import { resolve as nativeResolve } from 'path';
+import { resolve as nativeResolve } from 'adobe:path';
 
 /**
  * for some reason native path.resolve in UXP returns a URL object

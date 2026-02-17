@@ -6,6 +6,7 @@
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { stripAdobeProtocolPlugin } from '@bubblydoo/esbuild-adobe-protocol-plugin';
 import * as esbuild from 'esbuild';
 
 const __dirname = new URL('.', import.meta.url).pathname;
@@ -23,7 +24,6 @@ export async function wrapCodeWithRuntime(userCode: string): Promise<{
   success: false;
   error: string;
 }> {
-  console.log('wrapping this code:', userCode);
   try {
     const runtimeCode = await fs.readFile(path.join(__dirname, '../dist-runtime/runtime-code.cjs'), 'utf8');
     const result = await esbuild.build({
@@ -31,13 +31,14 @@ export async function wrapCodeWithRuntime(userCode: string): Promise<{
       bundle: true,
       format: 'cjs',
       target: 'es2020',
-      external: ['uxp', 'photoshop', 'path', 'fs', 'process', 'os', 'shell'],
+      external: ['uxp', 'photoshop', 'path', 'fs', 'process', 'os'],
       define: {
         __dirname: JSON.stringify('/photoshop-mcp'),
         __filename: JSON.stringify('/photoshop-mcp/index.js'),
       },
       write: false,
       plugins: [
+        stripAdobeProtocolPlugin(),
         {
           name: 'inline-code',
           setup(build) {

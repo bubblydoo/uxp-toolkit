@@ -18,8 +18,6 @@ export default antfu(
       'no-console': 'warn',
       'ts/explicit-function-return-type': 'off',
       'node/prefer-global/process': 'off',
-      'node/prefer-node-protocol': 'off',
-      'unicorn/prefer-node-protocol': 'off',
       'unused-imports/no-unused-vars': [
         'warn',
         {
@@ -33,10 +31,19 @@ export default antfu(
   },
   {
     files: [
-      '**/*.{ts,tsx}',
+      '**/*.{ts,tsx,css,html}',
+    ],
+    ignores: [
+      'packages/types-photoshop/**/*.d.ts',
+      'packages/types-uxp/**/*.d.ts',
     ],
     plugins: {
       uxp: uxpPlugin,
+    },
+    rules: {
+      'uxp/no-unsupported-css': 'error',
+      'uxp/no-unsupported-css-tailwind': 'error',
+      'uxp/prefer-adobe-protocol': 'error',
     },
   },
   {

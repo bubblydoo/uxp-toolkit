@@ -30,10 +30,12 @@
     "dist-schemas"
   ],
   "scripts": {
-    "build": "tsup && tsup --config tsup-runtime.config.ts && tsx collect-schemas.ts && tsx collect-readmes.ts",
-    "dev": "tsx watch src/index.ts"
+    "build": "tsup && tsx collect-schemas.ts && tsx collect-readmes.ts",
+    "dev": "tsx watch src/index.ts",
+    "docs-json": "typedoc --json docs.json"
   },
   "dependencies": {
+    "@bubblydoo/esbuild-adobe-protocol-plugin": "workspace:*",
     "@bubblydoo/uxp-devtools-common": "workspace:*",
     "@hono/mcp": "^0.2.3",
     "@hono/node-server": "^1.19.9",
