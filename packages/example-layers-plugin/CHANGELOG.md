@@ -1,5 +1,14 @@
 # @bubblydoo/example-layers-plugin
 
+## 0.0.17
+
+### Patch Changes
+
+- 7de7d7a: Add adobe protocol
+- Updated dependencies [7de7d7a]
+  - @bubblydoo/uxp-toolkit-react@0.0.16
+  - @bubblydoo/uxp-toolkit@0.0.16
+
 ## 0.0.16
 
 ### Patch Changes

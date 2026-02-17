@@ -1,7 +1,7 @@
 {
   "name": "@bubblydoo/example-layers-plugin",
   "type": "module",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "private": true,
   "scripts": {
     "dev": "vite build --watch --mode development",

@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-devtools-common
 
+## 0.0.8
+
+### Patch Changes
+
+- 7de7d7a: Add adobe protocol
+
 ## 0.0.7
 
 ### Patch Changes
