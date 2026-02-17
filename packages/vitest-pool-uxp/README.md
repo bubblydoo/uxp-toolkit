@@ -1,5 +1,7 @@
 # @bubblydoo/vitest-pool-uxp
 
+![NPM Version](https://img.shields.io/npm/v/@bubblydoo/vitest-pool-uxp)
+
 Vitest pool for running tests inside Adobe UXP environments (Photoshop, etc.).
 
 ## Overview

@@ -1,5 +1,7 @@
 # @bubblydoo/photoshop-mcp
 
+![NPM Version](https://img.shields.io/npm/v/@bubblydoo/photoshop-mcp)
+
 MCP (Model Context Protocol) server for Photoshop automation via Chrome DevTools Protocol.
 
 This allows AI assistants to execute JavaScript code directly in Adobe Photoshop's UXP environment.

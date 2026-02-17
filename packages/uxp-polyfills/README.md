@@ -1,5 +1,7 @@
 # UXP Polyfills
 
+![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-polyfills)
+
 This package contains polyfills that are convenient and sometimes needed for building UXP extensions.
 
 - 'matchmedia-polyfill' is a polyfill for the `matchMedia` API, which is not available in the UXP API but needed for React.

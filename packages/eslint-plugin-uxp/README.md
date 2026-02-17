@@ -1,5 +1,7 @@
 # @bubblydoo/eslint-plugin-uxp
 
+![NPM Version](https://img.shields.io/npm/v/@bubblydoo/eslint-plugin-uxp)
+
 Custom ESLint plugin for UXP development with Photoshop.
 
 ## Installation

@@ -1,5 +1,7 @@
 # @bubblydoo/uxp-toolkit-react
 
+![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-toolkit-react)
+
 React hooks for Photoshop UXP plugins. Generic, non–app-specific utilities built on `@bubblydoo/uxp-toolkit`.
 
 ## Peer dependencies
@@ -7,7 +9,7 @@ React hooks for Photoshop UXP plugins. Generic, non–app-specific utilities bui
 - `react` (^18 or ^19)
 - `@tanstack/react-query` (^5)
 - `@bubblydoo/uxp-toolkit` (workspace)
-- `zod` (^3 or ^4)
+- `zod` (^4)
 
 ## Exports
 

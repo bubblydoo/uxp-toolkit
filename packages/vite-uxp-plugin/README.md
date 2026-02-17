@@ -1,5 +1,7 @@
 # @bubblydoo/vite-uxp-plugin
 
+![NPM Version](https://img.shields.io/npm/v/@bubblydoo/vite-uxp-plugin)
+
 Vite plugin for Adobe UXP Photoshop projects.
 
 ## What it does
@@ -16,7 +18,12 @@ Vite plugin for Adobe UXP Photoshop projects.
 
 ## Important runtime model
 
-`vite serve` is intentionally not supported for UXP projects.
+`vite serve` or `vite dev` and HMR are not supported for UXP projects.
+
+There are a couple of reasons:
+- We need to output the files to a folder, not serve them over HTTP
+- UXP projects do not support ES modules (`<script type="module">` does not work), and Vite HMR relies on ES modules.
+- `@vite/plugin-legacy` could work, but it does not support dev mode.
 
 Use:
 

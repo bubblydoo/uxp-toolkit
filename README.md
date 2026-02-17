@@ -32,6 +32,10 @@ There are a lot of issues with the API:
 
 ## What we did
 
+| Package | Version |
+| --- | --- |
+| [@bubblydoo/uxp-toolkit](./packages/uxp-toolkit) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-toolkit) |
+
 We made functions for building typesafe UXP projects. Instead of just running `batchPlay`, and trusting what the output is, we verify what the output is.
 
 ### Core Functions
@@ -172,6 +176,11 @@ Icons:
 
 We publish our own types for the `uxp` and `photoshop` modules, which are based on other community efforts but adapted to be more accurate:
 
+| Package | Version |
+| --- | --- |
+| [@adobe-uxp-types/uxp](./packages/types-uxp) | ![NPM Version](https://img.shields.io/npm/v/@adobe-uxp-types/uxp) |
+| [@adobe-uxp-types/photoshop](./packages/types-photoshop) | ![NPM Version](https://img.shields.io/npm/v/@adobe-uxp-types/photoshop) |
+
 ```bash
 pnpm add -D @adobe-uxp-types/uxp @adobe-uxp-types/photoshop
 ```
@@ -221,103 +230,50 @@ try {
 }
 ```
 
-### Testing
+### Vite UXP plugin
 
-#### Vitest Integration
+| Package | Version |
+| --- | --- |
+| [@bubblydoo/vite-uxp-plugin](./packages/vite-uxp-plugin) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/vite-uxp-plugin) |
+
+`@bubblydoo/vite-uxp-plugin` adapts Vite for UXP constraints:
+- UXP-compatible output (manifest emission + CommonJS bundle behavior)
+- `@bubblydoo/vite-uxp-plugin/runtime` for hot-reload wiring in development mode
+- automatic dev websocket permission wiring in the generated `manifest.json`
+
+Unlike regular web Vite workflows, you should use `vite build --watch --mode development` (not `vite dev`) for UXP projects.
+
+### Testing a custom Vitest pool
+
+<!-- [@bubblydoo/vitest-pool-uxp](./packages/vitest-pool-uxp) and [@bubblydoo/vitest-pool-cdp](./packages/vitest-pool-cdp) -->
+
+| Package | Version |
+| --- | --- |
+| [@bubblydoo/vitest-pool-uxp](./packages/vitest-pool-uxp) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/vitest-pool-uxp) |
+| [@bubblydoo/vitest-pool-cdp](./packages/vitest-pool-cdp) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/vitest-pool-cdp) |
 
 We now support Vitest for unit testing TypeScript code without Photoshop:
 
-```bash
-pnpm test
-```
-
-The test suite includes:
-- Unit tests (`.test.ts`) for pure TypeScript functions
-- Type tests (`.test-d.ts`) for compile-time type checking
-- Photoshop builtin module aliases for testing code that imports `photoshop` or `uxp` modules
-
-Tests run in CI via GitHub Actions with JUnit reporting.
-
-#### UXP Testing Framework and Plugin
-
-```bash
-pnpm add @bubblydoo/uxp-test-framework
-```
-
-For integration tests that require Photoshop, we have developed a plugin specifically for testing UXP plugins. It allows you to run tests inside of Photoshop, and see the results in a panel.
-
-<img src="res/screenshot-test-plugin.png" alt="Screenshot of the test plugin" width="400" />
-
-You can run tests using the `create-uxp-test-plugin` command.
-
-`uxp-tests.json`:
-```json
-{
-  "$schema": "./node_modules/@bubblydoo/uxp-test-framework/uxp-tests-json-schema.json",
-  "testsFile": "test/index.ts",
-  "testFixturesDir": "test/fixtures",
-  "plugin": {
-    "id": "co.bubblydoo.uxp-toolkit-test-plugin",
-    "name": "UXP Toolkit Tests"
-  }
-}
-```
-
-`test/index.ts`:
+`vitest.config.ts`:
 ```ts
-import type { Test } from "@bubblydoo/uxp-test-framework";
-import { expect } from "chai";
-import { app } from "photoshop";
+import { defineConfig } from 'vitest/config';
+import { uxpPool } from '@bubblydoo/vitest-pool-uxp';
 
-const renameLayerTest: Test = {
-  name: "Should rename layer",
-  async run() {
-    const doc = await openFileByPath("plugin:/fixtures/one-layer.psd");
-    const descriptors = await getDocumentLayerDescriptors(doc.id);
-    const firstLayer = descriptors[0];
-
-    expect(firstLayer.name).to.equal("Layer 1");
-
-    await executeAsModal("Rename Layer", async (ctx) => {
-      await ctx.batchPlayCommand(
-        createRenameLayerCommand({ id: firstLayer.layerID, docId: firstLayer.docId }, "New Name")
-      );
-    });
-
-    const updatedDescriptors = await getDocumentLayerDescriptors(doc.id);
-    expect(updatedDescriptors[0].name).to.equal("New Name");
+export default defineConfig({
+  test: {
+    pool: uxpPool(),
+    isolate: false,
+    fileParallelism: false,
+    maxWorkers: 1,
   },
-};
-
-export const tests: Test[] = [
-  renameLayerTest,
-];
+});
 ```
-
-```json
-{
-  "name": "your-plugin",
-  "scripts": {
-    "uxp-test:build": "uxp-test build",
-    "uxp-test:dev": "uxp-test dev"
-  }
-}
-```
-
-Then you can run:
-```bash
-pnpm uxp-test:dev
-```
-
-And you will get a plugin in the `uxp-tests-plugin` directory, which you can load using UXP Developer Tools, and then you can run the tests inside of Photoshop.
-
-In the future, we'd like to get Vitest to work natively with a UXP runner or pool, but for now, this is a good compromise.
-
-The plugin also sourcemaps the errors, so you can find the error much more easily:
-
-<img src="res/screenshot-test-plugin-error.png" alt="Screenshot of the test plugin with an error" width="800" />
 
 ### React integration
+
+| Package | Version |
+| --- | --- |
+| [@bubblydoo/uxp-toolkit-react](./packages/uxp-toolkit-react) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-toolkit-react) |
 
 ```bash
 pnpm add @bubblydoo/uxp-toolkit-react
@@ -348,6 +304,10 @@ This package provides the following hooks:
 
 ### CLI
 
+| Package | Version |
+| --- | --- |
+| [@bubblydoo/uxp-cli](./packages/uxp-cli) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-cli) |
+
 We fixed the [official devtools package](https://github.com/adobe-uxp/devtools-cli), which had a lot of issues. You can find the fixed repo [here](https://github.com/bubblydoo/adobe-fixed-uxp-devtools).
 
 Based on this, we created our own CLI. You can run this without installing anything, just `pnpm`.
@@ -376,8 +336,29 @@ If you're using approved builds in pnpm, make sure to add `@adobe-fixed-uxp/uxp-
 
 ### Photoshop MCP
 
+| Package | Version |
+| --- | --- |
+| [@bubblydoo/photoshop-mcp](./packages/photoshop-mcp) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/photoshop-mcp) |
+
 We have a MCP server for Photoshop automation via Chrome DevTools Protocol. It allows AI assistants to execute JavaScript code directly in Adobe Photoshop's UXP environment, but it also has access to UXP Toolkit and its commands, to the TypeScript schemas and these readmes.
 
 ```bash
 pnpm --allow-build=@adobe-fixed-uxp/uxp-devtools-helper dlx @bubblydoo/photoshop-mcp
+```
+
+### UXP Puppeteer Transport
+
+| Package | Version |
+| --- | --- |
+| [@bubblydoo/uxp-puppeteer-transport](./packages/uxp-puppeteer-transport) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-puppeteer-transport) |
+
+This package bridges Puppeteer's browser-level CDP expectations to Photoshop's page-level UXP CDP endpoint.
+It is useful when you want to reuse Puppeteer-style automation against a UXP runtime.
+
+```ts
+import puppeteer from 'puppeteer-core';
+import { createUxpPuppeteerTransport } from '@bubblydoo/uxp-puppeteer-transport';
+
+const transport = await createUxpPuppeteerTransport(cdpUrl, executionContextId);
+const browser = await puppeteer.connect({ transport, defaultViewport: null });
 ```
