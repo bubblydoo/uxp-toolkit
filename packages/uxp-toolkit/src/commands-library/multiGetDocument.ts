@@ -142,7 +142,7 @@ export const adjustmentSchema = z.discriminatedUnion('_obj', [
       hue: z.number(),
       saturation: z.number(),
       lightness: z.number(),
-    })),
+    })).optional(),
     adjustment: z.array(z.object({
       _obj: z.literal('hueSatAdjustmentV2'),
       hue: z.number(),
