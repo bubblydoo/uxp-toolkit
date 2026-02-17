@@ -4,6 +4,12 @@
 
 ### Patch Changes
 
+- 1003479: Limit dist files
+
+## 0.0.16
+
+### Patch Changes
+
 - 7de7d7a: Add adobe protocol
 
 ## 0.0.15
