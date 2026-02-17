@@ -23,7 +23,9 @@ export default [
       uxp: uxpPlugin,
     },
     rules: {
-      'uxp/no-constants-import': 'error',
+      'uxp/no-unsupported-css': 'error',
+      'uxp/no-unsupported-css-tailwind': 'error',
+      'uxp/prefer-adobe-protocol': 'error',
     },
   },
   // Or use the recommended config
@@ -37,39 +39,69 @@ export default [
 {
   "plugins": ["@bubblydoo/uxp"],
   "rules": {
-    "@bubblydoo/uxp/no-constants-import": "error"
+    "@bubblydoo/uxp/no-unsupported-css": "error",
+    "@bubblydoo/uxp/no-unsupported-css-tailwind": "error",
+    "@bubblydoo/uxp/prefer-adobe-protocol": "error"
   }
 }
 ```
 
 ## Rules
 
-### `no-constants-import`
+### `prefer-adobe-protocol`
 
-Disallows importing from `"photoshop/dom/Constants"`.
+Requires `adobe:` protocol for Adobe UXP native module specifiers.
 
 **❌ Incorrect:**
 
 ```js
-import { BlendMode } from 'photoshop/dom/Constants';
+import { app } from 'uxp';
 ```
 
 ```js
-const { BlendMode } = require('photoshop/dom/Constants');
+const { app } = require('photoshop');
 ```
 
 **✅ Correct:**
 
 ```js
-import { constants } from 'photoshop';
-
-const { BlendMode } = constants;
+import { app } from 'adobe:uxp';
 ```
 
 ```js
-const { constants } = require('photoshop');
+const { app } = require('adobe:photoshop');
+```
 
-const { BlendMode } = constants;
+### `no-unsupported-css`
+
+Disallows CSS `gap` usage, because it is unsupported in UXP.
+
+**❌ Incorrect:**
+
+```js
+const style = { gap: 8 };
+```
+
+```js
+const css = `
+  .row {
+    gap: 1rem;
+  }
+`;
+```
+
+### `no-unsupported-css-tailwind`
+
+Disallows Tailwind `gap-*` utilities, because they map to CSS `gap`.
+
+**❌ Incorrect:**
+
+```jsx
+<div className="flex gap-2" />
+```
+
+```jsx
+<div className={`grid gap-x-4`} />
 ```
 
 ## License

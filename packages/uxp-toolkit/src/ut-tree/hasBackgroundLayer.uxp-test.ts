@@ -1,4 +1,4 @@
-import { app } from 'photoshop';
+import { app } from 'adobe:photoshop';
 import { describe, expect, it } from 'vitest';
 import { openFixture } from '../../test/open-fixture';
 import { createGetDocumentHasBackgroundLayerCommand } from '../commands-library/getDocument';

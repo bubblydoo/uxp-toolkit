@@ -1,13 +1,14 @@
 import type { Plugin, UserConfig } from 'vite';
 import type { HotReloadServer } from './hot-reload-server';
 import type { UxpManifest } from './manifest-type';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { createHotReloadServer } from './hot-reload-server';
 
 export type { UxpManifest } from './manifest-type';
 
 const __dirname = new URL('.', import.meta.url).pathname;
+const ADOBE_PROTOCOL = 'adobe:';
 
 export interface UxpViteConfig {
   hotReloadPort?: number;
@@ -20,7 +21,6 @@ export const PHOTOSHOP_NATIVE_MODULES = [
   'os',
   'path',
   'process',
-  'shell',
 ] as const;
 
 export type PhotoshopNativeModule = typeof PHOTOSHOP_NATIVE_MODULES[number];
@@ -117,12 +117,15 @@ export function uxp(manifest: UxpManifest, config?: UxpViteConfig): Plugin {
       if (id === '@bubblydoo/vite-uxp-plugin/runtime') {
         return VIRTUAL_RUNTIME_ID;
       }
+      if (id.startsWith(ADOBE_PROTOCOL)) {
+        return { id: id.replace(ADOBE_PROTOCOL, ''), external: true };
+      }
       return null;
     },
     async load(id) {
       if (id === VIRTUAL_RUNTIME_ID) {
         if (configState!.isDevMode) {
-          const runtimeCode = await fs.promises.readFile(path.join(__dirname, '../dist/runtime.cjs'), 'utf8');
+          const runtimeCode = await fs.promises.readFile(path.join(__dirname, '../dist-runtime/runtime.cjs'), 'utf8');
           return `var UXP_HOT_RELOAD_PORT = ${hotReloadPort}; ${runtimeCode}`;
         }
         return `module.exports = {}; // UXP Vite Plugin Runtime is empty in production`;

@@ -6,6 +6,13 @@ const nativeModules = [
   'uxp',
 ];
 
+const nativeUxpNodeModules = [
+  'fs',
+  'os',
+  'path',
+  'process',
+];
+
 const pluginPrefix = 'photoshop-builtin';
 
 const minimalModules = {
@@ -24,13 +31,17 @@ export function vitestPhotoshopAliasPlugin(): Plugin {
   return {
     name: 'vitest-photoshop-alias',
     resolveId(id) {
-      if (nativeModules.includes(id)) {
-        return `${id}?${pluginPrefix}`;
+      const strippedId = id.replace('adobe:', '');
+      if (nativeModules.includes(strippedId)) {
+        return `${strippedId}?${pluginPrefix}`;
+      }
+      if (nativeUxpNodeModules.includes(strippedId)) {
+        return `node:${strippedId}`;
       }
     },
     load(id) {
       if (id.endsWith(`?${pluginPrefix}`)) {
-        const origModuleId = id.replace(`?${pluginPrefix}`, '');
+        const origModuleId = id.replace(`?${pluginPrefix}`, '') as keyof typeof minimalModules;
         const mod = dedent`
         // This is a photoshop builtin module, not available in Vitest. This is an alias to provide minimal compatibility.
         const UNIMPLEMENTED = { __vitest_photoshop_alias_unimplemented__: true };

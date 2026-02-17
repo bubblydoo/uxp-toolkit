@@ -1,5 +1,5 @@
 import type { PsLayerRef, Tree, UTLayer, UTLayerWithoutChildren } from '@bubblydoo/uxp-toolkit';
-import type { Document } from 'photoshop';
+import type { Document } from 'adobe:photoshop';
 import {
   createCommand,
   executeAsModal,

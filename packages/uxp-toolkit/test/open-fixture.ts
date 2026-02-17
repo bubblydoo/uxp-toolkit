@@ -1,6 +1,6 @@
-import type { Document } from '@adobe-uxp-types/photoshop';
+import type { Document } from 'adobe:photoshop';
 import type { TestContext } from 'vitest';
-import { app, constants } from 'photoshop';
+import { app, constants } from 'adobe:photoshop';
 import { executeAsModal } from '../src/core/executeAsModal';
 import { openFileByPath } from '../src/filesystem/openFileByPath';
 import { resolveFixturePath } from './resolve-fixture';

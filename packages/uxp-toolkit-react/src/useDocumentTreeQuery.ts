@@ -1,5 +1,5 @@
 import type { UTCommandResult, UTLayer } from '@bubblydoo/uxp-toolkit';
-import type { Document } from 'photoshop';
+import type { Document } from 'adobe:photoshop';
 import { batchPlayCommand, getDocumentLayerDescriptors, photoshopLayerDescriptorsToUTLayers } from '@bubblydoo/uxp-toolkit';
 import { useOnDocumentEdited, useOnDocumentLayersEdited } from '@bubblydoo/uxp-toolkit-react';
 import { createGetDocumentCommand } from '@bubblydoo/uxp-toolkit/commands';

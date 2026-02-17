@@ -2,10 +2,7 @@
 import type { UTCommandResult } from './command';
 import { describe, expectTypeOf, test } from 'vitest';
 import { z } from 'zod';
-import {
-  createCommand,
-
-} from './command';
+import { createCommand } from './command';
 
 describe('UTCommandResult type tests', () => {
   test('extracts result type from non-modifying command', () => {

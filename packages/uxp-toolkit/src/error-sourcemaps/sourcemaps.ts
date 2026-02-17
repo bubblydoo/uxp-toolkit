@@ -1,8 +1,8 @@
 /* eslint-disable vars-on-top */
-import type { File } from 'uxp';
+import type { File } from 'adobe:uxp';
 import { originalPositionFor, TraceMap } from '@jridgewell/trace-mapping';
+import { storage } from 'adobe:uxp';
 import ErrorStackParser from 'error-stack-parser';
-import { storage } from 'uxp';
 import { UTError } from '../errors/ut-error';
 import { pathResolve } from '../node-compat/path/resolvePath';
 

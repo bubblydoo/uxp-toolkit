@@ -6,7 +6,7 @@
   "author": "Hans Otto Wirtz <hansottowirtz@gmail.com>",
   "scripts": {
     "build": "turbo run build",
-    "test": "turbo run test",
+    "test": "CI=true turbo run test",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "turbo run typecheck",

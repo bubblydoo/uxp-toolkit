@@ -2,7 +2,7 @@ import { describe, expectTypeOf, test } from 'vitest';
 
 describe('UXP module types', () => {
   test('basic UXP types exist', () => {
-    type UxpCommandEvent = import('./index').UxpCommandEvent;
+    type UxpCommandEvent = import('uxp').UxpCommandEvent;
 
     // Check that the type is not any
     expectTypeOf<UxpCommandEvent>().not.toBeAny();
@@ -10,33 +10,33 @@ describe('UXP module types', () => {
   });
 
   test('dialog namespace types', () => {
-    const dialog = {} as typeof import('./index').dialog;
+    const dialog = {} as typeof import('uxp').dialog;
 
     expectTypeOf(dialog.showOpenDialog).toBeFunction();
     expectTypeOf(dialog.showSaveDialog).toBeFunction();
   });
 
   test('entrypoints namespace types', () => {
-    const entrypoints = {} as typeof import('./index').entrypoints;
+    const entrypoints = {} as typeof import('uxp').entrypoints;
 
     expectTypeOf(entrypoints.setup).toBeFunction();
   });
 
   test('shell namespace types', () => {
-    const shell = {} as typeof import('./index').shell;
+    const shell = {} as typeof import('uxp').shell;
 
     expectTypeOf(shell.openExternal).toBeFunction();
     expectTypeOf(shell.openPath).toBeFunction();
   });
 
   test('storage namespace types', () => {
-    const storage = {} as typeof import('./index').storage;
+    const storage = {} as typeof import('uxp').storage;
 
     expectTypeOf(storage.localFileSystem).toBeObject();
   });
 
   test('os namespace types', () => {
-    const os = {} as typeof import('./index').os;
+    const os = {} as typeof import('uxp').os;
 
     expectTypeOf(os.platform).toBeFunction();
     expectTypeOf(os.release).toBeFunction();

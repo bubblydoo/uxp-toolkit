@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { stripAdobeProtocolPlugin } from '@bubblydoo/esbuild-adobe-protocol-plugin';
 import { createBirpc } from 'birpc';
 import * as devalue from 'devalue';
 import * as esbuild from 'esbuild';
@@ -838,6 +839,7 @@ export class CdpPoolWorker implements PoolWorker {
         ...(this.rawCdpOptions.esbuildOptions?.external || []),
       ],
       plugins: [
+        stripAdobeProtocolPlugin(),
         {
           name: 'vitest-api',
           setup(build) {

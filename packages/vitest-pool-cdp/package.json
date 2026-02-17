@@ -28,6 +28,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
+    "docs-json": "typedoc --json docs.json",
     "test:chrome": "node --import tsx ./node_modules/vitest/vitest.mjs --config test/vitest-chrome.config.ts",
     "test": "puppeteer browsers install chrome && pnpm test:chrome"
   },
@@ -35,6 +36,7 @@
     "vitest": ">=4"
   },
   "dependencies": {
+    "@bubblydoo/esbuild-adobe-protocol-plugin": "workspace:*",
     "@bubblydoo/uxp-devtools-common": "workspace:*",
     "@jridgewell/trace-mapping": "^0.3.31",
     "@vitest/expect": "^4.0.18",
@@ -45,7 +47,7 @@
     "chai": "^6.2.2",
     "chrome-remote-interface": "^0.33.3",
     "devalue": "^5.1.1",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.25.11",
     "flatted": "^3.3.3",
     "signal-exit": "^4.1.0",
     "zod": "^4.3.6"

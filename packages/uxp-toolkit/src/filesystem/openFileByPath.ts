@@ -1,5 +1,5 @@
-import { app } from 'photoshop';
-import { storage } from 'uxp';
+import { app } from 'adobe:photoshop';
+import { storage } from 'adobe:uxp';
 import { executeAsModal } from '../core/executeAsModal';
 import { isFile } from './isFileOrFolder';
 

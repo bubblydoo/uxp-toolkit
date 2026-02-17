@@ -11,6 +11,7 @@ Vite plugin for Adobe UXP Photoshop projects.
 - externalizes UXP/Photoshop native modules (`photoshop`, `uxp`, `fs`, `os`, `path`, `process`, `shell`)
 - outputs CommonJS bundle format (required by UXP)
 - rewrites `<script type="module"...>` to `<script...>` in `index.html`
+- strips `adobe:` protocol from module specifiers in final JS output, so you can use `adobe:photoshop` instead of `photoshop` in your source code (similar to how `node:` protocol works)
 - provides `@bubblydoo/vite-uxp-plugin/runtime` virtual runtime:
   - in development mode (`--mode development`), enables websocket hot reload
   - in production mode, resolves to an empty runtime module
@@ -60,6 +61,13 @@ Plugin entry file (for hot reload runtime):
 
 ```ts
 import '@bubblydoo/vite-uxp-plugin/runtime';
+```
+
+Native module imports can use either form in source code:
+
+```ts
+import { app } from 'photoshop'; // => const { app } = require('photoshop');
+import { app as app2 } from 'adobe:photoshop'; // => const { app: app2 } = require('photoshop');
 ```
 
 ## API

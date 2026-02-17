@@ -13,6 +13,9 @@
     ".": {
       "types": "./src/index.d.ts"
     },
+    "./with-protocol": {
+      "types": "./src/with-protocol.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {

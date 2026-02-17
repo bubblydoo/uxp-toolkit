@@ -1,5 +1,5 @@
-import type { ExecuteAsModalOptions, ExecutionContext } from 'photoshop';
-import { core } from 'photoshop';
+import type { ExecuteAsModalOptions, ExecutionContext } from 'adobe:photoshop';
+import { core } from 'adobe:photoshop';
 import { createModifyingBatchPlayContext } from './command';
 
 export type ExtendedExecutionContext = Omit<ExecutionContext, 'onCancel'> & ReturnType<typeof createModifyingBatchPlayContext> & {

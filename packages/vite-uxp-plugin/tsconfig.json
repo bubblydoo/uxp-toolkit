@@ -2,11 +2,11 @@
   "extends": "@bubblydoo/tsconfig/tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "typeRoots": [
-      "./node_modules/@adobe-uxp-types",
-      "./node_modules/@types"
+    "types": [
+      "@adobe-uxp-types/photoshop/with-protocol",
+      "@adobe-uxp-types/uxp/with-protocol",
+      "node"
     ],
-    "types": ["uxp", "photoshop", "node"],
     "outDir": "dist"
   },
   "include": ["src"]

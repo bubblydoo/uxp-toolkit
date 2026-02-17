@@ -1,4 +1,4 @@
-import type { Document } from 'photoshop';
+import type { Document } from 'adobe:photoshop';
 
 // The Adobe provided type is wrong
 export interface SuspendHistoryContext {}
