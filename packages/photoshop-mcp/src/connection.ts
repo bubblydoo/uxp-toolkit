@@ -48,6 +48,7 @@ export async function getOrReuseUxpConnection(): Promise<UxpConnection> {
   const connection: UxpConnection = {
     cdp: connectionOrig.cdp,
     executionContext: connectionOrig.executionContext,
+    devtoolsConnection: connectionOrig.devtoolsConnection,
     disconnect: async () => {
       await connectionOrig.disconnect();
       currentConnection = null;

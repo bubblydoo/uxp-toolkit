@@ -1,4 +1,5 @@
 import type CDP from 'chrome-remote-interface';
+import type { DevtoolsConnection } from './setup-devtools-url';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setupCdpSession, waitForExecutionContextCreated } from './cdp-session';
@@ -18,6 +19,7 @@ interface ExecutionContextDescription {
 export interface UxpConnection {
   cdp: CDP.Client;
   executionContext: ExecutionContextDescription;
+  devtoolsConnection: DevtoolsConnection;
   disconnect: () => Promise<void>;
 }
 
@@ -49,6 +51,7 @@ export async function createUxpConnection(pluginPath: string): Promise<UxpConnec
   const connection: UxpConnection = {
     cdp,
     executionContext,
+    devtoolsConnection,
     disconnect: async () => {
       try {
         await cdp.close();
