@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-devtools-common
 
+## 0.0.9
+
+### Patch Changes
+
+- f034514: Add devtoolsConnection to uxp connection
+
 ## 0.0.8
 
 ### Patch Changes

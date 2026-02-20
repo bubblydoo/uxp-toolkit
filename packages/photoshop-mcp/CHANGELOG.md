@@ -1,5 +1,13 @@
 # @bubblydoo/photoshop-mcp
 
+## 0.0.9
+
+### Patch Changes
+
+- f034514: Add devtoolsConnection to uxp connection
+- Updated dependencies [f034514]
+  - @bubblydoo/uxp-devtools-common@0.0.9
+
 ## 0.0.8
 
 ### Patch Changes
