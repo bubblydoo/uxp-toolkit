@@ -1,5 +1,12 @@
 # @bubblydoo/example-puppeteer-integration
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [f034514]
+  - @bubblydoo/uxp-devtools-common@0.0.9
+
 ## 0.0.4
 
 ### Patch Changes
