@@ -1,4 +1,4 @@
-![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-toolkit)
+[![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-toolkit)](https://www.npmjs.com/package/@bubblydoo/uxp-toolkit)
 
 # UXP Toolkit
 
@@ -34,7 +34,7 @@ There are a lot of issues with the API:
 
 | Package | Version |
 | --- | --- |
-| [@bubblydoo/uxp-toolkit](./packages/uxp-toolkit) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-toolkit) |
+| [@bubblydoo/uxp-toolkit](./packages/uxp-toolkit) | [![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-toolkit)](https://www.npmjs.com/package/@bubblydoo/uxp-toolkit) |
 
 We made functions for building typesafe UXP projects. Instead of just running `batchPlay`, and trusting what the output is, we verify what the output is.
 
@@ -178,8 +178,8 @@ We publish our own types for the `uxp` and `photoshop` modules, which are based 
 
 | Package | Version |
 | --- | --- |
-| [@adobe-uxp-types/uxp](./packages/types-uxp) | ![NPM Version](https://img.shields.io/npm/v/@adobe-uxp-types/uxp) |
-| [@adobe-uxp-types/photoshop](./packages/types-photoshop) | ![NPM Version](https://img.shields.io/npm/v/@adobe-uxp-types/photoshop) |
+| [@adobe-uxp-types/uxp](./packages/types-uxp) | [![NPM Version](https://img.shields.io/npm/v/@adobe-uxp-types/uxp)](https://www.npmjs.com/package/@adobe-uxp-types/uxp) |
+| [@adobe-uxp-types/photoshop](./packages/types-photoshop) | [![NPM Version](https://img.shields.io/npm/v/@adobe-uxp-types/photoshop)](https://www.npmjs.com/package/@adobe-uxp-types/photoshop) |
 
 ```bash
 pnpm add -D @adobe-uxp-types/uxp @adobe-uxp-types/photoshop
@@ -239,7 +239,7 @@ try {
 
 | Package | Version |
 | --- | --- |
-| [@bubblydoo/vite-uxp-plugin](./packages/vite-uxp-plugin) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/vite-uxp-plugin) |
+| [@bubblydoo/vite-uxp-plugin](./packages/vite-uxp-plugin) | [![NPM Version](https://img.shields.io/npm/v/@bubblydoo/vite-uxp-plugin)](https://www.npmjs.com/package/@bubblydoo/vite-uxp-plugin) |
 
 `@bubblydoo/vite-uxp-plugin` adapts Vite for UXP constraints:
 - UXP-compatible output (manifest emission + CommonJS bundle behavior)
@@ -254,8 +254,8 @@ Unlike regular web Vite workflows, you should use `vite build --watch --mode dev
 
 | Package | Version |
 | --- | --- |
-| [@bubblydoo/vitest-pool-uxp](./packages/vitest-pool-uxp) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/vitest-pool-uxp) |
-| [@bubblydoo/vitest-pool-cdp](./packages/vitest-pool-cdp) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/vitest-pool-cdp) |
+| [@bubblydoo/vitest-pool-uxp](./packages/vitest-pool-uxp) | [![NPM Version](https://img.shields.io/npm/v/@bubblydoo/vitest-pool-uxp)](https://www.npmjs.com/package/@bubblydoo/vitest-pool-uxp) |
+| [@bubblydoo/vitest-pool-cdp](./packages/vitest-pool-cdp) | [![NPM Version](https://img.shields.io/npm/v/@bubblydoo/vitest-pool-cdp)](https://www.npmjs.com/package/@bubblydoo/vitest-pool-cdp) |
 
 We now support Vitest for unit testing TypeScript code without Photoshop:
 
@@ -278,7 +278,7 @@ export default defineConfig({
 
 | Package | Version |
 | --- | --- |
-| [@bubblydoo/uxp-toolkit-react](./packages/uxp-toolkit-react) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-toolkit-react) |
+| [@bubblydoo/uxp-toolkit-react](./packages/uxp-toolkit-react) | [![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-toolkit-react)](https://www.npmjs.com/package/@bubblydoo/uxp-toolkit-react) |
 
 ```bash
 pnpm add @bubblydoo/uxp-toolkit-react
@@ -311,7 +311,7 @@ This package provides the following hooks:
 
 | Package | Version |
 | --- | --- |
-| [@bubblydoo/uxp-cli](./packages/uxp-cli) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-cli) |
+| [@bubblydoo/uxp-cli](./packages/uxp-cli) | [![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-cli)](https://www.npmjs.com/package/@bubblydoo/uxp-cli) |
 
 We fixed the [official devtools package](https://github.com/adobe-uxp/devtools-cli), which had a lot of issues. You can find the fixed repo [here](https://github.com/bubblydoo/adobe-fixed-uxp-devtools).
 
@@ -343,7 +343,7 @@ If you're using approved builds in pnpm, make sure to add `@adobe-fixed-uxp/uxp-
 
 | Package | Version |
 | --- | --- |
-| [@bubblydoo/photoshop-mcp](./packages/photoshop-mcp) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/photoshop-mcp) |
+| [@bubblydoo/photoshop-mcp](./packages/photoshop-mcp) | [![NPM Version](https://img.shields.io/npm/v/@bubblydoo/photoshop-mcp)](https://www.npmjs.com/package/@bubblydoo/photoshop-mcp) |
 
 We have a MCP server for Photoshop automation via Chrome DevTools Protocol. It allows AI assistants to execute JavaScript code directly in Adobe Photoshop's UXP environment, but it also has access to UXP Toolkit and its commands, to the TypeScript schemas and these readmes.
 
@@ -355,7 +355,7 @@ pnpm --allow-build=@adobe-fixed-uxp/uxp-devtools-helper dlx @bubblydoo/photoshop
 
 | Package | Version |
 | --- | --- |
-| [@bubblydoo/uxp-puppeteer-transport](./packages/uxp-puppeteer-transport) | ![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-puppeteer-transport) |
+| [@bubblydoo/uxp-puppeteer-transport](./packages/uxp-puppeteer-transport) | [![NPM Version](https://img.shields.io/npm/v/@bubblydoo/uxp-puppeteer-transport)](https://www.npmjs.com/package/@bubblydoo/uxp-puppeteer-transport) |
 
 This package bridges Puppeteer's browser-level CDP expectations to Photoshop's page-level UXP CDP endpoint.
 It is useful when you want to reuse Puppeteer-style automation against a UXP runtime.
