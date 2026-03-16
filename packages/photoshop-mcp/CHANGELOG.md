@@ -1,5 +1,13 @@
 # @bubblydoo/photoshop-mcp
 
+## 0.0.10
+
+### Patch Changes
+
+- 92a2f01: Improve mcp, cdp sessions
+- Updated dependencies [92a2f01]
+  - @bubblydoo/uxp-devtools-common@0.0.10
+
 ## 0.0.9
 
 ### Patch Changes
