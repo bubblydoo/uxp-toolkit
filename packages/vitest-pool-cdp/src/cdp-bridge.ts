@@ -1,16 +1,40 @@
 import type { CdpConnection, CdpPoolOptions } from './types';
+import EventEmitter from 'node:events';
 import CDP from 'chrome-remote-interface';
 import { evaluateInCdp } from './cdp-util';
 import { CDP_BINDING_NAME } from './types';
 
-export async function setupCdpSession(cdtUrl: string) {
+interface CdpSessionEventMap {
+  disconnect: [];
+}
+
+interface CdpSession {
+  cdp: CDP.Client;
+  isClosed: () => boolean;
+  events: EventEmitter<CdpSessionEventMap>;
+}
+
+export async function setupCdpSession(cdtUrl: string): Promise<CdpSession> {
   const cdp = await CDP({
     useHostName: false,
     local: true,
     target: cdtUrl,
   });
 
-  return cdp;
+  const events = new EventEmitter<CdpSessionEventMap>();
+
+  let isClosed = false;
+  cdp.on('disconnect', () => {
+    console.error('[vitest-pool-cdp] CDP disconnected');
+    isClosed = true;
+    events.emit('disconnect');
+  });
+
+  return {
+    cdp,
+    isClosed: () => isClosed,
+    events,
+  };
 }
 
 async function defaultExecutionContextOrSessionFn(cdp: CDP.Client) {
@@ -34,7 +58,8 @@ export async function setupCdpConnection(
 ): Promise<CdpConnection> {
   options.log('Connecting to CDP at', cdpUrl);
 
-  const cdp = await setupCdpSession(cdpUrl);
+  const cdpSession = await setupCdpSession(cdpUrl);
+  const cdp = cdpSession.cdp;
 
   const executionContextOrSessionFn = options.executionContextOrSession ?? defaultExecutionContextOrSessionFn;
   // options.log('Awaiting executionContextOrSessionFn');

@@ -1,7 +1,20 @@
+import EventEmitter from 'node:events';
 import CDP from 'chrome-remote-interface';
 
-export async function setupCdpSession(cdtUrl: string) {
+interface CdpSessionEventMap {
+  disconnect: [];
+}
+
+export interface CdpSession {
+  cdp: CDP.Client;
+  isClosed: () => boolean;
+  events: EventEmitter<CdpSessionEventMap>;
+}
+
+export async function setupCdpSession(cdtUrl: string): Promise<CdpSession> {
   const uuid = crypto.randomUUID();
+
+  let isClosed = false;
 
   const cdp = await CDP({
     useHostName: false,
@@ -17,7 +30,19 @@ export async function setupCdpSession(cdtUrl: string) {
     },
   });
 
-  return cdp;
+  const events = new EventEmitter<CdpSessionEventMap>();
+
+  cdp.on('disconnect', () => {
+    console.error('[uxp-devtools-common] CDP disconnected');
+    isClosed = true;
+    events.emit('disconnect');
+  });
+
+  return {
+    cdp,
+    isClosed: () => isClosed,
+    events,
+  };
 }
 
 interface ExecutionContextDescription {

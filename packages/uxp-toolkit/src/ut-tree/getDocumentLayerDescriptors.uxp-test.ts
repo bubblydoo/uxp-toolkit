@@ -77,4 +77,48 @@ describe('getDocumentLayerDescriptors', () => {
     const descriptors = await getDocumentLayerDescriptors(doc.id);
     expect(descriptors[0]?.hasUserMask).toBe(true);
   });
+
+  it('should parse RGB solid color layers from RGB fixture', async (t) => {
+    const doc = await openFixture(t, 'all-color-schemas-rgb.psd');
+    const descriptors = await getDocumentLayerDescriptors(doc.id);
+
+    function getColorKeys(layerName: string) {
+      const layer = descriptors.find(d => d.name === layerName);
+      const adjustment = layer?.adjustment?.[0];
+      if (!adjustment || !('color' in adjustment) || !adjustment.color) {
+        return null;
+      }
+      return Object.keys(adjustment.color).sort();
+    }
+
+    expect(getColorKeys('color-rgb-int')).toEqual(['_obj', 'blue', 'grain', 'red']);
+    expect(getColorKeys('color-rgb-float')).toEqual(['_obj', 'blueFloat', 'greenFloat', 'redFloat']);
+  });
+
+  it('should parse CMYK solid color layers from CMYK fixture', async (t) => {
+    const doc = await openFixture(t, 'all-color-schemas-cmyk.psd');
+    const descriptors = await getDocumentLayerDescriptors(doc.id);
+    const layer = descriptors.find(d => d.name === 'color-cmyk');
+    const color = layer?.adjustment?.[0] && 'color' in layer.adjustment[0] ? layer.adjustment[0].color : null;
+    const keys = color ? Object.keys(color).sort() : null;
+    expect(keys).toEqual(['_obj', 'black', 'cyan', 'magenta', 'yellowColor']);
+  });
+
+  it('should parse LAB solid color layers from LAB fixture', async (t) => {
+    const doc = await openFixture(t, 'all-color-schemas-lab.psd');
+    const descriptors = await getDocumentLayerDescriptors(doc.id);
+    const layer = descriptors.find(d => d.name === 'color-lab');
+    const color = layer?.adjustment?.[0] && 'color' in layer.adjustment[0] ? layer.adjustment[0].color : null;
+    const keys = color ? Object.keys(color).sort() : null;
+    expect(keys).toEqual(['_obj', 'a', 'b', 'luminance']);
+  });
+
+  it('should parse grayscale solid color layers from grayscale fixture', async (t) => {
+    const doc = await openFixture(t, 'all-color-schemas-gray.psd');
+    const descriptors = await getDocumentLayerDescriptors(doc.id);
+    const layer = descriptors.find(d => d.name === 'color-gray');
+    const color = layer?.adjustment?.[0] && 'color' in layer.adjustment[0] ? layer.adjustment[0].color : null;
+    const keys = color ? Object.keys(color).sort() : null;
+    expect(keys).toEqual(['_obj', 'gray']);
+  });
 });

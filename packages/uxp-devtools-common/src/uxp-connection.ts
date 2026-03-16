@@ -1,13 +1,9 @@
-import type CDP from 'chrome-remote-interface';
+import type { CdpSession } from './cdp-session';
 import type { DevtoolsConnection } from './setup-devtools-url';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { setupCdpSession, waitForExecutionContextCreated } from './cdp-session';
 import { setupDevtoolsConnection,
 } from './setup-devtools-url';
 import { setupCdpSessionWithUxpDefaults } from './uxp-cdp-defaults';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 interface ExecutionContextDescription {
   id: number;
@@ -17,7 +13,7 @@ interface ExecutionContextDescription {
 }
 
 export interface UxpConnection {
-  cdp: CDP.Client;
+  cdpSession: CdpSession;
   executionContext: ExecutionContextDescription;
   devtoolsConnection: DevtoolsConnection;
   disconnect: () => Promise<void>;
@@ -39,22 +35,22 @@ export async function createUxpConnection(pluginPath: string): Promise<UxpConnec
   console.error(`[photoshop-mcp] DevTools URL: ${devtoolsConnection.url}`);
 
   console.error('[photoshop-mcp] Setting up CDP session...');
-  const cdp = await setupCdpSession(devtoolsConnection.url);
+  const cdpSession = await setupCdpSession(devtoolsConnection.url);
 
   console.error('[photoshop-mcp] Waiting for execution context...');
-  const executionContext = await waitForExecutionContextCreated(cdp, async () => {
+  const executionContext = await waitForExecutionContextCreated(cdpSession.cdp, async () => {
     console.error('[photoshop-mcp] Setting up CDP session with UXP defaults...');
-    await setupCdpSessionWithUxpDefaults(cdp);
+    await setupCdpSessionWithUxpDefaults(cdpSession.cdp);
   });
   console.error('[photoshop-mcp] Execution context ready');
 
   const connection: UxpConnection = {
-    cdp,
+    cdpSession,
     executionContext,
     devtoolsConnection,
     disconnect: async () => {
       try {
-        await cdp.close();
+        await cdpSession.cdp.close();
         await devtoolsConnection.teardown();
       }
       catch {
@@ -85,7 +81,7 @@ export async function evaluateInUxp(
   errorStep: string;
 }> {
   try {
-    const result = await connection.cdp.Runtime.evaluate({
+    const result = await connection.cdpSession.cdp.Runtime.evaluate({
       expression,
       uniqueContextId: connection.executionContext.uniqueId,
       awaitPromise: true, // unfortunately this is not supported
@@ -124,7 +120,7 @@ export async function evaluateInUxp(
       // let attempts = 0;
       while (true) {
         // attempts++;
-        const promiseProperties = await connection.cdp.Runtime.getProperties({
+        const promiseProperties = await connection.cdpSession.cdp.Runtime.getProperties({
           objectId: result.result.objectId!,
         });
         const promiseState = promiseProperties.internalProperties!.find((property: any) => property.name === '[[PromiseState]]')!.value!;
@@ -147,7 +143,7 @@ export async function evaluateInUxp(
       };
     }
 
-    const objectResult = await connection.cdp.Runtime.getProperties({
+    const objectResult = await connection.cdpSession.cdp.Runtime.getProperties({
       objectId: awaitedResult.objectId!,
       ownProperties: true,
     });

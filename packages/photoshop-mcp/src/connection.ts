@@ -23,7 +23,12 @@ function getPluginConfig(): { pluginPath: string; pluginId: string } {
   return { pluginPath, pluginId };
 }
 
-let currentConnection: UxpConnection | null = null;
+declare global {
+  // eslint-disable-next-line vars-on-top
+  var currentConnectionPromise: Promise<UxpConnection> | null;
+}
+
+globalThis.currentConnectionPromise = null;
 
 /**
  * Establishes a connection to Photoshop via CDP.
@@ -35,35 +40,49 @@ let currentConnection: UxpConnection | null = null;
  *
  * The connection is cached and reused for subsequent calls.
  */
-export async function getOrReuseUxpConnection(): Promise<UxpConnection> {
+export async function globalGetOrReuseUxpConnection(): Promise<UxpConnection> {
   // Return existing connection if available
-  if (currentConnection) {
-    return currentConnection;
+  if (globalThis.currentConnectionPromise) {
+    console.error('[photoshop-mcp] Returning existing connection');
+    return globalThis.currentConnectionPromise;
   }
+
+  console.error('[photoshop-mcp] Creating new connection');
 
   const { pluginPath } = getPluginConfig();
 
-  const connectionOrig = await createUxpConnection(pluginPath);
+  const connectionPromise = createUxpConnection(pluginPath).then((connectionOrig) => {
+    const connection: UxpConnection = {
+      cdpSession: connectionOrig.cdpSession,
+      executionContext: connectionOrig.executionContext,
+      devtoolsConnection: connectionOrig.devtoolsConnection,
+      disconnect: async () => {
+        await connectionOrig.disconnect();
+        globalThis.currentConnectionPromise = null;
+      },
+    };
 
-  const connection: UxpConnection = {
-    cdp: connectionOrig.cdp,
-    executionContext: connectionOrig.executionContext,
-    devtoolsConnection: connectionOrig.devtoolsConnection,
-    disconnect: async () => {
-      await connectionOrig.disconnect();
-      currentConnection = null;
-    },
-  };
+    connection.cdpSession.events.on('disconnect', () => {
+      globalThis.currentConnectionPromise = null;
+    });
 
-  currentConnection = connection;
-  return connection;
+    return connection;
+  }).catch((error) => {
+    console.error('[photoshop-mcp] Error creating connection:', error);
+    globalThis.currentConnectionPromise = null;
+    throw error;
+  });
+
+  globalThis.currentConnectionPromise = connectionPromise;
+
+  return connectionPromise;
 }
 
 /**
  * Disconnect from Photoshop if connected.
  */
-export async function disconnectFromPhotoshop(): Promise<void> {
-  if (currentConnection) {
-    await currentConnection.disconnect();
+export async function globalDisconnectFromPhotoshop(): Promise<void> {
+  if (globalThis.currentConnectionPromise) {
+    await globalThis.currentConnectionPromise.then(connection => connection.disconnect());
   }
 }
