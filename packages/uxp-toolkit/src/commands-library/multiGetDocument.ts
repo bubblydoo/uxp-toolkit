@@ -14,9 +14,62 @@ const percentUnitSchema = z.object({
 const rgbColorSchema = z.object({
   _obj: z.literal('RGBColor'),
   red: z.number(),
+  /** This is the green channel, but is called "grain" in the API */
   grain: z.number(),
   blue: z.number(),
 });
+
+const rgbFloatColorSchema = z.object({
+  _obj: z.literal('RGBColor'),
+  redFloat: z.number(),
+  greenFloat: z.number(),
+  blueFloat: z.number(),
+});
+
+const hsbColorSchema = z.object({
+  _obj: z.literal('HSBColor'),
+  hue: z.number(),
+  saturation: z.number(),
+  brightness: z.number(),
+});
+
+const cmykColorSchema = z.object({
+  _obj: z.literal('CMYKColor'),
+  cyan: z.number(),
+  magenta: z.number(),
+  yellow: z.number(),
+  black: z.number(),
+});
+
+const cmykColorClassSchema = z.object({
+  _obj: z.literal('CMYKColorClass'),
+  cyan: z.number(),
+  magenta: z.number(),
+  yellowColor: z.number(),
+  black: z.number(),
+});
+
+const labColorSchema = z.object({
+  _obj: z.literal('labColor'),
+  luminance: z.number(),
+  a: z.number(),
+  b: z.number(),
+});
+
+const grayscaleColorSchema = z.object({
+  _obj: z.literal('grayscale'),
+  gray: z.number(),
+});
+
+const colorSchema = z.union([
+  rgbColorSchema,
+  rgbFloatColorSchema,
+  hsbColorSchema,
+  cmykColorSchema,
+  cmykColorClassSchema,
+  labColorSchema,
+  grayscaleColorSchema,
+]);
 
 const channelMatrixSchema = z.object({
   _obj: z.literal('channelMatrix'),
@@ -28,7 +81,7 @@ const channelMatrixSchema = z.object({
 
 const colorStopSchema = z.object({
   _obj: z.literal('colorStop'),
-  color: rgbColorSchema,
+  color: colorSchema,
   type: z.object({
     _enum: z.literal('colorStopType'),
     _value: z.string(),
@@ -169,17 +222,12 @@ export const adjustmentSchema = z.discriminatedUnion('_obj', [
     blue: z.number(),
     magenta: z.number(),
     useTint: z.boolean(),
-    tintColor: rgbColorSchema,
+    tintColor: colorSchema,
   }),
   // photoFilter (Photo Filter)
   z.object({
     _obj: z.literal('photoFilter'),
-    color: z.object({
-      _obj: z.literal('labColor'),
-      luminance: z.number(),
-      a: z.number(),
-      b: z.number(),
-    }),
+    color: colorSchema,
     density: z.number(),
     preserveLuminosity: z.boolean(),
   }),
@@ -257,7 +305,7 @@ export const adjustmentSchema = z.discriminatedUnion('_obj', [
   // solidColorLayer (Color Fill)
   z.object({
     _obj: z.literal('solidColorLayer'),
-    color: rgbColorSchema,
+    color: colorSchema,
   }),
   // gradientLayer (Gradient Fill)
   z.object({
