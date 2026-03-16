@@ -53,7 +53,7 @@ async function main() {
   console.log(`CDP URL: ${connection.url}\n`);
 
   // 2. First WS connection: initialise UXP CDP defaults and get execution context
-  const initCdp = await setupCdpSession(connection.url);
+  const { cdp: initCdp } = await setupCdpSession(connection.url);
   const execCtx = await waitForExecutionContextCreated(initCdp, async () => {
     await setupCdpSessionWithUxpDefaults(initCdp);
   });

@@ -51,7 +51,7 @@ export async function wrapCodeWithRuntime(userCode: string): Promise<{
             build.onLoad({ filter: /main-code\.js$/ }, async () => {
               return {
                 // contents: `window.result = require("user-code"); typeof window.result === 'object' && 'default' in window.result ? window.result.default : window.result;`,
-                contents: `globalThis.MAIN_EXPORT = require("user-code")`,
+                contents: `${SPECIAL_EXPORT_STRING}require("user-code")`,
                 loader: 'js',
               };
             });

@@ -24,6 +24,7 @@
     "photoshop-mcp": "./dist/index.js"
   },
   "files": [
+    "assets",
     "dist",
     "dist-readmes",
     "dist-runtime",
@@ -31,7 +32,7 @@
   ],
   "scripts": {
     "build": "tsup && tsx collect-schemas.ts && tsx collect-readmes.ts",
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch --clear-screen=false src/index.ts",
     "docs-json": "typedoc --json docs.json"
   },
   "dependencies": {
@@ -43,6 +44,7 @@
     "chrome-remote-interface": "^0.33.3",
     "esbuild": "^0.27.0",
     "hono": "^4.11.7",
+    "signal-exit": "^4.1.0",
     "zod": "^3.25.0"
   },
   "devDependencies": {

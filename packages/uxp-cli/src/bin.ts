@@ -132,7 +132,7 @@ async function dumpObject() {
   console.log(`DevTools URL: ${devtoolsConnection.url}\n`);
 
   console.log('Setting up CDP session...');
-  const cdp = await setupCdpSession(devtoolsConnection.url);
+  const { cdp } = await setupCdpSession(devtoolsConnection.url);
 
   const executionContext = await waitForExecutionContextCreated(cdp, async () => {
     await setupCdpSessionWithUxpDefaults(cdp);
