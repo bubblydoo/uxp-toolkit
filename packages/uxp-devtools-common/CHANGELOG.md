@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-devtools-common
 
+## 0.0.10
+
+### Patch Changes
+
+- 92a2f01: Improve mcp, cdp sessions
+
 ## 0.0.9
 
 ### Patch Changes

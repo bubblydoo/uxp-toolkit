@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.17
+
+### Patch Changes
+
+- 3d8a85d: fix: multiget color types
+
 ## 0.0.16
 
 ### Patch Changes

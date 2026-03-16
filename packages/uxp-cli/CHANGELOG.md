@@ -1,5 +1,12 @@
 # @bubblydoo/uxp-cli
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [92a2f01]
+  - @bubblydoo/uxp-devtools-common@0.0.10
+
 ## 0.0.9
 
 ### Patch Changes
