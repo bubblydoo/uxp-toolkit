@@ -1,5 +1,6 @@
 import type { CdpSession } from './cdp-session';
 import type { DevtoolsConnection } from './setup-devtools-url';
+import { z } from 'zod';
 import { setupCdpSession, waitForExecutionContextCreated } from './cdp-session';
 import { setupDevtoolsConnection,
 } from './setup-devtools-url';
@@ -62,6 +63,10 @@ export async function createUxpConnection(pluginPath: string): Promise<UxpConnec
   return connection;
 }
 
+const promiseStateSchema = z.object({
+  value: z.enum(['pending', 'fulfilled', 'rejected']),
+});
+
 /**
  * Evaluate JavaScript code in the UXP context.
  */
@@ -89,7 +94,7 @@ export async function evaluateInUxp(
       // generatePreview: true,
     });
 
-    console.error('result inside CDP.Runtime.evaluate', result);
+    // console.error('result inside CDP.Runtime.evaluate', result);
 
     if (result.exceptionDetails) {
       const error = result.exceptionDetails.exception?.description
@@ -123,10 +128,19 @@ export async function evaluateInUxp(
         const promiseProperties = await connection.cdpSession.cdp.Runtime.getProperties({
           objectId: result.result.objectId!,
         });
-        const promiseState = promiseProperties.internalProperties!.find((property: any) => property.name === '[[PromiseState]]')!.value!;
+        const promiseState = promiseStateSchema.parse(
+          promiseProperties.internalProperties!.find((property: any) => property.name === '[[PromiseState]]')!.value!,
+        );
         if (promiseState.value !== 'pending') {
           const promiseResult = promiseProperties.internalProperties!.find((property: any) => property.name === '[[PromiseResult]]')!.value;
           awaitedResult = promiseResult!;
+          if (promiseState.value === 'rejected') {
+            return {
+              success: false,
+              error: JSON.stringify(promiseResult, null, 2),
+              errorStep: 'inside CDP.Runtime.evaluate: promise rejected',
+            };
+          }
           break;
         }
         await new Promise(resolve => setTimeout(resolve, 500));
