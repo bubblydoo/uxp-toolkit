@@ -6,12 +6,12 @@ import { wrapCodeWithRuntime } from './runtime-wrapper';
 /**
  * Schema for the execute tool input
  */
-export const executeToolSchema = {
+export const executeToolSchema = z.object({
   name: z.string(),
   code: z.string(),
-};
+});
 
-export type ExecuteToolInput = z.infer<z.ZodObject<typeof executeToolSchema>>;
+export type ExecuteToolInput = z.infer<typeof executeToolSchema>;
 
 /**
  * Execute JavaScript code in Photoshop and return the result.
@@ -28,7 +28,7 @@ export async function executeInPhotoshop(connection: UxpConnection, input: Execu
   errorStep: string;
 }> {
   try {
-    console.log('wrapping code...');
+    // console.log('wrapping code...');
 
     const wrappedCodeResult = await wrapCodeWithRuntime(input.code);
 
@@ -59,8 +59,6 @@ export async function executeInPhotoshop(connection: UxpConnection, input: Execu
         errorStep: `evaluateInPhotoshop: ${result.errorStep}`,
       };
     }
-
-    console.log('result', result.result);
 
     return {
       success: true,
