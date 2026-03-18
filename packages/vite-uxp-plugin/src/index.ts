@@ -128,7 +128,7 @@ export function uxp(manifest: UxpManifest, config?: UxpViteConfig): Plugin {
           const runtimeCode = await fs.promises.readFile(path.join(__dirname, '../dist-runtime/runtime.cjs'), 'utf8');
           return `var UXP_HOT_RELOAD_PORT = ${hotReloadPort}; ${runtimeCode}`;
         }
-        return `module.exports = {}; // UXP Vite Plugin Runtime is empty in production`;
+        return `export {}; // UXP Vite Plugin Runtime is empty in production`;
       }
       return null;
     },
