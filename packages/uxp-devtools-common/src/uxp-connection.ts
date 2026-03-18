@@ -1,5 +1,6 @@
 import type { CdpSession } from './cdp-session';
 import type { DevtoolsConnection } from './setup-devtools-url';
+import { z } from 'zod';
 import { setupCdpSession, waitForExecutionContextCreated } from './cdp-session';
 import { setupDevtoolsConnection,
 } from './setup-devtools-url';
@@ -62,6 +63,65 @@ export async function createUxpConnection(pluginPath: string): Promise<UxpConnec
   return connection;
 }
 
+const promiseStateSchema = z.object({
+  value: z.enum(['pending', 'fulfilled', 'rejected']),
+});
+
+const UXP_PROMISE_RETENTION_STORE_KEY = '__uxpToolkitPendingPromises';
+
+function createObjectRetentionStore(connection: UxpConnection): (objectId: string) => Promise<() => Promise<void>> {
+  let retentionCounter = 0;
+
+  return async function store(objectId: string): Promise<() => Promise<void>> {
+    retentionCounter += 1;
+    const retentionKey = `uxpObject_${Date.now()}_${retentionCounter}`;
+    const serializedRetentionKey = JSON.stringify(retentionKey);
+
+    // Keep the real remote object alive by storing `this` in global scope.
+    await connection.cdpSession.cdp.Runtime.callFunctionOn({
+      objectId,
+      functionDeclaration: `
+        function(retentionKey, storeKey) {
+          if (!globalThis[storeKey]) {
+            globalThis[storeKey] = Object.create(null);
+          }
+          globalThis[storeKey][retentionKey] = this;
+        }
+      `,
+      arguments: [
+        { value: retentionKey },
+        { value: UXP_PROMISE_RETENTION_STORE_KEY },
+      ],
+      silent: true,
+    });
+
+    let isReleased = false;
+    return async function release(): Promise<void> {
+      if (isReleased) {
+        return;
+      }
+      isReleased = true;
+
+      await connection.cdpSession.cdp.Runtime.evaluate({
+        expression: `
+          (() => {
+            const store = globalThis['${UXP_PROMISE_RETENTION_STORE_KEY}'];
+            if (!store) {
+              return;
+            }
+            delete store[${serializedRetentionKey}];
+            if (Object.keys(store).length === 0) {
+              delete globalThis['${UXP_PROMISE_RETENTION_STORE_KEY}'];
+            }
+          })()
+        `,
+        uniqueContextId: connection.executionContext.uniqueId,
+        silent: true,
+      });
+    };
+  };
+}
+
 /**
  * Evaluate JavaScript code in the UXP context.
  */
@@ -81,6 +141,8 @@ export async function evaluateInUxp(
   errorStep: string;
 }> {
   try {
+    const storeRetainedObject = createObjectRetentionStore(connection);
+
     const result = await connection.cdpSession.cdp.Runtime.evaluate({
       expression,
       uniqueContextId: connection.executionContext.uniqueId,
@@ -89,7 +151,7 @@ export async function evaluateInUxp(
       // generatePreview: true,
     });
 
-    console.error('result inside CDP.Runtime.evaluate', result);
+    // console.error('result inside CDP.Runtime.evaluate', result);
 
     if (result.exceptionDetails) {
       const error = result.exceptionDetails.exception?.description
@@ -116,20 +178,41 @@ export async function evaluateInUxp(
     let awaitedResult = result.result;
 
     if (result.result.subtype === 'promise' && awaitPromise) {
-      // TODO: store promise in global var so it's not GC'ed
-      // let attempts = 0;
-      while (true) {
-        // attempts++;
-        const promiseProperties = await connection.cdpSession.cdp.Runtime.getProperties({
-          objectId: result.result.objectId!,
-        });
-        const promiseState = promiseProperties.internalProperties!.find((property: any) => property.name === '[[PromiseState]]')!.value!;
-        if (promiseState.value !== 'pending') {
-          const promiseResult = promiseProperties.internalProperties!.find((property: any) => property.name === '[[PromiseResult]]')!.value;
-          awaitedResult = promiseResult!;
-          break;
+      const promiseObjectId = result.result.objectId!;
+
+      // we store the object on the global scope to prevent it from being garbage collected
+      const releaseRetainedPromise = await storeRetainedObject(promiseObjectId);
+
+      try {
+        while (true) {
+          const promiseProperties = await connection.cdpSession.cdp.Runtime.getProperties({
+            objectId: promiseObjectId,
+          });
+          const promiseState = promiseStateSchema.parse(
+            promiseProperties.internalProperties!.find((property: any) => property.name === '[[PromiseState]]')!.value!,
+          );
+          if (promiseState.value !== 'pending') {
+            const promiseResult = promiseProperties.internalProperties!.find((property: any) => property.name === '[[PromiseResult]]')!.value;
+            awaitedResult = promiseResult!;
+            if (promiseState.value === 'rejected') {
+              return {
+                success: false,
+                error: JSON.stringify(promiseResult, null, 2),
+                errorStep: 'inside CDP.Runtime.evaluate: promise rejected',
+              };
+            }
+            break;
+          }
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
-        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      finally {
+        try {
+          await releaseRetainedPromise();
+        }
+        catch (error) {
+          console.error('Failed to release retained promise in UXP runtime', error);
+        }
       }
     }
 

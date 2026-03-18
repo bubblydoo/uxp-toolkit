@@ -35,20 +35,77 @@ function createMcpServer(connection: UxpConnection) {
         'The code has to be esm. It will be built into CJS using esbuild.',
         'The name input is purely descriptive for the UI.',
         'Top-level await is not supported, just return a promise, wrap in functions if needed.',
+        'e.g. `async function run() { ... }; export default run();`',
+        '## Returned value',
+        'The execution will always return an object with the "objectId" and "value" properties, coming straight from CDP as a RemoteObject.',
+        'If the "returnAs" input is "remoteObject" of unset, that object will be returned as JSON.',
+        'If the "returnAs" input is "string", only the "value" property of the RemoteObject has to be a string and will be returned as a text MCP block.',
+        'If the "returnAs" input is "pngImage", the "value" property of the RemoteObject has to be a base64 image string (without prefix like "data:image/png;base64,") and will be returned as an image MCP block.',
         '## Other information',
         'DOM functions are quite slow. Prefer using the @bubblydoo/uxp-toolkit package. Use read-docs for that.',
       ].join('\n'),
-      inputSchema: executeToolSchema,
+      inputSchema: executeToolSchema.extend({
+        returnAs: z.enum(['remoteObject', 'string', 'pngImage']).default('remoteObject'),
+      }),
     },
     async (input) => {
       try {
         const result = await executeInPhotoshop(connection, input);
 
+        if (!result.success) {
+          return {
+            isError: true,
+            content: [{
+              type: 'text',
+              text: `Error executing code in Photoshop, in ${result.errorStep}:\n${result.error}`,
+            }],
+          };
+        }
+
+        if (input.returnAs === 'pngImage') {
+          const value = result.result.value;
+          if (!value || typeof value !== 'string') {
+            return {
+              isError: true,
+              content: [{
+                type: 'text',
+                text: `The value is not a base64 image string, but a ${typeof value}. If returnAs is "pngImage", the value has to be a base64 image string.`,
+              }],
+            };
+          }
+
+          return {
+            content: [{
+              type: 'image',
+              mimeType: 'image/png',
+              data: value,
+            }],
+          };
+        }
+
+        if (input.returnAs === 'string') {
+          const value = result.result.value;
+          if (!value || typeof value !== 'string') {
+            return {
+              isError: true,
+              content: [{
+                type: 'text',
+                text: `The value is not a string, but a ${typeof value}. If returnAs is "string", the value has to be a string.`,
+              }],
+            };
+          }
+          return {
+            content: [{
+              type: 'text',
+              text: value,
+            }],
+          };
+        }
+
         return {
-          isError: !result.success,
           content: [{
             type: 'text',
-            text: result.success ? JSON.stringify(result.result, null, 2) : `Error executing code in Photoshop, in ${result.errorStep}:\n${result.error}`,
+            text: JSON.stringify(result.result, null, 2),
           }],
         };
       }
