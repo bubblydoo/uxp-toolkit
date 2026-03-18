@@ -1,5 +1,11 @@
 # @bubblydoo/vite-uxp-plugin
 
+## 0.0.4
+
+### Patch Changes
+
+- ee8dfb7: Fix vite plugin runtime export
+
 ## 0.0.3
 
 ### Patch Changes
