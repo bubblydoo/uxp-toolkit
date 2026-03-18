@@ -35,6 +35,7 @@ function createMcpServer(connection: UxpConnection) {
         'The code has to be esm. It will be built into CJS using esbuild.',
         'The name input is purely descriptive for the UI.',
         'Top-level await is not supported, just return a promise, wrap in functions if needed.',
+        'e.g. `async function run() { ... }; export default run();`',
         '## Returned value',
         'The execution will always return an object with the "objectId" and "value" properties, coming straight from CDP as a RemoteObject.',
         'If the "returnAs" input is "remoteObject" of unset, that object will be returned as JSON.',
