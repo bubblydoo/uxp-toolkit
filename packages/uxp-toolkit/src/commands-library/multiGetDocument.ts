@@ -201,7 +201,7 @@ export const adjustmentSchema = z.discriminatedUnion('_obj', [
       hue: z.number(),
       saturation: z.number(),
       lightness: z.number(),
-    })),
+    })).optional(),
   }),
   // colorBalance (Color Balance)
   z.object({
