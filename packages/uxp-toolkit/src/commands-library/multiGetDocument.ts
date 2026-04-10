@@ -247,15 +247,15 @@ export const adjustmentSchema = z.discriminatedUnion('_obj', [
       _enum: z.literal('colorLookupType'),
       _value: z.string(),
     }),
-    name: z.string(),
+    name: z.string().optional(),
     dither: z.boolean(),
     profile: z.unknown(),
     LUTFormat: z.object({
       _enum: z.literal('LUTFormatType'),
       _value: z.string(),
-    }),
-    LUT3DFileData: z.unknown(),
-    LUT3DFileName: z.string(),
+    }).optional(),
+    LUT3DFileData: z.unknown().optional(),
+    LUT3DFileName: z.string().optional(),
   }),
   // selectiveColor (Selective Color)
   z.object({
