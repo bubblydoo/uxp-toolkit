@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.19
+
+### Patch Changes
+
+- 8d1f75b: Fix color lookup adjustment layer schema
+
 ## 0.0.18
 
 ### Patch Changes
