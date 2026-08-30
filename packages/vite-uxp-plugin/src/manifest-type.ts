@@ -44,19 +44,20 @@ export interface UxpPanel {
   icons?: UxpIcon[];
 }
 
+interface HostDefinition {
+  app: string;
+  minVersion: string;
+  data?: { apiVersion?: number };
+}
+
+
 export interface UxpManifest {
   id: string;
   name: string;
   version: string;
   main: string;
   manifestVersion: number;
-  host: {
-    app: string;
-    minVersion: string;
-    data?: {
-      apiVersion?: number;
-    };
-  }[];
+  host: HostDefinition | HostDefinition[];
   entrypoints: Array<UxpPanel | UxpCommand>;
   featureFlags?: {
     enableAlerts?: boolean;
