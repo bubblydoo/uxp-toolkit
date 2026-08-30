@@ -44,6 +44,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "docs-json": "typedoc --json docs.json"
   },
@@ -62,6 +63,7 @@
     "@types/ws": "^8.18.1",
     "tsup": "^8.3.5",
     "typescript": "^5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vitest": "^4.0.18"
   }
 }

@@ -137,7 +137,8 @@ export function uxp(manifest: UxpManifest, config?: UxpViteConfig): Plugin {
       return html.replace('<script type="module" crossorigin', '<script');
     },
     generateBundle(this) {
-      const emittedManifest = configState!.isDevMode ? addHotReloadToPermissions(manifest, hotReloadPort) : manifest;
+      const manifestWithHostFlattened = flattenManifestHost(manifest);
+      const emittedManifest = configState!.isDevMode ? addHotReloadToPermissions(manifest, hotReloadPort) : manifestWithHostFlattened;
       this.emitFile({
         type: 'asset',
         source: JSON.stringify(emittedManifest, null, '\t'),
@@ -165,3 +166,12 @@ function addHotReloadToPermissions(manifest: UxpManifest, hotReloadPort: number)
     },
   };
 }
+
+function flattenManifestHost(manifest: UxpManifest) {
+  var copy = structuredClone(manifest);
+  if (Array.isArray(copy.host) && copy.host.length == 1) {
+    copy.host = copy.host[0];
+  }
+  return copy;
+}
+

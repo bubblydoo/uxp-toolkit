@@ -12,6 +12,10 @@ patchedDependencies:
 importers:
 
   .:
+    dependencies:
+      puppeteer:
+        specifier: ^24.36.1
+        version: 24.36.1(typescript@5.9.3)
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^7.2.0
@@ -684,6 +688,9 @@ importers:
       vite:
         specifier: ^6.3.5
         version: 6.4.1(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
+      vitest:
+        specifier: ^4.0.18
+        version: 4.0.18(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/vitest-pool-cdp:
     dependencies:
