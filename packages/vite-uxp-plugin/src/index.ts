@@ -5,7 +5,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { createHotReloadServer } from './hot-reload-server';
 
-export type { UxpManifest } from './manifest-type';
+export type { HostDefinition, UxpManifest } from './manifest-type';
 
 const __dirname = new URL('.', import.meta.url).pathname;
 const ADOBE_PROTOCOL = 'adobe:';

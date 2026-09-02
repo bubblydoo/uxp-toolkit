@@ -82,4 +82,5 @@ import { app as app2 } from 'adobe:photoshop'; // => const { app: app2 } = requi
 - `uxp`
 - `PHOTOSHOP_NATIVE_MODULES`
 - `UxpManifest`
+- `HostDefinition`
 - `UxpViteConfig`
