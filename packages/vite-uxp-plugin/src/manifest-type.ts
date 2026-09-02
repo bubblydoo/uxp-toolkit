@@ -44,19 +44,28 @@ export interface UxpPanel {
   icons?: UxpIcon[];
 }
 
+/**
+ * A UXP host application this plugin targets.
+ *
+ * Marketplace submissions require a single object. An array is allowed during
+ * development (e.g. Adobe UXP Developer Tools).
+ * @see https://developer.adobe.com/photoshop/uxp/guides/uxp_guide/uxp-misc/manifest-v4/#host
+ */
+export interface HostDefinition {
+  app: string;
+  minVersion: string;
+  data?: {
+    apiVersion?: number;
+  };
+}
+
 export interface UxpManifest {
   id: string;
   name: string;
   version: string;
   main: string;
   manifestVersion: number;
-  host: {
-    app: string;
-    minVersion: string;
-    data?: {
-      apiVersion?: number;
-    };
-  }[];
+  host: HostDefinition | HostDefinition[];
   entrypoints: Array<UxpPanel | UxpCommand>;
   featureFlags?: {
     enableAlerts?: boolean;
