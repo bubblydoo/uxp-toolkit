@@ -4,6 +4,7 @@
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { glob } from 'glob';
 
 const schemas = [
@@ -13,7 +14,7 @@ const schemas = [
 ];
 
 const nodeModulesPath = path.resolve('node_modules');
-const __dirname = new URL('.', import.meta.url).pathname;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 for (const schema of schemas) {
   const schemaPath = path.resolve(nodeModulesPath, schema);

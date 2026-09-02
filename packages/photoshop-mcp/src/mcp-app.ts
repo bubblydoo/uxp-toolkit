@@ -1,6 +1,7 @@
 import type { UxpConnection } from '@bubblydoo/uxp-devtools-common';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { StreamableHTTPTransport } from '@hono/mcp';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { glob } from 'glob';
@@ -10,7 +11,7 @@ import z from 'zod';
 import { executeInPhotoshop, executeToolSchema } from './execute-tool';
 import { getServerIcons } from './icons';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 
 function createMcpServer(connection: UxpConnection) {

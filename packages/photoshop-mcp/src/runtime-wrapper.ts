@@ -6,10 +6,11 @@
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { stripAdobeProtocolPlugin } from '@bubblydoo/esbuild-adobe-protocol-plugin';
 import * as esbuild from 'esbuild';
 
-const __dirname = new URL('.', import.meta.url).pathname;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SPECIAL_EXPORT_STRING = 'globalThis.MAIN_EXPORT = ';
 
@@ -42,67 +43,48 @@ export async function wrapCodeWithRuntime(userCode: string): Promise<{
         {
           name: 'inline-code',
           setup(build) {
-            build.onResolve({ filter: /main-code$/ }, async () => {
-              return {
-                path: '/main-code.js',
-                namespace: 'file',
-              };
-            });
-            build.onLoad({ filter: /main-code\.js$/ }, async () => {
-              return {
-                // contents: `window.result = require("user-code"); typeof window.result === 'object' && 'default' in window.result ? window.result.default : window.result;`,
-                contents: `${SPECIAL_EXPORT_STRING}require("user-code")`,
-                loader: 'js',
-              };
-            });
-            build.onResolve({ filter: /user-code$/ }, async () => {
-              return {
-                path: '/user-code.js',
-                namespace: 'file',
-              };
-            });
-            build.onLoad({ filter: /user-code\.js$/ }, async () => {
-              return {
-                contents: userCode,
-                loader: 'js',
-              };
-            });
-            build.onResolve({ filter: /runtime-code$/ }, async () => {
-              return {
-                path: '/runtime-code.js',
-                namespace: 'file',
-              };
-            });
-            build.onLoad({ filter: /runtime-code\.js$/ }, async () => {
-              return {
-                contents: runtimeCode,
-                loader: 'js',
-              };
-            });
-            build.onResolve({ filter: /@bubblydoo\/uxp-toolkit$/ }, async () => {
-              return {
-                path: '/@bubblydoo/uxp-toolkit/index.js',
-                namespace: 'file',
-              };
-            });
-            build.onLoad({ filter: /@bubblydoo\/uxp-toolkit\/index\.js$/ }, async () => {
-              return {
-                contents: 'module.exports = require("runtime-code").uxpToolkit;',
-                loader: 'js',
-              };
-            });
-            build.onResolve({ filter: /@bubblydoo\/uxp-toolkit\/commands$/ }, async () => {
-              return {
-                path: '/@bubblydoo/uxp-toolkit/commands/index.js',
-                namespace: 'file',
-              };
-            });
-            build.onLoad({ filter: /@bubblydoo\/uxp-toolkit\/commands\/index\.js$/ }, async () => {
-              return {
-                contents: 'module.exports = require("runtime-code").uxpToolkitCommands;',
-                loader: 'js',
-              };
-            });
+            const NS = 'virtual';
+
+            build.onResolve({ filter: /main-code$/ }, () => ({
+              path: 'main-code.js',
+              namespace: NS,
+            }));
+            build.onLoad({ filter: /main-code\.js$/, namespace: NS }, () => ({
+              contents: `${SPECIAL_EXPORT_STRING}require("user-code")`,
+              loader: 'js',
+            }));
+            build.onResolve({ filter: /user-code$/ }, () => ({
+              path: 'user-code.js',
+              namespace: NS,
+            }));
+            build.onLoad({ filter: /user-code\.js$/, namespace: NS }, () => ({
+              contents: userCode,
+              loader: 'js',
+            }));
+            build.onResolve({ filter: /runtime-code$/ }, () => ({
+              path: 'runtime-code.js',
+              namespace: NS,
+            }));
+            build.onLoad({ filter: /runtime-code\.js$/, namespace: NS }, () => ({
+              contents: runtimeCode,
+              loader: 'js',
+            }));
+            build.onResolve({ filter: /@bubblydoo\/uxp-toolkit$/ }, () => ({
+              path: '@bubblydoo/uxp-toolkit/index.js',
+              namespace: NS,
+            }));
+            build.onLoad({ filter: /uxp-toolkit\/index\.js$/, namespace: NS }, () => ({
+              contents: 'module.exports = require("runtime-code").uxpToolkit;',
+              loader: 'js',
+            }));
+            build.onResolve({ filter: /@bubblydoo\/uxp-toolkit\/commands$/ }, () => ({
+              path: '@bubblydoo/uxp-toolkit/commands/index.js',
+              namespace: NS,
+            }));
+            build.onLoad({ filter: /uxp-toolkit\/commands\/index\.js$/, namespace: NS }, () => ({
+              contents: 'module.exports = require("runtime-code").uxpToolkitCommands;',
+              loader: 'js',
+            }));
           },
         },
       ],

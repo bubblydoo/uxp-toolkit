@@ -3,11 +3,12 @@ import type { HotReloadServer } from './hot-reload-server';
 import type { UxpManifest } from './manifest-type';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createHotReloadServer } from './hot-reload-server';
 
 export type { HostDefinition, UxpManifest } from './manifest-type';
 
-const __dirname = new URL('.', import.meta.url).pathname;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ADOBE_PROTOCOL = 'adobe:';
 
 export interface UxpViteConfig {
