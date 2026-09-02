@@ -1,5 +1,11 @@
 # @bubblydoo/vite-uxp-plugin
 
+## 0.0.6
+
+### Patch Changes
+
+- 43cd0bb: Allow `UxpManifest.host` to be a single `HostDefinition` or an array, matching the UXP spec.
+
 ## 0.0.5
 
 ### Patch Changes
