@@ -27,20 +27,8 @@ export const manifest: UxpManifest = {
       preferredDockedSize: { width: 230, height: 300 },
       preferredFloatingSize: { width: 450, height: 400 },
       icons: [
-        {
-          width: 23,
-          height: 23,
-          path: 'icons/dark.png',
-          scale: [1, 2],
-          theme: ['darkest', 'dark', 'medium'],
-        },
-        {
-          width: 23,
-          height: 23,
-          path: 'icons/light.png',
-          scale: [1, 2],
-          theme: ['lightest', 'light'],
-        },
+        { width: 23, height: 23, path: 'icons/dark.png', scale: [1, 2], theme: ['darkest', 'dark'] },
+        { width: 23, height: 23, path: 'icons/light.png', scale: [1, 2], theme: ['lightest', 'light', 'all'] },
       ],
     },
   ],
@@ -69,13 +57,7 @@ export const manifest: UxpManifest = {
     allowCodeGenerationFromStrings: true,
   },
   icons: [
-    {
-      width: 48,
-      height: 48,
-      path: 'icons/plugin-icon.png',
-      scale: [1, 2],
-      theme: ['darkest', 'dark', 'medium', 'lightest', 'light', 'all'],
-      species: ['pluginList'],
-    },
+    { width: 48, height: 48, path: 'icons/plugin-dark.png', scale: [1, 2], theme: ['darkest', 'dark'] },
+    { width: 48, height: 48, path: 'icons/plugin-light.png', scale: [1, 2], theme: ['lightest', 'light', 'all'] },
   ],
 };
