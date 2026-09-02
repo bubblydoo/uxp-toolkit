@@ -1,5 +1,14 @@
 # @bubblydoo/photoshop-mcp
 
+## 0.0.12
+
+### Patch Changes
+
+- 65f293e: Fix Windows compatibility:
+
+  - Replace `new URL(import.meta.url).pathname` with `fileURLToPath` (5 occurrences) — the URL form produces an invalid leading-slash path on Windows (`/C:/Users/...`).
+  - Use a virtual esbuild namespace for `runtime-wrapper.ts`'s inline modules instead of platform-absolute `file`-namespace paths.
+
 ## 0.0.11
 
 ### Patch Changes
