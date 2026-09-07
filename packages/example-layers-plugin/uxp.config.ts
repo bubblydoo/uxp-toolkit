@@ -1,12 +1,11 @@
 import type { UxpManifest } from '@bubblydoo/vite-uxp-plugin';
 import { version } from './package.json';
 
-export const id = 'co.bubblydoo.example-layers-plugin';
-const name = 'Example Layers Plugin';
+export const id = 'ea305a81';
 
 export const manifest: UxpManifest = {
   id,
-  name,
+  name: 'Example Layers Plugin',
   version,
   main: 'index.html',
   manifestVersion: 6,
@@ -21,7 +20,7 @@ export const manifest: UxpManifest = {
       type: 'panel',
       id: `${id}.main`,
       label: {
-        default: name,
+        default: 'Example Layers',
       },
       minimumSize: { width: 230, height: 200 },
       maximumSize: { width: 2000, height: 2000 },
