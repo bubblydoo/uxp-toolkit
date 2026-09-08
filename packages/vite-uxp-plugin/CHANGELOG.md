@@ -1,5 +1,11 @@
 # @bubblydoo/vite-uxp-plugin
 
+## 0.0.8
+
+### Patch Changes
+
+- 9232a23: Added icons
+
 ## 0.0.7
 
 ### Patch Changes
