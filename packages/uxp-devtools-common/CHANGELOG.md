@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-devtools-common
 
+## 0.0.12
+
+### Patch Changes
+
+- 9232a23: Added icons
+
 ## 0.0.11
 
 ### Patch Changes

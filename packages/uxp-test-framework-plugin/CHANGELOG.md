@@ -1,5 +1,12 @@
 # @bubblydoo/uxp-test-framework-plugin
 
+## 0.0.24
+
+### Patch Changes
+
+- 9232a23: Added icons
+  - @bubblydoo/uxp-toolkit@0.0.21
+
 ## 0.0.23
 
 ### Patch Changes

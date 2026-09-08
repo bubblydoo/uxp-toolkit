@@ -1,5 +1,14 @@
 # @bubblydoo/vitest-pool-uxp
 
+## 0.0.12
+
+### Patch Changes
+
+- 9232a23: Added icons
+- Updated dependencies [9232a23]
+  - @bubblydoo/uxp-devtools-common@0.0.12
+  - @bubblydoo/vitest-pool-cdp@0.0.12
+
 ## 0.0.11
 
 ### Patch Changes
