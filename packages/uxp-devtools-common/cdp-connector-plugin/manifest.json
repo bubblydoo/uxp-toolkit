@@ -1,6 +1,6 @@
 {
-  "id": "co.bubblydoo.fake-plugin",
-  "name": "Fake Plugin",
+  "id": "co.bubblydoo.cdp-connector-plugin",
+  "name": "CDP Connector Plugin",
   "version": "0.0.6",
   "main": "index.html",
   "manifestVersion": 6,
@@ -13,9 +13,9 @@
   "entrypoints": [
     {
       "type": "panel",
-      "id": "co.bubblydoo.fake-plugin.main",
+      "id": "co.bubblydoo.cdp-connector-plugin.main",
       "label": {
-        "default": "Fake Plugin"
+        "default": "CDP Connector"
       },
       "minimumSize": {
         "width": 230,

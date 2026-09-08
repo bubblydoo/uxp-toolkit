@@ -22,7 +22,7 @@ export interface UxpConnection {
 
 /**
  * Establishes a connection to Photoshop via CDP.
- * Uses the fake-plugin from uxp-devtools-common by default.
+ * Uses the cdp-connector-plugin from uxp-devtools-common by default.
  *
  * Configuration via environment variables:
  * - PHOTOSHOP_MCP_PLUGIN_PATH: Path to the UXP plugin directory

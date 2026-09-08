@@ -6,20 +6,20 @@ import { createUxpConnection } from '@bubblydoo/uxp-devtools-common';
 const requireResolve = createRequire(import.meta.url).resolve;
 
 /**
- * Get the fake plugin path from uxp-devtools-common
+ * Get the CDP connector plugin path from uxp-devtools-common
  */
-function getFakePluginPath(): string {
+function getCdpConnectorPluginPath(): string {
   const uxpDevtoolsCommonDir = path.dirname(requireResolve('@bubblydoo/uxp-devtools-common/package.json'));
-  // Navigate from dist/connection.js to uxp-devtools-common/fake-plugin
-  return path.resolve(uxpDevtoolsCommonDir, 'fake-plugin');
+  // Navigate from dist/connection.js to uxp-devtools-common/cdp-connector-plugin
+  return path.resolve(uxpDevtoolsCommonDir, 'cdp-connector-plugin');
 }
 
 /**
  * Get plugin configuration from environment variables or use defaults.
  */
 function getPluginConfig(): { pluginPath: string; pluginId: string } {
-  const pluginPath = process.env.PHOTOSHOP_MCP_PLUGIN_PATH || getFakePluginPath();
-  const pluginId = process.env.PHOTOSHOP_MCP_PLUGIN_ID || 'com.example.fakeplugin';
+  const pluginPath = process.env.PHOTOSHOP_MCP_PLUGIN_PATH || getCdpConnectorPluginPath();
+  const pluginId = process.env.PHOTOSHOP_MCP_PLUGIN_ID || 'co.bubblydoo.cdp-connector-plugin';
   return { pluginPath, pluginId };
 }
 
@@ -32,7 +32,7 @@ globalThis.currentConnectionPromise = null;
 
 /**
  * Establishes a connection to Photoshop via CDP.
- * Uses the fake-plugin from uxp-devtools-common by default.
+ * Uses the cdp-connector-plugin from uxp-devtools-common by default.
  *
  * Configuration via environment variables:
  * - PHOTOSHOP_MCP_PLUGIN_PATH: Path to the UXP plugin directory

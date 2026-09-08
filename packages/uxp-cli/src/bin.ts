@@ -25,7 +25,7 @@ Options:
   --help, -h                  Show this help message
 
 Examples:
-  # Open devtools with fake plugin
+  # Open devtools with empty CDP connector plugin
   uxp-cli open-devtools
 
   # Open devtools with custom plugin
@@ -73,22 +73,22 @@ if (actionArgs['--help']) {
   process.exit(0);
 }
 
-async function getPluginInfo(useFakePlugin: boolean) {
-  const fakePluginPath = path.resolve(__dirname, '../../uxp-devtools-common/fake-plugin');
+async function getPluginInfo(useCdpConnectorPlugin: boolean) {
+  const cdpConnectorPluginPath = path.resolve(__dirname, '../../uxp-devtools-common/cdp-connector-plugin');
 
-  if (useFakePlugin) {
-    console.log('Using fake plugin:');
-    console.log(`  Plugin Path: ${fakePluginPath}`);
-    return { pluginPath: fakePluginPath };
+  if (useCdpConnectorPlugin) {
+    console.log('Using CDP connector plugin:');
+    console.log(`  Plugin Path: ${cdpConnectorPluginPath}`);
+    return { pluginPath: cdpConnectorPluginPath };
   }
 
   let pluginPath = actionArgs['--plugin-path'];
 
-  // Default to fake-plugin if not provided
+  // Default to cdp-connector-plugin if not provided
   if (!pluginPath) {
-    pluginPath = pluginPath || fakePluginPath;
+    pluginPath = pluginPath || cdpConnectorPluginPath;
 
-    console.log('Using default fake plugin:');
+    console.log('Using default CDP connector plugin:');
     console.log(`  Plugin Path: ${pluginPath}`);
   }
 

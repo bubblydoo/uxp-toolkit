@@ -170,4 +170,3 @@ export function uxpPool(options: UxpPoolOptions = {}): PoolRunnerInitializer {
 
 // Re-export types and utilities that users might need
 export type { PoolRunnerInitializer };
-export { getDefaultPluginPath as getFakePluginPath };

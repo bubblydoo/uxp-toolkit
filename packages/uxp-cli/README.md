@@ -26,6 +26,6 @@ uxp-cli open-devtools --plugin-path ./my-plugin
 
 ## Unexpected but useful details
 
-- If `--plugin-path` is omitted, the CLI uses a built-in fake plugin so you can still open DevTools immediately.
+- If `--plugin-path` is omitted, the CLI uses a built-in CDP connector plugin so you can still open DevTools immediately.
 - The CLI validates your plugin path and reads `manifest.json` to resolve the plugin ID automatically.
 - `dump-object` is a low-level debug command that writes runtime object internals to `dump.json` for CDP inspection workflows.

@@ -319,7 +319,7 @@ Based on this, we created our own CLI. You can run this without installing anyth
 
 This can replace UXP Developer Tools.
 
-Open devtools with a "fake" plugin (doesn't have any functionality)
+Open devtools with an "empty" plugin (doesn't have any functionality)
 
 ```bash
 pnpm --allow-build=@adobe-fixed-uxp/uxp-devtools-helper dlx @bubblydoo/uxp-cli open-devtools
