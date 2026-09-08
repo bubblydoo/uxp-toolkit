@@ -1,5 +1,13 @@
 # @bubblydoo/uxp-cli
 
+## 0.0.14
+
+### Patch Changes
+
+- 3d4b6b8: Rename fake plugin to cdp connector plugin
+- Updated dependencies [3d4b6b8]
+  - @bubblydoo/uxp-devtools-common@0.0.13
+
 ## 0.0.13
 
 ### Patch Changes

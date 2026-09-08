@@ -1,5 +1,14 @@
 # @bubblydoo/vitest-pool-uxp
 
+## 0.0.13
+
+### Patch Changes
+
+- 3d4b6b8: Rename fake plugin to cdp connector plugin
+- Updated dependencies [3d4b6b8]
+  - @bubblydoo/uxp-devtools-common@0.0.13
+  - @bubblydoo/vitest-pool-cdp@0.0.13
+
 ## 0.0.12
 
 ### Patch Changes
