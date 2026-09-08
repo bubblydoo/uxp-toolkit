@@ -104,7 +104,6 @@ export function uxp(manifest: UxpManifest, config?: UxpViteConfig): Plugin {
           exclude: [...existingExclude, ...PHOTOSHOP_NATIVE_MODULES],
         },
         build: {
-          outDir: 'dist',
           rollupOptions: {
             ...rollupOptions,
             external: mergeExternal(rollupOptions.external, nativeModuleRegexes),
