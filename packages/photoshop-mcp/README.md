@@ -96,8 +96,8 @@ Read the documentation for the toolkit packages.
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PORT` | `3020` | HTTP server port |
-| `PHOTOSHOP_MCP_PLUGIN_PATH` | (internal fake-plugin) | Path to UXP plugin directory |
-| `PHOTOSHOP_MCP_PLUGIN_ID` | `com.example.fakeplugin` | Plugin ID from manifest.json |
+| `PHOTOSHOP_MCP_PLUGIN_PATH` | (internal cdp-connector-plugin) | Path to UXP plugin directory |
+| `PHOTOSHOP_MCP_PLUGIN_ID` | `co.bubblydoo.cdp-connector-plugin` | Plugin ID from manifest.json |
 
 ## Endpoints
 

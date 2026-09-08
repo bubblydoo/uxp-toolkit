@@ -41,11 +41,11 @@ function assert(condition: boolean, message: string) {
 // ---------------------------------------------------------------------------
 
 async function main() {
-  // 1. Load the fake plugin into Photoshop and get the CDP WebSocket URL
+  // 1. Load the CDP connector plugin into Photoshop and get the CDP WebSocket URL
   const devtoolsCommonDir = path.dirname(
     fileURLToPath(import.meta.resolve('@bubblydoo/uxp-devtools-common/package.json')),
   );
-  const pluginPath = path.join(devtoolsCommonDir, 'fake-plugin');
+  const pluginPath = path.join(devtoolsCommonDir, 'cdp-connector-plugin');
 
   console.log('Setting up UXP devtools connection…');
   console.log(`Plugin path: ${pluginPath}`);
@@ -78,7 +78,7 @@ async function main() {
 
   await test('should read the plugin DOM', async () => {
     const text = await page.evaluate(() => document.body?.textContent?.trim() ?? '');
-    assert(text.includes('Fake plugin'), `body text does not contain "Fake plugin": "${text}"`);
+    assert(text.includes('CDP connector plugin'), `body text does not contain "CDP connector plugin": "${text}"`);
   });
 
   await test('should access the Photoshop API', async () => {
@@ -124,7 +124,7 @@ async function main() {
   await test('should query DOM elements in the plugin panel', async () => {
     const html = await page.evaluate(() => document.documentElement?.outerHTML ?? '');
     console.log(`    Plugin HTML length: ${html.length}`);
-    assert(html.includes('Fake plugin'), 'HTML should contain "Fake plugin"');
+    assert(html.includes('CDP connector plugin'), 'HTML should contain "CDP connector plugin"');
   });
 
   await test('async functions should work', async () => {

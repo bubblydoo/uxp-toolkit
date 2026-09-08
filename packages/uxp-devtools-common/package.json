@@ -38,8 +38,8 @@
     }
   },
   "files": [
-    "dist",
-    "fake-plugin"
+    "cdp-connector-plugin",
+    "dist"
   ],
   "scripts": {
     "build": "tsup",
