@@ -1,9 +1,11 @@
 import type { TaskPopulated, Test } from '@vitest/runner';
 import type * as vitestApi from 'vitest';
 import {
+  getState,
   JestAsymmetricMatchers,
   JestChaiExpect,
   JestExtend,
+  setState,
 } from '@vitest/expect';
 import * as vitestRunner from '@vitest/runner';
 import * as chai from 'chai';
@@ -44,6 +46,9 @@ chai.use(JestAsymmetricMatchers);
 
 function createExpect(test?: TaskPopulated | Test) {
   const expect = ((value: unknown, message?: string) => {
+    const { assertionCalls } = getState(expect);
+    setState({ assertionCalls: (assertionCalls ?? 0) + 1 }, expect);
+
     const assertion = chai.expect(value, message) as Chai.Assertion & { withTest?: (test: Test) => Chai.Assertion };
     const currentTest = test ?? vitestRunner.getCurrentTest();
     if (currentTest && assertion.withTest && 'type' in currentTest && currentTest.type === 'test') {
@@ -53,7 +58,84 @@ function createExpect(test?: TaskPopulated | Test) {
   }) as unknown as typeof vitestApi.expect;
 
   Object.assign(expect, chai.expect);
+
+  expect.getState = () => getState(expect);
+  expect.setState = state => setState(state, expect);
+
+  function assertions(expected: number) {
+    const errorGen = () =>
+      new Error(
+        `expected number of assertions to be ${expected}, but got ${expect.getState().assertionCalls}`,
+      );
+    expect.setState({
+      expectedAssertionsNumber: expected,
+      expectedAssertionsNumberErrorGen: errorGen,
+    });
+  }
+
+  function hasAssertions() {
+    const error = new Error('expected any number of assertion, but got none');
+    expect.setState({
+      isExpectingAssertions: true,
+      isExpectingAssertionsError: error,
+    });
+  }
+
+  chai.util.addMethod(expect, 'assertions', assertions);
+  chai.util.addMethod(expect, 'hasAssertions', hasAssertions);
+
+  setState(
+    {
+      assertionCalls: 0,
+      isExpectingAssertions: false,
+      isExpectingAssertionsError: null,
+      expectedAssertionsNumber: null,
+      expectedAssertionsNumberErrorGen: null,
+    },
+    expect,
+  );
+
   return expect;
+}
+
+/**
+ * Reset assertion state before each test try.
+ */
+function onBeforeTryTaskAssertions(expect: vitestApi.ExpectStatic) {
+  setState(
+    {
+      assertionCalls: 0,
+      isExpectingAssertions: false,
+      isExpectingAssertionsError: null,
+      expectedAssertionsNumber: null,
+      expectedAssertionsNumberErrorGen: null,
+    },
+    expect,
+  );
+}
+
+/**
+ * Check assertion expectations after each test try.
+ */
+function onAfterTryTaskAssertions(expect: vitestApi.ExpectStatic) {
+  const state = getState(expect);
+  if (!state)
+    return;
+
+  const {
+    assertionCalls,
+    expectedAssertionsNumber,
+    expectedAssertionsNumberErrorGen,
+    isExpectingAssertions,
+    isExpectingAssertionsError,
+  } = state;
+
+  if (expectedAssertionsNumber !== null && assertionCalls !== expectedAssertionsNumber) {
+    throw expectedAssertionsNumberErrorGen!();
+  }
+  if (isExpectingAssertions === true && assertionCalls === 0) {
+    throw isExpectingAssertionsError;
+  }
 }
 
 export {
@@ -61,13 +143,16 @@ export {
   configureSnapshotOptions,
   onAfterRunFiles,
   onAfterRunSuite,
+  onAfterTryTaskAssertions,
   onBeforeRunSuite,
   onBeforeTryTask,
+  onBeforeTryTaskAssertions,
 };
 
 export function createVitestApi() {
   const vi = createUnimplementedObject('vi');
   const expect = createExpect();
+
   return {
     afterAll: vitestRunner.afterAll,
     afterEach: vitestRunner.afterEach,
