@@ -25,4 +25,14 @@ describe('Chrome', () => {
     await new Promise(resolve => setTimeout(resolve, 2000));
     expect(true).toEqual(true);
   });
+
+  it('should support assertion counting', async () => {
+    expect.assertions(1);
+    expect(true).toEqual(true);
+  });
+
+  it('should support getting the global state for Jest compat', async () => {
+    const state = (globalThis as any)[Symbol.for('$$jest-matchers-object')];
+    expect(state).toBeDefined();
+  });
 });
