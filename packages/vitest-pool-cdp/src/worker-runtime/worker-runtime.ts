@@ -21,6 +21,7 @@ import type { BirpcReturn } from 'birpc';
 import type * as vitestApi from 'vitest';
 import type { PoolFunctions, SnapshotRuntimeConfig, WorkerFunctions } from '../rpc-types';
 import type { VitestUiState } from './ui';
+import { GLOBAL_EXPECT } from '@vitest/expect';
 import * as vitestRunner from '@vitest/runner';
 import { createBirpc } from 'birpc';
 import * as devalue from 'devalue';
@@ -29,6 +30,8 @@ import {
   configureSnapshotIO,
   configureSnapshotOptions,
   createVitestApi,
+  onAfterTryTaskAssertions,
+  onBeforeTryTaskAssertions,
   onAfterRunFiles as onSnapshotAfterRunFiles,
   onAfterRunSuite as onSnapshotAfterRunSuite,
   onBeforeRunSuite as onSnapshotBeforeRunSuite,
@@ -58,6 +61,13 @@ const ui = createUiBridge();
 // expose vitest api as global object, which will be used when doing
 // `import { expect } from 'vitest'` in test files
 globalThis.__vitest_api__ = createVitestApi();
+
+// Register the global expect for Jest compatibility
+Object.defineProperty(globalThis, GLOBAL_EXPECT, {
+  value: globalThis.__vitest_api__.expect,
+  writable: true,
+  configurable: true,
+});
 
 /**
  * Current config from the pool.
@@ -186,7 +196,12 @@ class CdpVitestRunner implements VitestRunner {
   }
 
   onBeforeTryTask(test: Test): void {
+    onBeforeTryTaskAssertions(globalThis.__vitest_api__.expect);
     onSnapshotBeforeTryTask(test);
+  }
+
+  onAfterTryTask(): void {
+    onAfterTryTaskAssertions(globalThis.__vitest_api__.expect);
   }
 
   onAfterRunFiles(): void {
