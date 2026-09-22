@@ -1,5 +1,11 @@
 # @bubblydoo/vitest-pool-cdp
 
+## 0.0.14
+
+### Patch Changes
+
+- 002a86e: Add assertion counting
+
 ## 0.0.13
 
 ### Patch Changes
