@@ -82,13 +82,14 @@ export interface BaseCdpPoolOptions {
   runBeforeTests?: (connection: CdpConnection) => Promise<void>;
 
   /**
-   * Whether to reuse the CDP connection between tests, which is useful in watch mode.
-   * It relies on explicit Vitest run/watch flags/commands (`--run`, `run`, `--watch`, `watch`)
-   * and falls back to `process.env.CI`.
+   * Whether to reuse the CDP connection between watch-mode reruns.
+   * Single-run mode (`watch: false`, including non-TTY and CI) always
+   * disconnects on stop so the Node process can exit.
    *
-   * It uses `signal-exit` to detect when the process is exiting and disconnect the connection.
+   * It uses `signal-exit` to disconnect if the process exits while the
+   * connection is still cached for watch mode.
    *
-   * @default detect from explicit run/watch args, else !!process.env.CI
+   * @default true
    */
   reuseConnection?: boolean;
 

@@ -82,12 +82,7 @@ export async function setupCdpConnection(
     cdp,
     executionContextOrSession,
     disconnect: async () => {
-      try {
-        await cdp.close();
-      }
-      catch {
-        // Ignore CDP close errors
-      }
+      // Unload the plugin and tear down Vulcan while the debug session is still valid.
       if (options.teardown) {
         try {
           await options.teardown();
@@ -95,6 +90,12 @@ export async function setupCdpConnection(
         catch (error) {
           console.error('Teardown error:', error);
         }
+      }
+      try {
+        await cdp.close();
+      }
+      catch {
+        // Ignore CDP close errors
       }
     },
   };
