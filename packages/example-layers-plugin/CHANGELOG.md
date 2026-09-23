@@ -1,5 +1,15 @@
 # @bubblydoo/example-layers-plugin
 
+## 0.0.25
+
+### Patch Changes
+
+- 16340cc: Add better example layers readme
+- Updated dependencies [82b670f]
+- Updated dependencies [16340cc]
+  - @bubblydoo/uxp-toolkit@0.0.22
+  - @bubblydoo/uxp-toolkit-react@0.0.23
+
 ## 0.0.24
 
 ### Patch Changes

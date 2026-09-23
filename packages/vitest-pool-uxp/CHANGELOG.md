@@ -1,5 +1,12 @@
 # @bubblydoo/vitest-pool-uxp
 
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [23bf01f]
+  - @bubblydoo/vitest-pool-cdp@0.0.15
+
 ## 0.0.14
 
 ### Patch Changes

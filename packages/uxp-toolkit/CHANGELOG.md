@@ -1,5 +1,11 @@
 # @bubblydoo/uxp-toolkit
 
+## 0.0.22
+
+### Patch Changes
+
+- 82b670f: Fix adjustment layers schemas
+
 ## 0.0.21
 
 ### Patch Changes

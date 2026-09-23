@@ -1,5 +1,11 @@
 # @bubblydoo/vitest-pool-cdp
 
+## 0.0.15
+
+### Patch Changes
+
+- 23bf01f: Add better watch mode detection
+
 ## 0.0.14
 
 ### Patch Changes
