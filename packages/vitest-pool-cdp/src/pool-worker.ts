@@ -78,30 +78,6 @@ interface ConnectionListenerState {
 
 const connectionListenerStates = new WeakMap<CdpConnection, ConnectionListenerState>();
 
-function detectSingleRunMode(): boolean {
-  const argv = process.argv.slice(2);
-  const isCi = !!process.env.CI;
-
-  const hasWatchFlag = argv.includes('--watch') || argv.includes('--watchAll') || argv.includes('-w');
-  if (hasWatchFlag) {
-    return false;
-  }
-
-  if (argv.includes('--run')) {
-    return true;
-  }
-
-  const command = argv.find(arg => !arg.startsWith('-'));
-  if (command === 'watch') {
-    return false;
-  }
-  if (command === 'run') {
-    return true;
-  }
-
-  return isCi;
-}
-
 /**
  * Custom Vitest pool worker that communicates over CDP using birpc.
  * Uses @vitest/runner in the CDP context for full Vitest compatibility.
@@ -151,7 +127,7 @@ export class CdpPoolWorker implements PoolWorker {
   private runnerConfig: RunnerRuntimeConfig & SnapshotRuntimeConfig = {};
 
   private reuseConnection: boolean;
-  private isSingleRunMode: boolean;
+  private isWatchMode: boolean;
   private cleanupHotkeys: (() => void) | null = null;
 
   constructor(poolOptions: PoolOptions, rawCdpOptions: RawCdpPoolOptions) {
@@ -163,9 +139,10 @@ export class CdpPoolWorker implements PoolWorker {
       : () => {};
     this.reuseConnection = rawCdpOptions.reuseConnection ?? true;
 
-    // We need to reuse a single connection in watch mode, but disconnect in single-run mode
-    // so Vitest does not report a hanging process.
-    this.isSingleRunMode = detectSingleRunMode();
+    // Reuse the CDP connection across watch reruns, but disconnect in single-run
+    // mode so Node can exit (Vitest reports a hanging process otherwise).
+    // Use Vitest's resolved config: watch defaults to `!isCI && stdin.isTTY`,
+    this.isWatchMode = poolOptions.project.vitest.config.watch === true;
 
     // Error sourcemapping is on by default
     const enableErrorSourcemapping = rawCdpOptions.enableErrorSourcemapping ?? true;
@@ -575,12 +552,13 @@ export class CdpPoolWorker implements PoolWorker {
     if (this.connection) {
       this.detachConnectionListeners();
 
-      if (this.isSingleRunMode || !this.reuseConnection) {
+      if (!this.isWatchMode || !this.reuseConnection) {
         this.log('Disconnecting CDP connection...');
         await this.connection.disconnect();
         this.connection = null;
         cachedConnectionState = null;
         this.cleanupHotkeys?.();
+        this.cleanupHotkeys = null;
       }
       else {
         this.log('Keeping existing CDP connection for reuse');
