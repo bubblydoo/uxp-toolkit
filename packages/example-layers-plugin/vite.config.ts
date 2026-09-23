@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     react(),
     tsconfigPaths(),
-    uxp(manifest) as any,
+    uxp(manifest),
   ],
   build: {
     sourcemap: true,

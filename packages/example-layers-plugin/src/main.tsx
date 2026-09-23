@@ -132,7 +132,7 @@ function LayersPanel({ document }: { document: Document }) {
       <div>
         Error:
         <div>{treeQuery.error.message}</div>
-        <ButtonDiv onClick={() => treeQuery.refetch()}>
+        <ButtonDiv className="underline" onClick={() => treeQuery.refetch()}>
           Retry
         </ButtonDiv>
       </div>
