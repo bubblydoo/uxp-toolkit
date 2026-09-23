@@ -295,6 +295,8 @@ function App() {
 }
 ```
 
+For a good example of how to use this package, see the [Example Layers Plugin](./packages/example-layers-plugin).
+
 This package provides the following hooks:
 
 - `useActiveDocument` – Sync external store for the current active document

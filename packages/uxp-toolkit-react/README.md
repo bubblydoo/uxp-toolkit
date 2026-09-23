@@ -4,6 +4,8 @@
 
 React hooks for Photoshop UXP plugins. Generic, non–app-specific utilities built on `@bubblydoo/uxp-toolkit`.
 
+For a good example of how to use this package, see the [Example Layers Plugin](../example-layers-plugin).
+
 ## Peer dependencies
 
 - `react` (^18 or ^19)
