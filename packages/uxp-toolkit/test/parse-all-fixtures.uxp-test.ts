@@ -4,6 +4,8 @@ import { getDocumentLayerDescriptors } from '../src/ut-tree/getDocumentLayerDesc
 import { openFixture } from './open-fixture';
 
 const fixtures = [
+  'all-adjustment-layers-empty.psd',
+  'all-adjustment-layers.psd',
   'all-color-schemas-cmyk.psd',
   'all-color-schemas-gray.psd',
   'all-color-schemas-lab.psd',

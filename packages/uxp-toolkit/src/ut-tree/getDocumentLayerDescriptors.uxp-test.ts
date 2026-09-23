@@ -64,6 +64,40 @@ describe('getDocumentLayerDescriptors', () => {
     );
   });
 
+  it('should parse empty default adjustment layers', async (t) => {
+    const doc = await openFixture(t, 'all-adjustment-layers-empty.psd');
+    const descriptors = await getDocumentLayerDescriptors(doc.id);
+    const layers = photoshopLayerDescriptorsToUTLayers(descriptors);
+    const kinds = layers.map(l => `${l.name}:${l.kind}:${l.adjustment?.type}`);
+    expect(kinds.join(',')).toEqual(
+      [
+        'Pattern Fill 1:pattern:patternLayer',
+        'Gradient Fill 1:gradientFill:gradientLayer',
+        'Color Fill 1:solidColor:solidColorLayer',
+        'Gradient Map 1:adjustmentLayer:gradientMapClass',
+        'Threshold 1:adjustmentLayer:thresholdClassEvent',
+        'Posterize 1:adjustmentLayer:posterization',
+        'Invert 1:adjustmentLayer:invert',
+        'Selective Color 1:adjustmentLayer:selectiveColor',
+        'Color Lookup 1:adjustmentLayer:colorLookup',
+        'Channel Mixer 1:adjustmentLayer:channelMixer',
+        'Photo Filter 2:adjustmentLayer:photoFilter',
+        'Photo Filter 1:adjustmentLayer:photoFilter',
+        'Black & White 1:adjustmentLayer:blackAndWhite',
+        'Color Balance 1:adjustmentLayer:colorBalance',
+        'Hue/Saturation 1:adjustmentLayer:hueSaturation',
+        'Exposure 1:adjustmentLayer:exposure',
+        'Curves 1:adjustmentLayer:curves',
+        'Levels 1:adjustmentLayer:levels',
+        'Brightness/Contrast 1:adjustmentLayer:brightnessEvent',
+        'Grain 1:adjustmentLayer:grainAdjustment',
+        'Clarity and dehaze 1:adjustmentLayer:clarity',
+        'Color and vibrance 1:adjustmentLayer:vibrance',
+        'Background:pixel:undefined',
+      ].join(','),
+    );
+  });
+
   it('should correctly identify linked layers', async (t) => {
     const doc = await openFixture(t, 'linked-layers.psd');
     const descriptors = await getDocumentLayerDescriptors(doc.id);

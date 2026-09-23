@@ -113,18 +113,18 @@ export const adjustmentSchema = z.discriminatedUnion('_obj', [
   // vibrance (Color and vibrance)
   z.object({
     _obj: z.literal('vibrance'),
-    whiteBalancePopupIndex: z.number(),
-    temperature: z.number(),
-    tint: z.number(),
-    useLegacy: z.boolean(),
-    vibrance: z.number(),
-    saturation: z.number(),
+    whiteBalancePopupIndex: z.number().optional(),
+    temperature: z.number().optional(),
+    tint: z.number().optional(),
+    useLegacy: z.boolean().optional(),
+    vibrance: z.number().optional(),
+    saturation: z.number().optional(),
   }),
   // clarity (Clarity and dehaze)
   z.object({
     _obj: z.literal('clarity'),
-    clarity: z.number(),
-    dehaze: z.number(),
+    clarity: z.number().optional(),
+    dehaze: z.number().optional(),
   }),
   // grainAdjustment (Grain)
   z.object({
@@ -174,7 +174,7 @@ export const adjustmentSchema = z.discriminatedUnion('_obj', [
         horizontal: z.number(),
         vertical: z.number(),
       })),
-    })),
+    })).optional(),
   }),
   // exposure (Exposure)
   z.object({
@@ -264,7 +264,7 @@ export const adjustmentSchema = z.discriminatedUnion('_obj', [
     method: z.object({
       _enum: z.literal('correctionMethod'),
       _value: z.string(),
-    }),
+    }).optional(),
     colorCorrection: z.array(z.object({
       _obj: z.literal('colorCorrection'),
       colors: z.object({
@@ -275,7 +275,7 @@ export const adjustmentSchema = z.discriminatedUnion('_obj', [
       magenta: percentUnitSchema,
       yellowColor: percentUnitSchema,
       black: percentUnitSchema,
-    })),
+    })).optional(),
   }),
   // invert (Invert)
   z.object({

@@ -31,6 +31,37 @@ function parseSolidColorLayer(color: Record<string, unknown>) {
   });
 }
 
+describe('multiGetDocument empty adjustment parsing', () => {
+  function parseAdjustment(adjustment: Record<string, unknown>) {
+    return layerDescriptorSchema.parse({
+      ...baseLayerDescriptor,
+      layerKind: 2,
+      adjustment: [adjustment],
+    });
+  }
+
+  it('parses empty Color and Vibrance, Clarity, Curves, and Selective Color adjustments', () => {
+    const variants = [
+      { _obj: 'vibrance', useLegacy: false },
+      { _obj: 'clarity' },
+      {
+        _obj: 'curves',
+        transferFunction: 0,
+        presetKind: { _enum: 'presetKindType', _value: 'presetKindDefault' },
+      },
+      {
+        _obj: 'selectiveColor',
+        presetKind: { _enum: 'presetKindType', _value: 'presetKindDefault' },
+      },
+    ];
+
+    for (const variant of variants) {
+      const parsed = parseAdjustment(variant);
+      expect(parsed.adjustment?.[0]?._obj).toBe(variant._obj);
+    }
+  });
+});
+
 describe('multiGetDocument color parsing', () => {
   it('parses all supported solid color schemas', () => {
     const variants = [
