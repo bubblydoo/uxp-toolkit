@@ -1,5 +1,13 @@
 # @bubblydoo/uxp-toolkit-react
 
+## 0.0.23
+
+### Patch Changes
+
+- 16340cc: Add better example layers readme
+- Updated dependencies [82b670f]
+  - @bubblydoo/uxp-toolkit@0.0.22
+
 ## 0.0.22
 
 ### Patch Changes
