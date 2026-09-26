@@ -6,6 +6,13 @@ MCP (Model Context Protocol) server for Photoshop automation via Chrome DevTools
 
 This allows AI assistants to execute JavaScript code directly in Adobe Photoshop's UXP environment.
 
+Inspired by [Cloudflare's Code Mode](https://blog.cloudflare.com/code-mode/).
+
+## Quick start
+```bash
+pnpm --allow-build=@adobe-fixed-uxp/uxp-devtools-helper dlx @bubblydoo/photoshop-mcp@latest
+```
+
 ## How it works
 
 1. The MCP server connects to Photoshop via the Chrome DevTools Protocol (CDP)
